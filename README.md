@@ -9,11 +9,10 @@ El objetivo principal es integrar **técnicas de navegación SLAM en ROS con vis
 ## Integrantes del equipo
 
 - Daniel Franco – CEO & Requirements Manager
-- Victoria Arteaga – Project Manager
 - Luis Gómez – CTO & Product Manager
 - Marco Muñoz – Design & Modeling Manager
 - Catalina Morán – Construction & Test Manager
-- Juan Martínez – Documentation & Tool Manager
+- Juan Martínez – Project, Documentation & Tool Manager
 - Nour Maimouni – Communication & Liaisons Manager
 - Mario Guerra – Simulation & Control Manager
 - Lucas Goñi – Assurance, Quality, Impact & Sustainability Manager
