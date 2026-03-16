@@ -13,10 +13,7 @@ find_package(rosidl_default_generators REQUIRED)
 # find_package(<dependency> REQUIRED)
 
 rosidl_generate_interfaces(${PROJECT_NAME}
-  #"msg/Num.msg"
-  #"msg/Sphere.msg"
-  #"srv/AddThreeInts.srv"
-  #DEPENDENCIES geometry_msgs
+  "srv/SavePose.srv"
 )
 
 
