@@ -24,6 +24,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
+            'pose_recorder = ticare_navigation.pose_recorder:main',
         ],
     },
 )
