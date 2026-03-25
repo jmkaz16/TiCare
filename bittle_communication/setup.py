@@ -1,6 +1,6 @@
 from setuptools import find_packages, setup
 
-package_name = 'action_node'
+package_name = 'bittle_communication'
 
 setup(
     name=package_name,
@@ -15,7 +15,7 @@ setup(
     zip_safe=True,
     maintainer='catalina',
     maintainer_email='ketamoran@gmail.com',
-    description='Implementación del nodo de acciones de Bittle',
+    description='Implementación del nodo de comunicación con Bittle',
     license='Apache-2.0',
     extras_require={
         'test': [

@@ -1,6 +1,6 @@
 from setuptools import find_packages, setup
 
-package_name = 'voice_node'
+package_name = 'bittle_actions'
 
 setup(
     name=package_name,
@@ -15,7 +15,7 @@ setup(
     zip_safe=True,
     maintainer='catalina',
     maintainer_email='ketamoran@gmail.com',
-    description='Implementación del nodo de comunicación con Bittle',
+    description='Implementación del nodo de acciones de Bittle',
     license='Apache-2.0',
     extras_require={
         'test': [
@@ -24,6 +24,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
+            'command = bittle_actions.action_commands:main',
         ],
     },
 )
