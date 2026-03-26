@@ -4,7 +4,7 @@ import numpy as np
 import keyboard
 from rapidfuzz import fuzz
 
-TARGET_WAKE = "hola tiago"
+TARGET_WAKE = "Paicaché"  # la palabra clave que quieres detectar
 
 def is_wake_word(text):
     text = text.lower().strip()
