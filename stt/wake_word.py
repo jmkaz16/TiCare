@@ -4,26 +4,51 @@ import numpy as np
 import keyboard
 from rapidfuzz import fuzz
 
-TARGET_WAKE = "Perro"  # la palabra clave que quieres detectar
+TARGET_WAKE = "perro"
+
+
+def clean_wake_word(text):
+    """
+    Si la frase contiene la wake-word, la elimina y devuelve el resto.
+    Ejemplo:
+    "perro, levanta el culo" → "levanta el culo"
+    """
+    text = text.lower().strip()
+
+    if TARGET_WAKE in text:
+        # Quitar la wake-word y limpiar comas/espacios
+        cleaned = text.replace(TARGET_WAKE, "").strip(" ,.")
+        return cleaned if cleaned else None  # None si no hay orden después
+
+    return None
+
 
 def is_wake_word(text):
     text = text.lower().strip()
+
+    # 1) Si contiene la wake-word → activamos
+    if TARGET_WAKE in text:
+        print("Wake-word encontrada dentro de la frase.")
+        return True
+
+    # 2) Fuzzy matching como respaldo
     score = fuzz.ratio(text, TARGET_WAKE)
     print(f"Similitud con wake-word: {score}")
 
-    return score > 70  # puedes ajustar este umbral
+    return score > 70
+
 
 def listen_for_wake_word(duration=3, fs=16000):
-    print("Escuchando la palabra clave... (pulsa 's' para salir)")
+    print("Escuchando la palabra clave ... (pulsa 's' para salir)")
 
-    model = whisper.load_model("small")  # más preciso que tiny
+    model = whisper.load_model("small")
 
     while True:
         if keyboard.is_pressed("s"):
-            print("Detenido por el usuario. Saliendo...")
-            return False
+            print("Detenido por el usuario. Saliendo ...")
+            return None  # no activado
 
-        print("Grabando fragmento...")
+        print("Grabando fragmento ...")
         audio = sd.rec(int(duration * fs), samplerate=fs, channels=1)
         sd.wait()
 
@@ -31,9 +56,16 @@ def listen_for_wake_word(duration=3, fs=16000):
 
         result = model.transcribe(audio, language="es")
         text = result["text"].lower().strip()
-
         print(f"Detectado: {text}")
 
         if is_wake_word(text):
+            # Ver si hay orden dentro de la misma frase
+            remaining = clean_wake_word(text)
+
+            if remaining:
+                print("Wake-word + orden detectada en la misma frase.")
+                print(f"Orden detectada: {remaining}")
+                return remaining  # devolvemos la orden directamente
+
             print("¡Palabra clave detectada!")
-            return True
+            return ""  # indica que debe grabar la orden completa
