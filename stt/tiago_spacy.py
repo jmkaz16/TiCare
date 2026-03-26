@@ -1,59 +1,103 @@
 import spacy
+from rapidfuzz import fuzz, process
+from input.command_map import COMMAND_MAP
 
 nlp = spacy.load("es_core_news_sm")
 
-# Limpia el texto de puntuación y espacios innecesarios
-def clean_text(text):
-    return text.strip().replace(".", "").replace("!", "").replace("?", "")
+# ============================
+# NORMALIZACIÓN
+# ============================
 
-# Parsea el comando de texto y extrae la acción, objeto y topic
+def normalize(text):
+    return text.lower().strip()
+
+
+# ============================
+# Fuzzy matching
+# ============================
+
+def fuzzy_match(text, threshold=75):
+    """
+    Devuelve el comando si encuentra un sinónimo con suficiente similitud.
+    """
+    choices = list(COMMAND_MAP.keys())
+
+    match, score, _ = process.extractOne(
+        text,
+        choices,
+        scorer=fuzz.ratio
+    )
+
+    if score >= threshold:
+        return COMMAND_MAP[match]
+
+    return None
+
+
+# ============================
+# PARSEADOR PRINCIPAL
+# ============================
+
 def parse_command(text):
-    text = clean_text(text) # Limpiar el texto antes de procesar
-    doc = nlp(text) # Procesar el texto con spaCy para obtener tokens y sus propiedades
+    text_norm = normalize(text)
 
-    tokens = [t.text.lower() for t in doc] # Convertir los tokens a minúsculas para facilitar la comparación
+    # 1) Coincidencia exacta
+    if text_norm in COMMAND_MAP:
+        return {
+            "action": COMMAND_MAP[text_norm],
+            "object": None,
+            "topic": text_norm
+        }
 
-    # Acción = primer token
-    action = tokens[0] if len(tokens) > 0 else None
+    # 2) Fuzzy matching
+    fuzzy_result = fuzzy_match(text_norm)
+    if fuzzy_result:
+        return {
+            "action": fuzzy_result,
+            "object": None,
+            "topic": text_norm
+        }
 
-    # Objeto = segundo token en adelante (si existe)
+    # 3) Fallback con spaCy si no se reconoce la orden
+    doc = nlp(text_norm)
+
+    action = None
     obj = None
-    if len(tokens) > 1:
-        # buscamos el primer token que no sea determinante
-        for t in doc[1:]:
-            if t.pos_ not in ["DET", "ADP", "PRON"]:
-                obj = t.lemma_.lower()
-                break
 
-    topic = text.lower() # El topic se puede considerar como el texto completo en minúsculas
+    # Primer verbo
+    for token in doc:
+        if token.pos_ == "VERB":
+            action = token.lemma_
+            break
 
-    # Devolver un diccionario con la acción, objeto y topic extraído
+    # Primer sustantivo, adverbio o adposición
+    for token in doc:
+        if token.pos_ in ["NOUN", "ADV", "ADP"]:
+            obj = token.text
+            break
+
     return {
         "action": action,
         "object": obj,
-        "topic": topic
-    } 
+        "topic": text_norm
+    }
 
-# Función principal para procesar un archivo de texto y escribir el resultado en otro archivo
+
+# ============================
+# PROCESAR ARCHIVO
+# ============================
+
 def process_file(input_path, output_path):
     with open(input_path, "r", encoding="utf-8") as f:
         text = f.read().strip()
 
     result = parse_command(text)
 
-    action = result["action"]
-    obj = result["object"]
-    topic = result["topic"]
-
-    # Crear una salida formateada con la información extraída
     output = (
-        f"Orden detectada:\n"
-        f"Acción: {action}\n"
-        f"Objeto: {obj}\n"
-        f"Topic: {topic}\n"
+        f"Acción: {result['action']}\n"
+        f"Objeto: {result['object']}\n"
+        f"Topic: {result['topic']}\n"
     )
 
-    # Escribir la salida en el archivo de salida
     with open(output_path, "w", encoding="utf-8") as f:
         f.write(output)
-
