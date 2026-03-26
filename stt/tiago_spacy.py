@@ -2,16 +2,11 @@ import spacy
 from rapidfuzz import fuzz, process
 from input.command_map import COMMAND_MAP
 
-
-# ============================================================
-# 1. CARGAR MODELO spaCy
-# ============================================================
-
 nlp = spacy.load("es_core_news_sm")
 
 
 # ============================================================
-# 2. NORMALIZACIÓN DE TEXTO
+# 1. NORMALIZACIÓN
 # ============================================================
 
 def normalize(text):
@@ -19,79 +14,153 @@ def normalize(text):
 
 
 # ============================================================
-# 3. FUZZY MATCHING POR FRASE COMPLETA
+# 2. MAPEO DE ACCIONES (usa diccionario + fuzzy)
 # ============================================================
 
-def fuzzy_match(text, threshold=75):
+def map_action_from_text(text):
     """
-    Intenta encontrar una coincidencia aproximada entre la frase completa
-    y los sinónimos del diccionario.
+    Intenta mapear la frase completa a una acción conocida.
     """
     choices = list(COMMAND_MAP.keys())
     match, score, _ = process.extractOne(text, choices, scorer=fuzz.ratio)
 
-    if score >= threshold:
+    if score >= 75:
+        return COMMAND_MAP[match]
+
+    return None
+
+
+def map_action_from_word(word):
+    """
+    Intenta mapear una sola palabra (o su lema) a una acción conocida.
+    """
+    lemma = nlp(word)[0].lemma_
+    choices = list(COMMAND_MAP.keys())
+
+    # Coincidencia directa
+    match, score, _ = process.extractOne(word, choices, scorer=fuzz.ratio)
+    if score >= 70:
+        return COMMAND_MAP[match]
+
+    # Coincidencia por lema
+    match, score, _ = process.extractOne(lemma, choices, scorer=fuzz.ratio)
+    if score >= 70:
         return COMMAND_MAP[match]
 
     return None
 
 
 # ============================================================
-# 4. FUZZY MATCHING POR PALABRAS CLAVE (MEJORA IMPORTANTE)
+# 3. ANALIZADOR SINTÁCTICO ROBUSTO
 # ============================================================
 
-def fuzzy_match_words(text, threshold=70):
+def parse_syntax(text):
     """
-    Permite reconocer órdenes incompletas como:
-    - "choca"
-    - "cinco"
-    - "choca la mano"
-    - "choca eso"
-    - "choca conmigo"
-
-    Analiza:
-    - palabras individuales
-    - bigramas
-    - trigramas
+    Extrae:
+    - verbo principal
+    - determinante
+    - objeto (nombre)
+    - dirección (izquierda, derecha, adelante, atrás…)
     """
-    words = text.split()
-    choices = list(COMMAND_MAP.keys())
+    doc = nlp(text)
 
-    # ---- 4.1 Palabras individuales ----
-    for w in words:
-        match, score, _ = process.extractOne(w, choices, scorer=fuzz.ratio)
-        if score >= threshold:
-            return COMMAND_MAP[match]
+    verb = None
+    det = None
+    noun = None
+    direction = None
 
-    # ---- 4.2 Bigramas ----
-    for i in range(len(words) - 1):
-        bg = f"{words[i]} {words[i+1]}"
-        match, score, _ = process.extractOne(bg, choices, scorer=fuzz.ratio)
-        if score >= threshold:
-            return COMMAND_MAP[match]
+    # Lista de direcciones reconocidas
+    direction_words = {
+        "izquierda": "left",
+        "derecha": "right",
+        "arriba": "up",
+        "abajo": "down",
+        "delante": "forward",
+        "adelante": "forward",
+        "atrás": "back",
+        "atras": "back",
+        "hacia": None  # se usa en combinación
+    }
 
-    # ---- 4.3 Trigramas ----
-    for i in range(len(words) - 2):
-        tg = f"{words[i]} {words[i+1]} {words[i+2]}"
-        match, score, _ = process.extractOne(tg, choices, scorer=fuzz.ratio)
-        if score >= threshold:
-            return COMMAND_MAP[match]
+    # Buscar verbo principal
+    for token in doc:
+        if token.pos_ == "VERB":
+            verb = token.lemma_
+            break
 
-    return None
+    # Buscar determinante + nombre
+    for token in doc:
+        if token.pos_ == "DET":
+            det = token.text
+
+        if token.pos_ == "NOUN":
+            noun = token.text
+
+            # Si el nombre es una dirección
+            if noun in direction_words:
+                direction = direction_words[noun]
+
+            break
+
+    # Buscar direcciones como adverbios o adposiciones
+    for token in doc:
+        if token.text in direction_words:
+            # Caso simple: "izquierda", "derecha"
+            if direction_words[token.text]:
+                direction = direction_words[token.text]
+
+        # Caso compuesto: "hacia atrás"
+        if token.text == "hacia":
+            next_token = token.nbor(1)
+            if next_token.text in direction_words:
+                direction = direction_words[next_token.text]
+
+    # Si no hay verbo pero sí nombre → verbo implícito
+    if verb is None and noun:
+        if noun in ["pata", "mano"]:
+            verb = "dar"
+        if noun in ["cinco"]:
+            verb = "chocar"
+
+    return verb, det, noun, direction
 
 
 # ============================================================
-# 5. PARSEADOR PRINCIPAL
+# 4. PARSEADOR PRINCIPAL
 # ============================================================
 
 def parse_command(text):
-    """
-    Devuelve un diccionario con:
-    - Acción
-    - Objeto
-    - Topic original
-    """
-
     text_norm = normalize(text)
 
-    # ----
+    # ---- 1. Intento directo por frase completa ----
+    action = map_action_from_text(text_norm)
+    if action:
+        return {
+            "action": action,
+            "object": None,
+            "direction": None,
+            "topic": text_norm
+        }
+
+    # ---- 2. Análisis sintáctico ----
+    verb, det, noun, direction = parse_syntax(text_norm)
+
+    # ---- 2.1 Mapear verbo a acción ----
+    if verb:
+        action = map_action_from_word(verb)
+
+    # ---- 2.2 Si no hay acción pero sí nombre → intentar mapear nombre ----
+    if noun and not action:
+        action = map_action_from_word(noun)
+
+    # ---- 2.3 Si no hay acción pero sí dirección → movimiento ----
+    if direction and not action:
+        action = direction
+
+    # ---- 3. Resultado final ----
+    return {
+        "action": action,
+        "object": noun,
+        "direction": direction,
+        "topic": text_norm
+    }
