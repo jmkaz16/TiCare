@@ -1,21 +1,27 @@
 
 # 1) Create a virtual environment (optional but recommended)
-# python -m venv venv
+    # python -m venv .venv
 # 2) Activate the virtual environment
-# venv\Scripts\activate
+    # .venv\Scripts\activate
 
 # 3) Install the required programs and libraries
-# pip install openai-whisper
-# pip install spacy
-# python -m spacy download es_core_news_sm
+    # Librerías principales
+    openai-whisper # pip install -U openai-whisper
+    spacy # pip install -U spacy
+    es_core_news_sm @ https://github.com/explosion/spacy-models/releases/download/es_core_news_sm-3.7.0/es_core_news_sm-3.7.0-py3-none-any.whl
+        # python -m spacy download es_core_news_sm-3.7.0-py3-none-any.whl
+    # Procesamiento de audio
+    sounddevice #pip install -U sounddevice
+    numba==0.59.1 # pip install -U numba==0.59.1
+    scipy==1.11.4 # pip install scipy==1.11.4
+    numpy==1.26.4 # pip install numpy==1.26.4
+    
+    # Utilidades varias
+    rapidfuzz --no-deps # pip install -U rapidfuzz --no-deps
+    keyboard # pip install -U keyboard
 
-# 4) Install the required libraries for audio processing
-# pip install sounddevice
-# pip install scipy==1.10.1
-# pip install numpy==1.23.5
-# pip install numba
-# pip install rapidfuzz --no-deps
-# pip install keyboard
 
-# 5) Check if the required libraries are installed correctly
+    # pip install -r requirements.txt 
+
+# 4) Check if the required libraries are installed correctly
 # python -c "import whisper, spacy, sounddevice, numpy, rapidfuzz, keyboard; print('TODO OK')"

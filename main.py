@@ -7,7 +7,7 @@ from stt.wake_word import listen_for_wake_word
 from stt.tiago_spacy import process_file  # <-- IMPORTANTE
 
 def main():
-    print("Sistema listo. Di: 'Hola, Tiago' para comenzar.")
+    print("Sistema listo. Di: 'Perro' para comenzar.")
 
     # Esperar palabra clave
     listen_for_wake_word()
