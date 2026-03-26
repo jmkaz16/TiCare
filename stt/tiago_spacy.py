@@ -2,31 +2,33 @@ import spacy
 from rapidfuzz import fuzz, process
 from input.command_map import COMMAND_MAP
 
+
+# ============================================================
+# 1. CARGAR MODELO spaCy
+# ============================================================
+
 nlp = spacy.load("es_core_news_sm")
 
-# ============================
-# NORMALIZACIÓN
-# ============================
+
+# ============================================================
+# 2. NORMALIZACIÓN DE TEXTO
+# ============================================================
 
 def normalize(text):
     return text.lower().strip()
 
 
-# ============================
-# Fuzzy matching
-# ============================
+# ============================================================
+# 3. FUZZY MATCHING POR FRASE COMPLETA
+# ============================================================
 
 def fuzzy_match(text, threshold=75):
     """
-    Devuelve el comando si encuentra un sinónimo con suficiente similitud.
+    Intenta encontrar una coincidencia aproximada entre la frase completa
+    y los sinónimos del diccionario.
     """
     choices = list(COMMAND_MAP.keys())
-
-    match, score, _ = process.extractOne(
-        text,
-        choices,
-        scorer=fuzz.ratio
-    )
+    match, score, _ = process.extractOne(text, choices, scorer=fuzz.ratio)
 
     if score >= threshold:
         return COMMAND_MAP[match]
@@ -34,70 +36,62 @@ def fuzzy_match(text, threshold=75):
     return None
 
 
-# ============================
-# PARSEADOR PRINCIPAL
-# ============================
+# ============================================================
+# 4. FUZZY MATCHING POR PALABRAS CLAVE (MEJORA IMPORTANTE)
+# ============================================================
+
+def fuzzy_match_words(text, threshold=70):
+    """
+    Permite reconocer órdenes incompletas como:
+    - "choca"
+    - "cinco"
+    - "choca la mano"
+    - "choca eso"
+    - "choca conmigo"
+
+    Analiza:
+    - palabras individuales
+    - bigramas
+    - trigramas
+    """
+    words = text.split()
+    choices = list(COMMAND_MAP.keys())
+
+    # ---- 4.1 Palabras individuales ----
+    for w in words:
+        match, score, _ = process.extractOne(w, choices, scorer=fuzz.ratio)
+        if score >= threshold:
+            return COMMAND_MAP[match]
+
+    # ---- 4.2 Bigramas ----
+    for i in range(len(words) - 1):
+        bg = f"{words[i]} {words[i+1]}"
+        match, score, _ = process.extractOne(bg, choices, scorer=fuzz.ratio)
+        if score >= threshold:
+            return COMMAND_MAP[match]
+
+    # ---- 4.3 Trigramas ----
+    for i in range(len(words) - 2):
+        tg = f"{words[i]} {words[i+1]} {words[i+2]}"
+        match, score, _ = process.extractOne(tg, choices, scorer=fuzz.ratio)
+        if score >= threshold:
+            return COMMAND_MAP[match]
+
+    return None
+
+
+# ============================================================
+# 5. PARSEADOR PRINCIPAL
+# ============================================================
 
 def parse_command(text):
+    """
+    Devuelve un diccionario con:
+    - Acción
+    - Objeto
+    - Topic original
+    """
+
     text_norm = normalize(text)
 
-    # 1) Coincidencia exacta
-    if text_norm in COMMAND_MAP:
-        return {
-            "action": COMMAND_MAP[text_norm],
-            "object": None,
-            "topic": text_norm
-        }
-
-    # 2) Fuzzy matching
-    fuzzy_result = fuzzy_match(text_norm)
-    if fuzzy_result:
-        return {
-            "action": fuzzy_result,
-            "object": None,
-            "topic": text_norm
-        }
-
-    # 3) Fallback con spaCy si no se reconoce la orden
-    doc = nlp(text_norm)
-
-    action = None
-    obj = None
-
-    # Primer verbo
-    for token in doc:
-        if token.pos_ == "VERB":
-            action = token.lemma_
-            break
-
-    # Primer sustantivo, adverbio o adposición
-    for token in doc:
-        if token.pos_ in ["NOUN", "ADV", "ADP"]:
-            obj = token.text
-            break
-
-    return {
-        "action": action,
-        "object": obj,
-        "topic": text_norm
-    }
-
-
-# ============================
-# PROCESAR ARCHIVO
-# ============================
-
-def process_file(input_path, output_path):
-    with open(input_path, "r", encoding="utf-8") as f:
-        text = f.read().strip()
-
-    result = parse_command(text)
-
-    output = (
-        f"Acción: {result['action']}\n"
-        f"Objeto: {result['object']}\n"
-        f"Topic: {result['topic']}\n"
-    )
-
-    with open(output_path, "w", encoding="utf-8") as f:
-        f.write(output)
+    # ----
