@@ -1,6 +1,4 @@
 import os
-from datetime import datetime
-
 from stt.record_audio import record_audio
 from stt.whisper_stt import transcribe_audio
 from stt.wake_word import listen_for_wake_word
@@ -9,6 +7,9 @@ from stt.tiago_spacy import parse_command
 
 def main():
     print("Sistema listo. Di: 'Perro' para comenzar.")
+
+    # Crear carpeta state si no existe
+    os.makedirs("state", exist_ok=True)
 
     # ============================
     # 1. Detectar wake-word
@@ -27,57 +28,59 @@ def main():
         print("\nActivado. Grabando mensaje completo ... ")
         audio_file = record_audio(duration=5)
 
+        # Guardar audio siempre como el mismo archivo
+        audio_path = "state/audio.wav"
+        os.replace(audio_file, audio_path)
+
         # ============================
         # 3. Transcribir audio
         # ============================
-        text = transcribe_audio(audio_file)
-
-    # Crear timestamp
-    fecha = datetime.now().strftime("%Y%m%d_%H%M%S")
+        text = transcribe_audio(audio_path)
 
     # ============================
-    # 4. Guardar transcripción
+    # 4. Guardar transcripción (SIEMPRE MISMO ARCHIVO)
     # ============================
-    transcription_dir = "audio/transcriptions"
-    os.makedirs(transcription_dir, exist_ok=True)
-
-    transcription_path = os.path.join(
-        transcription_dir,
-        f"transcription_{fecha}.txt"
-    )
+    transcription_path = "state/transcription.txt"
 
     with open(transcription_path, "w", encoding="utf-8") as f:
         f.write(text)
 
+    print(f"\nTranscripción guardada en: {transcription_path}")
     print("Texto final:", text)
 
     # ============================
     # 5. Procesar con spaCy + fuzzy
     # ============================
-    topics_dir = "audio/topics"
-    os.makedirs(topics_dir, exist_ok=True)
-
-    topic_path = os.path.join(topics_dir, f"topic_{fecha}.txt")
+    topic_path = "state/topic.txt"
 
     result = parse_command(text)
+
+    # Si parse_command devolvió None, creamos un resultado vacío
+    if result is None:
+        result = {
+            "action": None,
+            "object": None,
+            "topic": text
+        }
 
     with open(topic_path, "w", encoding="utf-8") as f:
         f.write(f"Acción: {result['action']}\n")
         f.write(f"Objeto: {result['object']}\n")
         f.write(f"Topic: {result['topic']}\n")
 
-    # ============================
-    # 6. Guardar ORDEN final
-    # ============================
-    orders_dir = "audio/orders"
-    os.makedirs(orders_dir, exist_ok=True)
+    print(f"\nTopic generado en: {topic_path}")
 
-    order_path = os.path.join(orders_dir, f"order_{fecha}.txt")
+    # ============================
+    # 6. Guardar ORDEN final (SIEMPRE MISMO ARCHIVO)
+    # ============================
+    order_path = "state/order.txt"
 
     with open(order_path, "w", encoding="utf-8") as f:
         f.write(f"Acción: {result['action']}\n")
         f.write(f"Objeto: {result['object']}\n")
         f.write(f"Topic: {result['topic']}\n")
+
+    print(f"\nOrden generada en: {order_path}")
 
 
 if __name__ == "__main__":
