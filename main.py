@@ -45,7 +45,6 @@ def main():
     with open(transcription_path, "w", encoding="utf-8") as f:
         f.write(text)
 
-    print(f"\nTranscripción guardada en: {transcription_path}")
     print("Texto final:", text)
 
     # ============================
@@ -68,19 +67,15 @@ def main():
         f.write(f"Objeto: {result['object']}\n")
         f.write(f"Topic: {result['topic']}\n")
 
-    print(f"\nTopic generado en: {topic_path}")
-
     # ============================
     # 6. Guardar ORDEN final (SIEMPRE MISMO ARCHIVO)
     # ============================
     order_path = "state/order.txt"
 
     with open(order_path, "w", encoding="utf-8") as f:
-        f.write(f"Acción: {result['action']}\n")
-        f.write(f"Objeto: {result['object']}\n")
-        f.write(f"Topic: {result['topic']}\n")
+        f.write(f"{result['action']}")
 
-    print(f"\nOrden generada en: {order_path}")
+    print(f"\nOrden generada\n")
 
 
 if __name__ == "__main__":
