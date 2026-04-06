@@ -1,4 +1,10 @@
 .venv/
-audio/
+
+state/audio.wav
+state/order.json
+state/order.txt
+state/transcription.txt
+state/topic.txt
+
 stt/__pycache__/
 input/__pycache__/

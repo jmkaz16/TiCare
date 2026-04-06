@@ -15,8 +15,7 @@ from stt.record_audio import record_audio
 from stt.whisper_stt import transcribe_audio
 from stt.wake_word import listen_for_wake_word
 from stt.tiago_spacy import parse_command
-# Nuevo: semantic chunking
-from semantic_chunk import semantic_chunk
+from stt.semantic_chunk import semantic_chunk
 
 def ensure_state_dir():
     """
@@ -110,7 +109,6 @@ def main():
 
     # 5) Semantic chunking: dividir la frase en múltiples órdenes
     chunks = semantic_chunk(text)
-    print("Chunks detectados:", chunks)
 
     # 6) Procesar cada chunk con el parser (tiago_spacy.parse_command)
     results = []
@@ -133,8 +131,6 @@ def main():
     save_orders_list(results)
 
     print("\nÓrdenes generadas y guardadas en state/ (order.txt y orders.json).")
-    for i, r in enumerate(results, 1):
-        print(f"{i}. action={r.get('action')} object={r.get('object')} direction={r.get('direction')}")
 
 if __name__ == "__main__":
     main()

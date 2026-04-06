@@ -1,3 +1,4 @@
-Acción: fiv
+Acción: jmp
 Objeto: None
-Topic: ¡! chócame esos cinco
+Dirección: None
+Topic: salta

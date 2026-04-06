@@ -1,75 +1,90 @@
+# stt/tiago_spacy.py
+# Versión con lazy loading de spaCy para evitar bloqueos en import.
+# - get_nlp() carga el modelo solo cuando se necesita.
+# - Si no puede cargar es_core_news_sm, usa spacy.blank("es") como fallback.
+# - Esto permite que 'import stt.tiago_spacy' sea rápido y no bloquee main.py.
+
+import unicodedata
+from typing import Optional, Tuple
 import spacy
-from rapidfuzz import fuzz, process
-from input.command_map import COMMAND_MAP
 
-nlp = spacy.load("es_core_news_sm")
+# Variable privada para almacenar la instancia del modelo
+_nlp: Optional[spacy.language.Language] = None
 
+def _normalize_text_remove_accents(s: str) -> str:
+    """
+    Normaliza texto: minúsculas, strip y elimina marcas diacríticas (tildes).
+    Útil para matching fuzzy y para normalizar conectores.
+    """
+    s = s.lower().strip()
+    s = unicodedata.normalize("NFD", s)
+    s = "".join(ch for ch in s if unicodedata.category(ch) != "Mn")
+    return s
 
-# ============================================================
-# 1. NORMALIZACIÓN
-# ============================================================
+def get_nlp() -> spacy.language.Language:
+    """
+    Devuelve la instancia de spaCy. Si no está cargada, intenta cargar
+    'es_core_news_sm'. Si falla, crea y devuelve un modelo en blanco.
+    """
+    global _nlp
+    if _nlp is not None:
+        return _nlp
 
-def normalize(text):
+    try:
+        # Intento de carga del modelo entrenado
+        _nlp = spacy.load("es_core_news_sm")
+        print("spaCy: modelo es_core_news_sm cargado correctamente.")
+    except Exception as e:
+        # Fallback: modelo en blanco para evitar que la importación falle
+        print("spaCy: no se pudo cargar es_core_news_sm. Usando modelo en blanco. Error:", e)
+        _nlp = spacy.blank("es")
+    return _nlp
+
+# Funciones del parser que usan get_nlp() en lugar de usar nlp global en import
+def normalize(text: str) -> str:
     return text.lower().strip()
 
-
-# ============================================================
-# 2. MAPEO DE ACCIONES (usa diccionario + fuzzy)
-# ============================================================
-
-def map_action_from_text(text):
-    """
-    Intenta mapear la frase completa a una acción conocida.
-    """
+def map_action_from_text(text: str):
+    # Placeholder: tu lógica de fuzzy con COMMAND_MAP aquí
+    # Importa COMMAND_MAP localmente si lo necesitas para evitar import circular
+    from input.command_map import COMMAND_MAP
+    from rapidfuzz import process, fuzz
     choices = list(COMMAND_MAP.keys())
-    match, score, _ = process.extractOne(text, choices, scorer=fuzz.ratio)
-
-    if score >= 75:
-        return COMMAND_MAP[match]
-
+    match = process.extractOne(text, choices, scorer=fuzz.ratio)
+    if match:
+        matched_text, score, _ = match
+        if score >= 75:
+            return COMMAND_MAP[matched_text]
     return None
 
-
-def map_action_from_word(word):
-    """
-    Intenta mapear una sola palabra (o su lema) a una acción conocida.
-    """
-    lemma = nlp(word)[0].lemma_
+def map_action_from_word(word: str):
+    nlp = get_nlp()
+    if not word:
+        return None
+    lemma = nlp(word)[0].lemma_ if len(nlp(word)) > 0 else word
+    from input.command_map import COMMAND_MAP
+    from rapidfuzz import process, fuzz
     choices = list(COMMAND_MAP.keys())
-
-    # Coincidencia directa
-    match, score, _ = process.extractOne(word, choices, scorer=fuzz.ratio)
-    if score >= 70:
-        return COMMAND_MAP[match]
-
-    # Coincidencia por lema
-    match, score, _ = process.extractOne(lemma, choices, scorer=fuzz.ratio)
-    if score >= 70:
-        return COMMAND_MAP[match]
-
+    match = process.extractOne(word, choices, scorer=fuzz.ratio)
+    if match and match[1] >= 70:
+        return COMMAND_MAP[match[0]]
+    match = process.extractOne(lemma, choices, scorer=fuzz.ratio)
+    if match and match[1] >= 70:
+        return COMMAND_MAP[match[0]]
     return None
 
-
-# ============================================================
-# 3. ANALIZADOR SINTÁCTICO ROBUSTO
-# ============================================================
-
-def parse_syntax(text):
+def parse_syntax(text: str) -> Tuple[Optional[str], Optional[str], Optional[str], Optional[str]]:
     """
-    Extrae:
-    - verbo principal
-    - determinante
-    - objeto (nombre)
-    - dirección (izquierda, derecha, adelante, atrás…)
+    Analizador sintáctico robusto que usa spaCy para extraer verbo, determinante,
+    nombre y dirección. Usa get_nlp() para asegurar lazy loading.
     """
+    nlp = get_nlp()
     doc = nlp(text)
-
     verb = None
     det = None
     noun = None
     direction = None
 
-    # Lista de direcciones reconocidas
     direction_words = {
         "izquierda": "left",
         "derecha": "right",
@@ -79,43 +94,36 @@ def parse_syntax(text):
         "adelante": "forward",
         "atrás": "back",
         "atras": "back",
-        "hacia": None  # se usa en combinación
+        "hacia": None
     }
 
-    # Buscar verbo principal
     for token in doc:
         if token.pos_ == "VERB":
             verb = token.lemma_
             break
 
-    # Buscar determinante + nombre
     for token in doc:
-        if token.pos_ == "DET":
+        if token.pos_ == "DET" and det is None:
             det = token.text
-
-        if token.pos_ == "NOUN":
+        if token.pos_ == "NOUN" and noun is None:
             noun = token.text
-
-            # Si el nombre es una dirección
             if noun in direction_words:
                 direction = direction_words[noun]
+                break
 
-            break
-
-    # Buscar direcciones como adverbios o adposiciones
     for token in doc:
         if token.text in direction_words:
-            # Caso simple: "izquierda", "derecha"
             if direction_words[token.text]:
                 direction = direction_words[token.text]
+            if token.text == "hacia":
+                # intentar lookahead
+                try:
+                    next_token = token.nbor(1)
+                    if next_token.text in direction_words:
+                        direction = direction_words[next_token.text]
+                except Exception:
+                    pass
 
-        # Caso compuesto: "hacia atrás"
-        if token.text == "hacia":
-            next_token = token.nbor(1)
-            if next_token.text in direction_words:
-                direction = direction_words[next_token.text]
-
-    # Si no hay verbo pero sí nombre → verbo implícito
     if verb is None and noun:
         if noun in ["pata", "mano"]:
             verb = "dar"
@@ -124,43 +132,23 @@ def parse_syntax(text):
 
     return verb, det, noun, direction
 
-
-# ============================================================
-# 4. PARSEADOR PRINCIPAL
-# ============================================================
-
-def parse_command(text):
+def parse_command(text: str):
+    """
+    Función principal que normaliza, intenta mapeo directo por frase,
+    y si no, usa análisis sintáctico y mapeo por palabra.
+    """
     text_norm = normalize(text)
-
-    # ---- 1. Intento directo por frase completa ----
     action = map_action_from_text(text_norm)
     if action:
-        return {
-            "action": action,
-            "object": None,
-            "direction": None,
-            "topic": text_norm
-        }
+        return {"action": action, "object": None, "direction": None, "topic": text_norm}
 
-    # ---- 2. Análisis sintáctico ----
     verb, det, noun, direction = parse_syntax(text_norm)
-
-    # ---- 2.1 Mapear verbo a acción ----
+    action = None
     if verb:
         action = map_action_from_word(verb)
-
-    # ---- 2.2 Si no hay acción pero sí nombre → intentar mapear nombre ----
     if noun and not action:
         action = map_action_from_word(noun)
-
-    # ---- 2.3 Si no hay acción pero sí dirección → movimiento ----
     if direction and not action:
         action = direction
 
-    # ---- 3. Resultado final ----
-    return {
-        "action": action,
-        "object": noun,
-        "direction": direction,
-        "topic": text_norm
-    }
+    return {"action": action, "object": noun, "direction": direction, "topic": text_norm}
