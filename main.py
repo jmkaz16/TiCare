@@ -62,7 +62,7 @@ def main() -> None:
     """
     print("Sistema listo. Di la wake-word para comenzar.")
 
-    ensure_state_dir()
+    ensure_state_dir() # Aseguramos que exista la carpeta para guardar archivos
 
     # 1) Detectar wake-word
     wake_result = listen_for_wake_word()
@@ -100,10 +100,10 @@ def main() -> None:
     parsed_results = []
     actions: List[Optional[str]] = []
     for ch in chunks:
-        parsed = parse_command(ch)
+        parsed = parse_command(ch) 
         if parsed is None:
             parsed = {"action": None, "object": None, "direction": None, "topic": ch}
-        parsed_results.append(parsed)
+        parsed_results.append(parsed) 
         # Extraer la acción; si no existe, guardamos None para escribir línea vacía
         action = parsed.get("action") if isinstance(parsed, dict) else None
         actions.append(action)
