@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import rclpy 
 from rclpy.node import Node
 
@@ -6,7 +8,7 @@ from std_msgs.msg import String
 import serial
 import time
 
-BITTLE_COMMANDS = {
+'''BITTLE_COMMANDS = {
     "stand": "kup",
     "butt_up": "kbuttUp",
     "calibrate": "kcalib",
@@ -48,7 +50,7 @@ BITTLE_COMMANDS = {
     "sleep": "kzz",
     "frontflip": "kff",
     "backflip": "kbf"
-}
+}'''
 
 class BittleAction(Node):
 
@@ -64,7 +66,8 @@ class BittleAction(Node):
         self.subscription  # prevent unused variable warning
 
     def execute_command(self, msg):
-        cmd = BITTLE_COMMANDS.get(msg.data)
+        # cmd = BITTLE_COMMANDS.get(msg.data) con diccionario
+        cmd = "k" + msg.data
         if cmd:
             self.ser.write(f'{cmd}\n'.encode())
             self.ser.flush() # forces transmisssion from OS serial write buffer to Bittle
