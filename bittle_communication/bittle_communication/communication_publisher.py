@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import os
 import rclpy
 from rclpy.node import Node
 
@@ -17,10 +18,17 @@ class CommunicationPublisher(Node):
 
     def timer_callback(self):
         msg = String()
-        msg.data = 'Hello, World! %d' % self.i
+        msg.data = self.read_from_file()
         self.publisher_.publish(msg)
         self.get_logger().info('Publishing: "%s"' % msg.data)
         self.i += 1
+
+    def read_from_file(self, file="order.txt"):
+        if os.path.exists(file):
+            with open(file, "r") as f:
+                return f.read().strip()
+        else:
+            self.get_logger().warn(f"File {file} does not exist.")
 
 
 def main(args=None):
