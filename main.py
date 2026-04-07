@@ -1,136 +1,128 @@
-# main.py
-# Programa principal que:
-# 1) Detecta la wake-word (o recibe la orden directamente si viene en la misma frase)
-# 2) Graba audio si es necesario
-# 3) Transcribe con Whisper
-# 4) Aplica semantic chunking para dividir la frase en múltiples órdenes
-# 5) Procesa cada chunk con el parser (tiago_spacy.parse_command)
-# 6) Guarda el resultado en archivos dentro de state/ para que otros módulos los consuman
-
 import os
-import json
+from typing import List, Optional
 
-# Importar módulos del proyecto
 from stt.record_audio import record_audio
 from stt.whisper_stt import transcribe_audio
 from stt.wake_word import listen_for_wake_word
 from stt.tiago_spacy import parse_command
 from stt.semantic_chunk import semantic_chunk
 
-def ensure_state_dir():
-    """
-    Asegura que exista la carpeta 'state' donde guardamos archivos
-    persistentes (audio, transcripción, topic, order).
-    """
-    os.makedirs("state", exist_ok=True)
+# -------------------------
+# Configuración / utilidades
+# -------------------------
+STATE_DIR = "state"
+AUDIO_PATH = os.path.join(STATE_DIR, "audio.wav")
+TOPIC_PATH = os.path.join(STATE_DIR, "topic.txt")
+ORDER_PATH = os.path.join(STATE_DIR, "order.txt")
 
-def save_transcription(text: str, path: str = "state/transcription.txt"):
+# Duración de la grabación en segundos.
+DURATION = 10  # segundos
+
+def ensure_state_dir() -> None:
     """
-    Guarda la transcripción en un archivo de texto (sobrescribe siempre).
+    Asegura que exista la carpeta 'state' donde guardamos artefactos mínimos.
+    """
+    os.makedirs(STATE_DIR, exist_ok=True)
+
+def save_topic_chunks(chunks: List[str], path: str = TOPIC_PATH) -> None:
+    """
+    Guarda todos los chunks detectados en topic.txt, uno por línea.
+    Si la lista está vacía, escribe la transcripción original pasada como único elemento.
     """
     with open(path, "w", encoding="utf-8") as f:
-        f.write(text)
+        for c in chunks:
+            line = c.strip()
+            if line:
+                f.write(line + "\n")
 
-def save_topic(result: dict, path: str = "state/topic.txt"):
+def save_orders(actions: List[Optional[str]], path: str = ORDER_PATH) -> None:
     """
-    Guarda un resumen legible del parseo del primer chunk (útil para debugging).
-    Si hay múltiples resultados, se guarda el primero y el topic original.
+    Guarda únicamente la acción de cada chunk en order.txt, una por línea.
+    Si una acción es None o vacía, escribe una línea vacía para mantener la correspondencia.
     """
     with open(path, "w", encoding="utf-8") as f:
-        f.write(f"Acción: {result.get('action')}\n")
-        f.write(f"Objeto: {result.get('object')}\n")
-        f.write(f"Dirección: {result.get('direction')}\n")
-        f.write(f"Topic: {result.get('topic')}\n")
+        for a in actions:
+            if a is None:
+                f.write("\n")
+            else:
+                f.write(str(a).strip() + "\n")
 
-def save_orders_list(results: list, path_txt: str = "state/order.txt", path_json: str = "state/orders.json"):
-    """
-    Guarda la lista de órdenes (una por línea) en order.txt y además
-    en formato JSON en orders.json con más detalle.
-    Cada elemento de results es el diccionario devuelto por parse_command.
-    """
-    # Guardar solo las acciones en order.txt (una por línea). Si action es None,
-    # escribimos 'None' para que el consumidor sepa que no se detectó acción.
-    with open(path_txt, "w", encoding="utf-8") as f:
-        for r in results:
-            action = r.get("action") if r else None
-            f.write(f"{action}\n")
-
-    # Guardar JSON con más detalle (lista de dicts)
-    with open(path_json, "w", encoding="utf-8") as f:
-        json.dump({"orders": results}, f, ensure_ascii=False, indent=2)
-
-def main():
+# -------------------------
+# Flujo principal
+# -------------------------
+def main() -> None:
     """
     Flujo principal:
-    - Espera wake-word
-    - Si la orden viene junto con la wake-word, la procesa directamente
-    - Si no, graba audio, transcribe y procesa
-    - Aplica semantic_chunk para dividir en múltiples órdenes
-    - Procesa cada chunk con parse_command
-    - Guarda resultados en state/
+    1) Espera wake-word (o recibe orden en la misma frase).
+    2) Si la orden no viene en la activación, graba audio y lo transcribe.
+    3) Aplica semantic_chunk para dividir la frase en órdenes (chunks).
+    4) Procesa cada chunk con parse_command y guarda:
+       - topic.txt: todos los chunks (uno por línea)
+       - order.txt: solo la acción de cada chunk (uno por línea)
     """
-    print("Sistema listo. Di: 'Perro' para comenzar.")
+    print("Sistema listo. Di la wake-word para comenzar.")
 
     ensure_state_dir()
 
-    # 1) Detectar wake-word (puede devolver:
-    #    - None -> no activado (por ejemplo, usuario pulsó 's' para salir)
-    #    - "" (cadena vacía) -> wake-word detectada, pero sin orden en la misma frase
-    #    - "texto de la orden" -> wake-word + orden en la misma frase
+    # 1) Detectar wake-word
     wake_result = listen_for_wake_word()
 
     if wake_result is None:
-        # Salida controlada por el usuario o error en la escucha
-        print("No se detectó activación. Saliendo.")
+        print("No se detectó activación o se solicitó salida. Terminando.")
         return
 
     if wake_result:
-        # Caso: wake-word y orden en la misma frase
-        print("\nOrden detectada dentro de la frase de activación.")
+        # Wake-word y orden en la misma frase
+        print("\nOrden detectada en la frase de activación.")
         text = wake_result
     else:
-        # Caso: solo wake-word -> grabamos la orden completa
-        print("\nActivado. Grabando mensaje completo ... ")
-        audio_file = record_audio(duration=5)
+        # Solo wake-word -> grabamos la orden completa
+        print(f"\nActivado. Grabando mensaje durante {DURATION} segundos...")
+        audio_file = record_audio(duration=DURATION)  # usa la variable DURATION
 
-        # Normalizamos la ubicación del audio para el pipeline
-        audio_path = "state/audio.wav"
-        # Reemplazamos (mueve/renombra) el archivo grabado a state/audio.wav
-        os.replace(audio_file, audio_path)
+        # Intentar mover/renombrar el audio al path dentro de state
+        try:
+            os.replace(audio_file, AUDIO_PATH)
+            audio_path = AUDIO_PATH
+        except Exception:
+            audio_path = audio_file
 
-        # 3) Transcribir audio
+        # Transcribir audio (no se guarda en disco)
         text = transcribe_audio(audio_path)
 
-        # 4) Guardar transcripción
-        save_transcription(text)
+    # Mostrar la transcripción en consola para debugging
+    print(f"\nTranscripción detectada: {repr(text)}")
 
-    # Mostrar texto final por consola para debugging
-    print("Texto final:", text)
+    # 4) Semantic chunking
+    chunks = semantic_chunk(text)  # lista de strings (puede ser 1 elemento con todo el texto)
 
-    # 5) Semantic chunking: dividir la frase en múltiples órdenes
-    chunks = semantic_chunk(text)
-
-    # 6) Procesar cada chunk con el parser (tiago_spacy.parse_command)
-    results = []
+    # 5) Procesar cada chunk con parse_command y extraer la acción
+    parsed_results = []
+    actions: List[Optional[str]] = []
     for ch in chunks:
-        # parse_command devuelve un dict con keys: action, object, direction, topic
         parsed = parse_command(ch)
-        # Si parse_command devolviera None, normalizamos a un dict vacío
         if parsed is None:
             parsed = {"action": None, "object": None, "direction": None, "topic": ch}
-        results.append(parsed)
+        parsed_results.append(parsed)
+        # Extraer la acción; si no existe, guardamos None para escribir línea vacía
+        action = parsed.get("action") if isinstance(parsed, dict) else None
+        actions.append(action)
 
-    # 7) Guardar topic y órdenes
-    # Guardamos el primer resultado en topic.txt para compatibilidad con el sistema anterior
-    if results:
-        save_topic(results[0])
+    # Si no se detectaron chunks (lista vacía), tratamos el texto completo como único chunk
+    if not chunks:
+        # Guardar topic con la transcripción completa
+        save_topic_chunks([text])
+        # Intentar parsear la transcripción completa y guardar su acción
+        parsed_full = parse_command(text)
+        action_full = parsed_full.get("action") if isinstance(parsed_full, dict) else None
+        save_orders([action_full])
     else:
-        save_topic({"action": None, "object": None, "direction": None, "topic": text})
+        # Guardar todos los chunks en topic.txt
+        save_topic_chunks(chunks)
+        # Guardar solo las acciones en order.txt (una por línea)
+        save_orders(actions)
 
-    # Guardar todas las órdenes en order.txt (una por línea) y en orders.json
-    save_orders_list(results)
-
-    print("\nÓrdenes generadas y guardadas en state/ (order.txt y orders.json).")
+    print("\nProceso completado.")
 
 if __name__ == "__main__":
     main()

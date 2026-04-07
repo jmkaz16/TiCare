@@ -39,6 +39,10 @@ def is_wake_word(text):
 
 
 def listen_for_wake_word(duration=3, fs=16000):
+    # listen_for_wake_word puede devolver:
+    # - None -> salida/abort
+    # - "" (cadena vacía) -> wake-word detectada sin orden en la misma frase
+    # - "texto de la orden" -> wake-word + orden en la misma frase
     print("Escuchando la palabra clave ... (pulsa 's' para salir)")
 
     model = whisper.load_model("small")
