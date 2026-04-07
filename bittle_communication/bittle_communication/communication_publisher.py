@@ -15,7 +15,7 @@ class CommunicationPublisher(Node):
     def __init__(self):
         super().__init__('communication_publisher')
         self.publisher_ = self.create_publisher(String, 'bittle_cmd', 10)
-        timer_period = 0.5  # seconds
+        timer_period = 10  # seconds
         self.timer = self.create_timer(timer_period, self.timer_callback)
         self.i = 0
 
@@ -46,7 +46,8 @@ def main(args=None):
     communication_publisher = CommunicationPublisher()
 
     try:
-        rclpy.spin(communication_publisher)
+        # rclpy.spin(communication_publisher)
+        communication_publisher.timer_callback()  # Call the timer callback once
     
     except KeyboardInterrupt:
         pass
