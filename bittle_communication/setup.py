@@ -24,6 +24,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
+            'communication_publisher = bittle_communication.communication_publisher:main',
         ],
     },
 )
