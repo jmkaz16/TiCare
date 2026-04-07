@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 
 import os
+from ament_index_python.packages import get_package_share_directory
+
+
 import rclpy
 from rclpy.node import Node
 
@@ -11,10 +14,16 @@ class CommunicationPublisher(Node):
 
     def __init__(self):
         super().__init__('communication_publisher')
-        self.publisher_ = self.create_publisher(String, 'bittle_raw', 10)
+        self.publisher_ = self.create_publisher(String, 'bittle_cmd', 10)
         timer_period = 0.5  # seconds
         self.timer = self.create_timer(timer_period, self.timer_callback)
         self.i = 0
+
+        # Obtain the base path to the installed package
+        package_share_path = get_package_share_directory('bittle_communication')
+        # Save the path of the 'data' folder as a variable to avoid recalculating it eveery time a position is saved
+        self.data_dir = os.path.join(package_share_path, 'data')
+        self.file_path = os.path.join(self.data_dir, 'order.txt')
 
     def timer_callback(self):
         msg = String()
@@ -23,12 +32,12 @@ class CommunicationPublisher(Node):
         self.get_logger().info('Publishing: "%s"' % msg.data)
         self.i += 1
 
-    def read_from_file(self, file="order.txt"):
-        if os.path.exists(file):
-            with open(file, "r") as f:
+    def read_from_file(self):
+        if os.path.exists(self.file_path):
+            with open(self.file_path, "r") as f:
                 return f.read().strip()
         else:
-            self.get_logger().warn(f"File {file} does not exist.")
+            self.get_logger().warn(f"File {self.file_path} does not exist.")
 
 
 def main(args=None):
