@@ -3,9 +3,10 @@ from scipy.io.wavfile import write
 import os
 from datetime import datetime
 
+
 def record_audio(duration=5, fs=44100):
     # Crear carpeta recordings si no existe
-    recordings_dir = "audio\\recordings"
+    recordings_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "recordings")
     os.makedirs(recordings_dir, exist_ok=True)
 
     # Nombre único basado en fecha y hora
@@ -28,9 +29,9 @@ def get_latest_recording():
     # Si no existe la carpeta o está vacía
     if not os.path.exists(recordings_dir):
         raise FileNotFoundError("La carpeta 'recordings' no existe.")
-    
+
     files = [f for f in os.listdir(recordings_dir) if f.endswith(".wav")]
-    
+
     if not files:
         raise FileNotFoundError("No hay archivos .wav en la carpeta 'recordings'.")
 
@@ -44,4 +45,3 @@ def get_latest_recording():
 
 if __name__ == "__main__":
     record_audio()
-
