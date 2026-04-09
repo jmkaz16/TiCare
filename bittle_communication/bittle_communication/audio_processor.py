@@ -1,6 +1,7 @@
 import os
 import time
 from typing import List, Optional
+import warnings
 
 from stt.record_audio import record_audio
 from stt.whisper_stt import transcribe_audio
@@ -18,6 +19,10 @@ ORDER_PATH = os.path.join(STATE_DIR, "order.txt")
 
 # Duración de la grabación en segundos.
 DURATION = 5  # segundos
+
+# Suprimir avisos específicos de UserWarning de Whisper
+warnings.filterwarnings("ignore", message="Performing inference on CPU when CUDA is available")
+warnings.filterwarnings("ignore", message="FP16 is not supported on CPU; using FP32 instead")
 
 
 def ensure_state_dir() -> None:
