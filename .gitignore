@@ -6,4 +6,6 @@ state/order.txt
 state/transcription.txt
 state/topic.txt
 
+*.wav
+
 **/__pycache__/

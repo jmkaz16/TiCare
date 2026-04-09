@@ -1,7 +1,6 @@
 import whisper
 import sounddevice as sd
 import numpy as np
-import keyboard
 from rapidfuzz import fuzz
 
 TARGET_WAKE = "perro"
@@ -45,12 +44,9 @@ def listen_for_wake_word(duration=3, fs=16000):
     # - "texto de la orden" -> wake-word + orden en la misma frase
     print("Escuchando la palabra clave ... (pulsa 's' para salir)")
 
-    model = whisper.load_model("small")
+    model = whisper.load_model("small", device="cpu")
 
     while True:
-        if keyboard.is_pressed("s"):
-            print("Detenido por el usuario. Saliendo ...")
-            return None  # no activado
 
         print("Grabando fragmento ...")
         audio = sd.rec(int(duration * fs), samplerate=fs, channels=1)
