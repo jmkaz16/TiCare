@@ -1,4 +1,2 @@
-Acción: jmp
-Objeto: None
-Dirección: None
-Topic: salta
+salta
+hasta el muerto

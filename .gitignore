@@ -6,5 +6,4 @@ state/order.txt
 state/transcription.txt
 state/topic.txt
 
-stt/__pycache__/
-input/__pycache__/
+**/__pycache__/
