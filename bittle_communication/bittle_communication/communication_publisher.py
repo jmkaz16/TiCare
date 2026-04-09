@@ -23,7 +23,17 @@ class CommunicationPublisher(Node):
         # Obtener la ruta del paquete y ruta de los archivos
         package_share_path = get_package_share_directory("bittle_communication")
         self.data_dir = os.path.abspath(
-            os.path.join(package_share_path, "..", "..", "..", "..", "src", "bittle_communication", "state")
+            os.path.join(
+                package_share_path,
+                "..",
+                "..",
+                "..",
+                "..",
+                "src",
+                "bittle_communication",
+                "bittle_communication",
+                "state",
+            )
         )
         self.file_path = os.path.join(self.data_dir, "order.txt")
         self.lock_path = os.path.join(self.data_dir, "order.lock")

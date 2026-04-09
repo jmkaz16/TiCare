@@ -6,7 +6,7 @@ from datetime import datetime
 
 def record_audio(duration=5, fs=44100):
     # Crear carpeta recordings si no existe
-    recordings_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "recordings")
+    recordings_dir = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "recordings"))
     os.makedirs(recordings_dir, exist_ok=True)
 
     # Nombre único basado en fecha y hora
