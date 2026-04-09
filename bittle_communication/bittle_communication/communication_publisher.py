@@ -22,7 +22,9 @@ class CommunicationPublisher(Node):
 
         # Obtener la ruta del paquete y ruta de los archivos
         package_share_path = get_package_share_directory("bittle_communication")
-        self.data_dir = os.path.join(package_share_path, "state")
+        self.data_dir = os.path.abspath(
+            os.path.join(package_share_path, "..", "..", "..", "..", "src", "bittle_communication", "state")
+        )
         self.file_path = os.path.join(self.data_dir, "order.txt")
         self.lock_path = os.path.join(self.data_dir, "order.lock")
 
@@ -36,7 +38,7 @@ class CommunicationPublisher(Node):
     def read_from_file(self):
         # Comprobar si el archivo existe
         if not os.path.exists(self.file_path):
-            return None
+            return ""
 
         try:
             # Comprobar si el semáforo existe y esperar a que desaparezca
@@ -57,7 +59,7 @@ class CommunicationPublisher(Node):
 
         except Exception as e:
             self.get_logger().error(f"Error processing {self.file_path}: {e}")
-            return None
+            return ""
 
         finally:
             # Eliminar el semáforo

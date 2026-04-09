@@ -8,12 +8,10 @@ from stt.wake_word import listen_for_wake_word
 from stt.tiago_spacy import parse_command
 from stt.semantic_chunk import semantic_chunk
 
-from ament_index_python.packages import get_package_share_directory
-
 # -------------------------
 # Configuración / utilidades
 # -------------------------
-STATE_DIR = os.path.join(get_package_share_directory("bittle_communication"), "state")
+STATE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "state")
 AUDIO_PATH = os.path.join(STATE_DIR, "audio.wav")
 TOPIC_PATH = os.path.join(STATE_DIR, "topic.txt")
 ORDER_PATH = os.path.join(STATE_DIR, "order.txt")
