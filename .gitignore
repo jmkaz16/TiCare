@@ -1,2 +1,14 @@
 // Todo lo que queremos que Git ignore
 .venv
+
+
+# Entorno Virtual (¡Súper importante! Pesa mucho y no se sube)
+.venv/
+venv/
+env/
+
+# Caché de Python (Archivos temporales que crea el ordenador solo)
+**/__pycache__/
+
+
+test_API.py
