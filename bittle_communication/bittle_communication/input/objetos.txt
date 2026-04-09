@@ -1,0 +1,6 @@
+botella
+puerta
+mando
+caja
+mesa
+silla
