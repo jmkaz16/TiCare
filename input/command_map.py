@@ -112,6 +112,7 @@ COMMAND_MAP = {
     # hg
     "abrázame": "hg",
     "dame un abrazo": "hg",
+    "reza": "hg",
 
     # hi
     "saluda": "hi",
