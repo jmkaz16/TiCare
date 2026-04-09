@@ -1,4 +1,5 @@
 import os
+import time
 from typing import List, Optional
 
 from stt.record_audio import record_audio
@@ -16,7 +17,7 @@ TOPIC_PATH = os.path.join(STATE_DIR, "topic.txt")
 ORDER_PATH = os.path.join(STATE_DIR, "order.txt")
 
 # Duración de la grabación en segundos.
-DURATION = 10  # segundos
+DURATION = 5  # segundos
 
 def ensure_state_dir() -> None:
     """
@@ -40,12 +41,17 @@ def save_orders(actions: List[Optional[str]], path: str = ORDER_PATH) -> None:
     Guarda únicamente la acción de cada chunk en order.txt, una por línea.
     Si una acción es None o vacía, escribe una línea vacía para mantener la correspondencia.
     """
+    while os.path.exists(os.path.join(STATE_DIR, "order.lock")):
+        time.sleep(0.1)  # Espera a que el lock se libere
+    
+    open(os.path.join(STATE_DIR, "order.lock"), "w").close() 
     with open(path, "w", encoding="utf-8") as f:
         for a in actions:
             if a is None:
                 f.write("\n")
             else:
                 f.write(str(a).strip() + "\n")
+    os.remove(os.path.join(STATE_DIR, "order.lock"))
 
 # -------------------------
 # Flujo principal
