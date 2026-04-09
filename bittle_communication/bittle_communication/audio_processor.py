@@ -5,17 +5,11 @@ from typing import List, Optional
 import rclpy
 from rclpy.node import Node
 
-from stt.record_audio import record_audio
-from stt.whisper_stt import transcribe_audio
-from stt.wake_word import listen_for_wake_word
-from stt.tiago_spacy import parse_command
-from stt.semantic_chunk import semantic_chunk
-
-from ament_index_python.packages import get_package_share_directory
-
-# -------------------------
-# Configuración / utilidades
-# -------------------------
+from bittle_communication.stt.record_audio import record_audio
+from bittle_communication.stt.whisper_stt import transcribe_audio
+from bittle_communication.stt.wake_word import listen_for_wake_word
+from bittle_communication.stt.tiago_spacy import parse_command
+from bittle_communication.stt.semantic_chunk import semantic_chunk
 
 
 class AudioProcessor(Node):
@@ -26,6 +20,7 @@ class AudioProcessor(Node):
         self.declare_parameter("recording_duration", 5)  # duración de la grabación en segundos
 
         self.current_dir = os.path.dirname(os.path.abspath(__file__))
+        self.get_logger().info(f"AudioProcessor iniciado. Current directory: {self.current_dir}")
         self.state_dir = os.path.join(self.current_dir, "..", "state")
 
         self.audio_path = os.path.join(self.state_dir, "audio.wav")
