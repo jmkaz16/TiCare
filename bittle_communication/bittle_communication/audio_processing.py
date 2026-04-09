@@ -8,10 +8,12 @@ from stt.wake_word import listen_for_wake_word
 from stt.tiago_spacy import parse_command
 from stt.semantic_chunk import semantic_chunk
 
+from ament_index_python.packages import get_package_share_directory
+
 # -------------------------
 # Configuración / utilidades
 # -------------------------
-STATE_DIR = "state"
+STATE_DIR = os.path.join(get_package_share_directory("bittle_communication"), "state")
 AUDIO_PATH = os.path.join(STATE_DIR, "audio.wav")
 TOPIC_PATH = os.path.join(STATE_DIR, "topic.txt")
 ORDER_PATH = os.path.join(STATE_DIR, "order.txt")
@@ -19,11 +21,13 @@ ORDER_PATH = os.path.join(STATE_DIR, "order.txt")
 # Duración de la grabación en segundos.
 DURATION = 5  # segundos
 
+
 def ensure_state_dir() -> None:
     """
     Asegura que exista la carpeta 'state' donde guardamos artefactos mínimos.
     """
     os.makedirs(STATE_DIR, exist_ok=True)
+
 
 def save_topic_chunks(chunks: List[str], path: str = TOPIC_PATH) -> None:
     """
@@ -36,6 +40,7 @@ def save_topic_chunks(chunks: List[str], path: str = TOPIC_PATH) -> None:
             if line:
                 f.write(line + "\n")
 
+
 def save_orders(actions: List[Optional[str]], path: str = ORDER_PATH) -> None:
     """
     Guarda únicamente la acción de cada chunk en order.txt, una por línea.
@@ -43,8 +48,8 @@ def save_orders(actions: List[Optional[str]], path: str = ORDER_PATH) -> None:
     """
     while os.path.exists(os.path.join(STATE_DIR, "order.lock")):
         time.sleep(0.1)  # Espera a que el lock se libere
-    
-    open(os.path.join(STATE_DIR, "order.lock"), "w").close() 
+
+    open(os.path.join(STATE_DIR, "order.lock"), "w").close()
     with open(path, "w", encoding="utf-8") as f:
         for a in actions:
             if a is None:
@@ -52,6 +57,7 @@ def save_orders(actions: List[Optional[str]], path: str = ORDER_PATH) -> None:
             else:
                 f.write(str(a).strip() + "\n")
     os.remove(os.path.join(STATE_DIR, "order.lock"))
+
 
 # -------------------------
 # Flujo principal
@@ -68,7 +74,7 @@ def main() -> None:
     """
     print("Sistema listo. Di la wake-word para comenzar.")
 
-    ensure_state_dir() # Aseguramos que exista la carpeta para guardar archivos
+    ensure_state_dir()  # Aseguramos que exista la carpeta para guardar archivos
 
     # 1) Detectar wake-word
     wake_result = listen_for_wake_word()
@@ -106,10 +112,10 @@ def main() -> None:
     parsed_results = []
     actions: List[Optional[str]] = []
     for ch in chunks:
-        parsed = parse_command(ch) 
+        parsed = parse_command(ch)
         if parsed is None:
             parsed = {"action": None, "object": None, "direction": None, "topic": ch}
-        parsed_results.append(parsed) 
+        parsed_results.append(parsed)
         # Extraer la acción; si no existe, guardamos None para escribir línea vacía
         action = parsed.get("action") if isinstance(parsed, dict) else None
         actions.append(action)
@@ -129,6 +135,7 @@ def main() -> None:
         save_orders(actions)
 
     print("\nProceso completado.")
+
 
 if __name__ == "__main__":
     main()
