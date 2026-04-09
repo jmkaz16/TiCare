@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+from time import time
 from ament_index_python.packages import get_package_share_directory
 
 
@@ -13,17 +14,17 @@ from std_msgs.msg import String
 class CommunicationPublisher(Node):
 
     def __init__(self):
-        super().__init__('communication_publisher')
-        self.publisher_ = self.create_publisher(String, 'bittle_cmd', 10)
-        timer_period = 10  # seconds
+        super().__init__("communication_publisher")
+        self.publisher_ = self.create_publisher(String, "bittle_cmd", 10)
+        timer_period = 2  # segundos
         self.timer = self.create_timer(timer_period, self.timer_callback)
         self.i = 0
 
-        # Obtain the base path to the installed package
-        package_share_path = get_package_share_directory('bittle_communication')
-        # Save the path of the 'data' folder as a variable to avoid recalculating it eveery time a position is saved
-        self.data_dir = os.path.join(package_share_path, 'data')
-        self.file_path = os.path.join(self.data_dir, 'order.txt')
+        # Obtener la ruta del paquete y ruta de los archivos
+        package_share_path = get_package_share_directory("bittle_communication")
+        self.data_dir = os.path.join(package_share_path, "state")
+        self.file_path = os.path.join(self.data_dir, "order.txt")
+        self.lock_path = os.path.join(self.data_dir, "order.lock")
 
     def timer_callback(self):
         msg = String()
@@ -33,11 +34,35 @@ class CommunicationPublisher(Node):
         self.i += 1
 
     def read_from_file(self):
-        if os.path.exists(self.file_path):
+        # Comprobar si el archivo existe
+        if not os.path.exists(self.file_path):
+            return None
+
+        try:
+            # Comprobar si el semáforo existe y esperar a que desaparezca
+            while os.path.exists(self.lock_path):
+                time.sleep(0.1)
+
+            # Crear el semáforo
+            open(self.lock_path, "w").close()
+
+            # Leer el contenido del archivo
             with open(self.file_path, "r") as f:
-                return f.read().strip()
-        else:
-            self.get_logger().warn(f"File {self.file_path} does not exist.")
+                content = f.read().strip()
+
+            # Elminar el archivo
+            os.remove(self.file_path)
+
+            return content
+
+        except Exception as e:
+            self.get_logger().error(f"Error processing {self.file_path}: {e}")
+            return None
+
+        finally:
+            # Eliminar el semáforo
+            if os.path.exists(self.lock_path):
+                os.remove(self.lock_path)
 
 
 def main(args=None):
@@ -46,16 +71,16 @@ def main(args=None):
     communication_publisher = CommunicationPublisher()
 
     try:
-        # rclpy.spin(communication_publisher)
-        communication_publisher.timer_callback()  # Call the timer callback once
-    
+        rclpy.spin(communication_publisher)
+        # communication_publisher.timer_callback() # Llamar manualmente a la función para publicar inmediatamente al iniciar
+
     except KeyboardInterrupt:
         pass
-    
+
     finally:
         communication_publisher.destroy_node()
         rclpy.shutdown()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
