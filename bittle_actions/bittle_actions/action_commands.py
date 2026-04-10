@@ -89,6 +89,9 @@ class BittleAction(Node):
         if self.ser is None:
             self.get_logger().error('Serial connection not established')
             return
+        if msg.data == "":
+            self.get_logger().warn('Received empty command')
+            return
         # cmd = BITTLE_COMMANDS.get(msg.data) con diccionario
         cmd = "k" + msg.data
         if cmd:
@@ -98,7 +101,8 @@ class BittleAction(Node):
             self.get_logger().warn('Unknown command')
 
     def __del__(self):
-        if hasattr(self, 'ser') and self.ser.is_open:
+        if hasattr(self, 'ser') and self.ser is not None:
+            self.get_logger().info('Closing Bluetooth connection')
             self.ser.close()
 
 
