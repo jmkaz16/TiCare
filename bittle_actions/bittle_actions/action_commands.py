@@ -116,8 +116,9 @@ def main(args=None):
     except KeyboardInterrupt: # Ctrl+C
         pass
     finally:
-        bittle_action.destroy_node()
-        rclpy.shutdown()
+        if rclpy.ok():
+            bittle_action.destroy_node()
+            rclpy.shutdown()
 
 
 if __name__ == '__main__':

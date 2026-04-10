@@ -90,8 +90,9 @@ def main(args=None):
         pass
 
     finally:
-        communication_publisher.destroy_node()
-        rclpy.shutdown()
+        if rclpy.ok():
+            communication_publisher.destroy_node()
+            rclpy.shutdown()
 
 
 if __name__ == "__main__":
