@@ -4,7 +4,13 @@ from launch_ros.actions import Node
 
 def generate_launch_description():
 
-    bittle_action_node = Node(package="bittle_actions", executable="command", output="screen")
+    bittle_action_node = Node(
+        package="bittle_actions", 
+        executable="command", 
+        output="screen",
+        parameters=[
+            {"MAC_ADDRESS": "31:02:00:00:30:AD"}
+        ])
 
     bittle_communication_node = Node(
         package="bittle_communication", executable="communication_publisher", output="screen"
