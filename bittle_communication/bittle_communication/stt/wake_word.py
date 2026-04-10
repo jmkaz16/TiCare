@@ -42,7 +42,7 @@ def listen_for_wake_word(duration=3, fs=16000):
     # - None -> salida/abort
     # - "" (cadena vacía) -> wake-word detectada sin orden en la misma frase
     # - "texto de la orden" -> wake-word + orden en la misma frase
-    print("Escuchando la palabra clave ... (pulsa 's' para salir)")
+    print("Escuchando la palabra clave ... (pulsa 'Ctrl+C' para salir)")
 
     model = whisper.load_model("small", device="cpu")
 
