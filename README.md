@@ -9,8 +9,8 @@ El objetivo principal es la **implementación de un sistema de control por voz p
 
 Se ha estructurado en los siguientes paquetes:
 
-- [`bittle_communication`](https://github.com/jmkaz16/TiCare/tree/chucho/bittle_communication): Responsable de la captura de audio, el reconocimiento de voz, procesamiento del lenguaje natural y el mapeo de sinónimos,. Publica las órdenes procesadas en el tópico `/bittle_raw`.
-- [`bittle_manager`](https://github.com/jmkaz16/TiCare/tree/chucho/bittle_manager): Actúa como el núcleo lógico del sistema. Implementa una máquina de estados finita (FSM) que gestiona  la validación de comandos críticos y la organización de una cola de ejecución para órdenes múltiples. Se sucribe a `/bittle_raw' y publica en `bittle_cmd`.
+- [`bittle_communication`](https://github.com/jmkaz16/TiCare/tree/chucho/bittle_communication): Responsable de la captura de audio, el reconocimiento de voz, procesamiento del lenguaje natural y el mapeo de sinónimos. Publica las órdenes procesadas en el tópico `/bittle_raw`.
+- [`bittle_manager`](https://github.com/jmkaz16/TiCare/tree/chucho/bittle_manager): Actúa como el núcleo lógico del sistema. Implementa una máquina de estados finita (FSM) que gestiona  la validación de comandos críticos y la organización de una cola de ejecución para órdenes múltiples. Se sucribe a `/bittle_raw` y publica en `bittle_cmd`.
 - [`bittle_actions`](https://github.com/jmkaz16/TiCare/tree/chucho/bittle_manager): Gestiona la comunicación de bajo nivel con el hardware del robot. Se suscribe al tópico `/bittle_cmd` y traduce las instrucciones validadas en comandos serie específicos para el controlador de Petoi Bittle.
 - [`bittle_bringup`](https://github.com/jmkaz16/TiCare/tree/chucho/bittle_bringup): Contiene los archivos de lanzamiento (`launch files`) y las configuraciones de parámetros (`.yaml`) necesarias para iniciar el sistema completo de manera coordinada.
 
@@ -21,7 +21,7 @@ Se ha estructurado en los siguientes paquetes:
 - **Juan Martínez:** Diseño de la arquitectura del sistema, implementación y desarrollo de los paquetes `bittle_communication` y `bittle_bringup` e integración global del sistema.
 - **Mario Guerra:** Desarrollo del módulo de reconocimiento de voz, implementación del sistema de mapeo de sinónimos y procesamiento de lenguaje natural (NLP).
 - **Nour Maimouni:** Coordinación, integración y validación del módulo de voz.
-- **Luis Gómez:** desarollo lógica de control interna de `bittle_manager`. (_Pendiente de validar_)
+- **Luis Gómez:** Desarollo lógica de control interna de `bittle_manager`. (_Pendiente de validar_)
     
 
 ## Guía de Instalación y Configuración
