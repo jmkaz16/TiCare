@@ -21,7 +21,7 @@ Se ha estructurado en los siguientes paquetes:
 - **Juan Martínez:** Diseño de la arquitectura del sistema, implementación y desarrollo de los paquetes `bittle_communication` y `bittle_bringup` e integración global del sistema.
 - **Mario Guerra:** Desarrollo del módulo de reconocimiento de voz, implementación del sistema de mapeo de sinónimos y procesamiento de lenguaje natural (NLP).
 - **Nour Maimouni:** Coordinación, integración y validación del módulo de voz.
-- **Luis Gómez:** Desarollo lógica de control interna de `bittle_manager`. (_Pendiente de validar_)
+- **Luis Gómez:** Desarrollo de la lógica de control de `bittle_manager`. (_Pendiente de validar_)
     
 
 ## Guía de Instalación y Configuración
