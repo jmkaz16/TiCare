@@ -1,97 +1,110 @@
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String
-import time
 
 class BittleStateMachine(Node):
     def __init__(self):
         super().__init__('bittle_state_machine')
         
-        # 1. Suscriptor: Escucha las órdenes ya procesadas por el sistema de voz
+        # Suscriptor: Escucha en 'bittle_raw'
         self.subscription = self.create_subscription(
             String,
-            'bittle_cmd',
+            'bittle_raw',
             self.command_callback,
             10)
         
-        # 2. Publicador: Envía las órdenes validadas al nodo de actuación de Bittle
-        self.publisher_ = self.create_publisher(String, 'bittle_final_cmd', 10)
+        # Publicador: Publica en 'bittle_cmd'
+        self.publisher_ = self.create_publisher(String, 'bittle_cmd', 10)
         
-        # 3. Estado Inicial: Asumimos que Bittle se enciende de pie ("up")
-        self.current_state = "up" 
+        # Temporizador: Dicta el ritmo de ejecución de las órdenes compuestas
+        timer_period = 2.0  # 2 segundos entre acción y acción
+        self.timer = self.create_timer(timer_period, self.timer_callback)
+        self.i = 0
         
-        # 4. Clasificación de comandos para facilitar la lógica
+        # Cola de comandos: Almacena la secuencia de acciones a realizar
+        self.command_queue = []
+        
+        # Estado Inicial
+        self.current_state = "rest" 
+        
+        # Clasificación de comandos
         self.postures = [
             "sit", "up", "rest", "dropped", "pd", 
             "tbl", "zz", "buttUp", "lifted", "str", "calib"
         ]
         self.movements_and_actions = [
             "bk", "bkL", "bkR", "jpF", "phF", "phL", "phR", 
-            "trF", "trL", "trR", "wkF", "wkL", "wkR", "mw", "jmp", # Movimientos
-            "bx", "chr", "dg", "fiv", "hds", "hg", "hi", "hu",     # Acciones
+            "trF", "trL", "trR", "wkF", "mw", "jmp",
+            "bx", "chr", "dg", "fiv", "hds", "hg", "hi", "hu",
             "kc", "pee", "pu", "scrh", "snf", "wh", "angry"
         ]
+        self.turns = ["wkL", "wkR"] 
 
-        self.get_logger().info("Bittle State Machine iniciada correctamente.")
-        self.get_logger().info(f"Estado inicial de Bittle: {self.current_state}")
+        self.get_logger().info("Máquina de Estados iniciada. Lista para secuencias compuestas.")
+        self.get_logger().info(f"Estado inicial: {self.current_state}")
 
     def command_callback(self, msg):
-        requested_action = msg.data.strip()
+        # 1. DIVIDIR MENSAJE: Si llegan varias órdenes (ej: "up\nbx"), las separamos en una lista.
+        incoming_commands = msg.data.strip().split('\n')
         
-        if not requested_action:
+        if not incoming_commands or incoming_commands == ['']:
             return
 
-        self.get_logger().info(f"==> Orden recibida: '{requested_action}' | Estado actual: '{self.current_state}'")
+        self.get_logger().info(f"Bloque de órdenes recibido: {incoming_commands}")
 
-        # Regla 1: Si piden una postura en la que YA estamos, lo ignoramos para ahorrar batería/tiempo
-        if requested_action in self.postures and requested_action == self.current_state:
-            self.get_logger().info("Bittle ya está en esa postura. Ignorando orden.")
-            return
+        # 2. PROCESAR CADA ORDEN INDIVIDUALMENTE
+        for raw_action in incoming_commands:
+            requested_action = raw_action.strip()
+            if not requested_action:
+                continue
 
-        # Regla 2: RESOLUCIÓN DE CONFLICTOS
-        # Si piden un movimiento o acción, Bittle DEBE estar de pie ("up")
-        if requested_action in self.movements_and_actions:
-            if self.current_state != "up":
-                self.get_logger().warn(f"Conflicto: Bittle está '{self.current_state}'. Levantando primero...")
-                self.send_command("up")
-                
-                # Pausa para dar tiempo físico a que los motores levanten al perro
-                # (Ajusta este tiempo según lo que tarde Bittle en la vida real)
-                time.sleep(1.5) 
-                
+            # Simulamos el estado futuro basándonos en lo que ya hay esperando en la cola
+            simulated_state = self.current_state
+            if self.command_queue:
+                last_queued = self.command_queue[-1]
+                if last_queued in self.postures:
+                    simulated_state = last_queued
+                else:
+                    simulated_state = "up"
+
+            # Regla 1: Ignorar posturas redundantes
+            if requested_action in self.postures and requested_action == simulated_state:
+                self.get_logger().info(f"Postura '{requested_action}' redundante. Ignorando en la secuencia.")
+                continue
+
+            # Regla 2: Resolver conflictos (Añadir transición "up")
+            if requested_action in self.movements_and_actions or requested_action in self.turns:
+                if simulated_state != "up":
+                    self.get_logger().info(f"Añadiendo transición 'up' antes de '{requested_action}'...")
+                    self.command_queue.append("up")
+                    simulated_state = "up"
+
+            # Añadir la orden validada a la cola
+            self.command_queue.append(requested_action)
+            self.get_logger().info(f"Orden '{requested_action}' encolada.")
+
+            # Regla 3: Control de giros (Detener giro a los 90º)
+            if requested_action in self.turns:
+                self.get_logger().info(f"Giro detectado. Añadiendo 'up' a la cola para detenerlo.")
+                self.command_queue.append("up")
+
+    def timer_callback(self):
+        # El temporizador saca de la cola una acción cada 2 segundos de forma secuencial
+        if self.command_queue:
+            action_to_publish = self.command_queue.pop(0)
+            
+            msg = String()
+            msg.data = action_to_publish
+            self.publisher_.publish(msg)
+            
+            # Actualizamos el estado real de la máquina
+            if action_to_publish in self.postures:
+                self.current_state = action_to_publish
+            else:
                 self.current_state = "up"
-                self.get_logger().info("Bittle ya está de pie. Procediendo con la orden...")
-
-        # Regla 3: Si estaba durmiendo ("zz") o "muerto" ("pd") y le piden sentarse, 
-        # a veces físicamente necesitan pasar por "up" primero (opcional, actívalo si es el caso)
-        if requested_action == "sit" and self.current_state in ["zz", "pd", "tbl", "dropped"]:
-             self.get_logger().warn("Postura compleja detectada. Levantando antes de sentar...")
-             self.send_command("up")
-             time.sleep(1.5)
-             self.current_state = "up"
-
-        # 5. Ejecutar la orden final solicitada
-        self.send_command(requested_action)
-        
-        # 6. Actualizar el estado interno
-        self.update_state(requested_action)
-
-    def send_command(self, action):
-        """Envia el comando al nodo actuador"""
-        msg = String()
-        msg.data = action
-        self.publisher_.publish(msg)
-        self.get_logger().info(f"Publicado en bittle_final_cmd: {action}")
-
-    def update_state(self, action):
-        """Actualiza la memoria del estado de Bittle"""
-        if action in self.postures:
-            # Si es una postura fija, el perro se queda así
-            self.current_state = action
-        else:
-            # Si es un movimiento (caminar) o acción (saludar), 
-            # al terminar el perro vuelve a su estado base de pie.
-            self.current_state = "up"
+                
+            self.get_logger().info(f'[{self.i}] Ejecutando secuencia: "{action_to_publish}" | Quedan en cola: {len(self.command_queue)}')
+            self.i += 1
 
 def main(args=None):
     rclpy.init(args=args)
