@@ -24,6 +24,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
+            'state_machine = bittle_manager.state_system_machine:main',
         ],
     },
 )
