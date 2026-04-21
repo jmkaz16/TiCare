@@ -1,13 +1,59 @@
-import whisper
+# audio_processor.py
+
+import warnings
+from stt.record_audio import record_audio
+from stt.whisper_stt import transcribe_audio
+from stt.wake_word import listen_for_wake_word
+from stt.tiago_spacy import parse_command
+
+# Duración de la grabación en segundos
+DURATION = 5
+
+# Suprimir avisos de Whisper
+warnings.filterwarnings("ignore", message="Performing inference on CPU when CUDA is available")
+warnings.filterwarnings("ignore", message="FP16 is not supported on CPU; using FP32 instead")
 
 
-def transcribe_audio(audio_path):
-    print("Cargando modelo Whisper...")
-    model = whisper.load_model("base", device="cpu")
+def main() -> None:
+    print("Sistema listo. Di la wake-word para comenzar.")
 
-    print("Transcribiendo audio...")
-    result = model.transcribe(audio_path, language="es")
+    # 1) Detectar wake-word
+    wake_result = listen_for_wake_word()
 
-    text = result["text"]
-    print("Transcripción:", text)
-    return text
+    if wake_result is None:
+        print("No se detectó activación o se solicitó salida. Terminando.")
+        return
+
+    if wake_result:
+        # Wake-word + orden en la misma frase
+        print("\nOrden detectada en la frase de activación.")
+        text = wake_result
+
+    else:
+        # Solo wake-word → grabamos la orden completa
+        print(f"\nActivado. Grabando mensaje durante {DURATION} segundos...")
+        fs, audio_data = record_audio(duration=DURATION)
+
+        # Transcribir audio en memoria
+        text = transcribe_audio(audio_data)
+
+    # Mostrar transcripción
+    print(f"\nTranscripción detectada: {repr(text)}")
+
+    # Interpretar directamente SIN semantic chunking
+    parsed = parse_command(text)
+    action = parsed.get("action")
+    topic = parsed.get("topic")
+
+    # Mostrar resultados por consola
+    print("\n--- TOPIC DETECTADO ---")
+    print("•", topic)
+
+    print("\n--- ACCIÓN DETECTADA ---")
+    print("•", action)
+
+    print("\nProceso completado.")
+
+
+if __name__ == "__main__":
+    main()
