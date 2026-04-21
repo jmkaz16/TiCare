@@ -2,11 +2,9 @@
 
 import whisper
 
+model = whisper.load_model("small", device="cpu")
 def transcribe_audio(audio_data):
-    print("Cargando modelo Whisper...")
-    model = whisper.load_model("base", device="cpu")
-
-    print("Transcribiendo audio...")
+    
     result = model.transcribe(audio_data, language="es")
     
     text = result["text"]

@@ -13,7 +13,6 @@ DURATION = 5
 warnings.filterwarnings("ignore", message="Performing inference on CPU when CUDA is available")
 warnings.filterwarnings("ignore", message="FP16 is not supported on CPU; using FP32 instead")
 
-
 def main() -> None:
     print("Sistema listo. Di la wake-word para comenzar.")
 
@@ -28,7 +27,6 @@ def main() -> None:
         # Wake-word + orden en la misma frase
         print("\nOrden detectada en la frase de activación.")
         text = wake_result
-
     else:
         # Solo wake-word → grabamos la orden completa
         print(f"\nActivado. Grabando mensaje durante {DURATION} segundos...")
@@ -40,20 +38,23 @@ def main() -> None:
     # Mostrar transcripción
     print(f"\nTranscripción detectada: {repr(text)}")
 
-    # Interpretar directamente SIN semantic chunking
+    # Interpretar con el parser final
     parsed = parse_command(text)
     action = parsed.get("action")
-    topic = parsed.get("topic")
+    obj = parsed.get("object")
+    place = parsed.get("place")
 
     # Mostrar resultados por consola
-    print("\n--- TOPIC DETECTADO ---")
-    print("•", topic)
+    print("\n --- ACCIÓN DETECTADA --- ")
+    print(".", action)
 
-    print("\n--- ACCIÓN DETECTADA ---")
-    print("•", action)
+    print("\n --- OBJETO DETECTADO --- ")
+    print(".", obj)
+
+    print("\n --- LUGAR DETECTADO --- ")
+    print(".", place)
 
     print("\nProceso completado.")
-
 
 if __name__ == "__main__":
     main()
