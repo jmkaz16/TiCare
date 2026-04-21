@@ -35,9 +35,6 @@ def main() -> None:
         # Transcribir audio en memoria
         text = transcribe_audio(audio_data)
 
-    # Mostrar transcripción
-    print(f"\nTranscripción detectada: {repr(text)}")
-
     # Interpretar con el parser final
     parsed = parse_command(text)
     action = parsed.get("action")
