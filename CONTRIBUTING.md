@@ -38,6 +38,7 @@ Each Python ROS 2 package must maintain a consistent layout:
     ├── worlds/          # Gazebo world files
     ├── package.xml      # Package metadata
     ├── setup.py         # Build instructions
+    ├── setup.cfg        # Config instructions
     └── requirements.txt # External Python dependencies
 ```
 
