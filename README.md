@@ -47,7 +47,7 @@ For optimal performance in ROS 2 Humble, we use `cyclonedds`.
 1. Install the RMW implementation:
     
     ```sh
-    sudo apt install ros-humble-rmw-cyclonedds-cpp
+    sudo apt update && sudo apt install ros-humble-rmw-cyclonedds-cpp
     ```
     
 2. Configure your environment by adding the following line to your `~/.bashrc`:
