@@ -1,16 +1,7 @@
 <?xml version="1.0"?>
 <sdf version="1.7">
   <world name="car">
-    <!-- light source -->
-    <include>
-      <uri>model://sun</uri>
-    </include>
-    <!-- A ground plane -->
-    <include>
-      <uri>model://ground_plane</uri>
-    </include>
-
-
+  
     <model name='wall_sx'>
       <static>1</static>
       <link name='link'>
