@@ -1,12 +1,12 @@
 # TiCare
 
-Este repositorio contiene el desarrollo de software para el proyecto **TiCare**, una startup creada en el marco de la asignatura **IngenIA Robótica del Máster en Ingeniería Industrial**. TiCare diseña soluciones robóticas para el hogar, centradas en el acompañamiento, asistencia y mejora de la calidad de vida de personas mayores mediante el **robot TIAGo.**
+This repository contains the software for **TiCare**, a robotics startup developed within the **IngenIA Robótica** framework of the Master's in Industrial Engineering (ETSII UPM). Our mission is to design healthcare robotics solutions for the home, focusing on companionship, assistance, and improving the quality of life for the elderly using the **TIAGo robot** platform.
 
-## Descripción
+## Project Overview
 
-El objetivo principal es integrar **técnicas de navegación SLAM en ROS con visión por computador en MATLAB** para que el robot TIAGo pueda localizar y alcanzar objetos en entornos domésticos. Este sistema combina percepción visual, planificación de trayectorias y control robótico para ofrecer una solución completa de asistencia.
+The primary objective is to integrate advanced **SLAM navigation techniques in ROS 2** with **Computer Vision in Python**. This allows the TIAGo robot to autonomously locate, navigate toward, and retrieve objects in domestic environments. The system combines visual perception, path planning, and robotic control to provide a comprehensive assistance solution.
 
-## Integrantes del equipo
+## Team Members
 
 - Daniel Franco – CEO & Requirements Manager
 - Luis Gómez – CTO & Product Manager
@@ -17,7 +17,7 @@ El objetivo principal es integrar **técnicas de navegación SLAM en ROS con vis
 - Mario Guerra – Simulation & Control Manager
 - Lucas Goñi – Assurance, Quality, Impact & Sustainability Manager
 
-## Enlaces
+## Links
 
 - 🌐 Web: [www.ticare.com](https://new-chat-n7ld.bolt.host/)
 - 📸 Instagram: [@TiCare\_\_](https://instagram.com/TiCare__)
