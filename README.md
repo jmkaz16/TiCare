@@ -18,7 +18,7 @@ Open a terminal and run the following commands to create your workspace and clon
 ```sh
 mkdir -p ~/ticare_ws/src
 cd ~/ticare_ws/src
-git clone https://github.com/jmkaz16/TiCare.git -b navigation
+git clone https://github.com/jmkaz16/TiCare.git -b navigation .
 ```
 
 ### 2. Import External Dependencies
