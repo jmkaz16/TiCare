@@ -1,0 +1,649 @@
+<?xml version="1.0"?>
+<sdf version="1.7">
+  <world name="car">
+    <include><uri>model://sun</uri></include>
+    <include><uri>model://ground_plane</uri></include>
+
+  
+    <model name='wall_sx'>
+      <static>1</static>
+      <link name='link'>
+        <pose>-0.6000000000000001 8.6 1.4 0 -0 0</pose>
+        <collision name='collision'>
+          <geometry>
+            <box>
+              <size>9 0.05 2.8</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>9 0.05 2.8</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+
+    <model name='wall_dx'>
+      <static>1</static>
+      <link name='link'>
+        <pose>1.05 -28.25 1.4 0 -0 0</pose>
+        <collision name='collision'>
+          <geometry>
+            <box>
+              <size>4.1 0.05 2.8</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>4.1 0.05 2.8</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+    
+    <model name='wall_dx_2'>
+      <static>1</static>
+      <link name='link'>
+        <pose>-1.25 -24.05 1.4 0 -0 0</pose>
+        <collision name='collision'>
+          <geometry>
+            <box>
+              <size>0.5 0.05 2.8</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>0.5 0.05 2.8</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+    
+
+    <model name='wall_sopra'>
+      <static>1</static>
+      <link name='link'>
+        <pose>5.5 -6.05 1.4 0 -0 1.57</pose>
+        <collision name='collision'>
+          <geometry>
+            <box>
+              <size>21.1 0.05 2.8</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>21.1 0.05 2.8</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+
+    <model name='wall_sopra_1'>
+      <static>1</static>
+      <link name='link'>
+        <pose>3.9 6.550000000000001 1.4 0 -0 1.57</pose>
+        <collision name='collision'>
+          <geometry>
+            <box>
+              <size>4.1 0.05 2.8</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>4.1 0.05 2.8</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+    
+    <model name='wall_sopra_2'>
+      <static>1</static>
+      <link name='link'>
+        <pose>-3.0999999999999996 -20.3 1.4 0 -0 1.57</pose>
+        <collision name='collision'>
+          <geometry>
+            <box>
+              <size>3 0.05 2.8</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>3 0.05 2.8</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+    
+    <model name='wall_sopra_3'>
+      <static>1</static>
+      <link name='link'>
+        <pose>3.1 -23.525 1.4 0 -0 1.57</pose>
+        <collision name='collision'>
+          <geometry>
+            <box>
+              <size>9.45 0.05 2.8</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>9.45 0.05 2.8</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+
+    
+    <model name='corridor'>
+      <static>1</static>
+      <link name='link'>
+        <pose>-5.1 -5.275 1.4 0 -0 1.57</pose>
+        <collision name='collision'>
+          <geometry>
+            <box>
+              <size>27.75 0.05 2.8</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>27.75 0.05 2.8</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+    
+    <model name='corridor_vertical'>
+      <static>1</static>
+      <link name='link'>
+        <pose>-4.1 -18.8 1.4 0 -0 0</pose>
+        <collision name='collision'>
+          <geometry>
+            <box>
+              <size>2 0.05 2.8</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>2 0.05 2.8</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+    
+    <model name='i'>
+      <static>1</static>
+      <link name='link'>
+        <pose>1.0 4.5 1.4 0 -0 0</pose>
+        <collision name='collision'>
+          <geometry>
+            <box>
+              <size>9 0.05 2.8</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>9 0.05 2.8</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+    
+    <model name='i_2'>
+      <static>1</static>
+      <link name='link'>
+        <pose>-3.575 5.5 1.4 0 -0 0</pose>
+        <collision name='collision'>
+          <geometry>
+            <box>
+              <size>0.15 0.05 2.8</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>0.15 0.05 2.8</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+    
+    <model name='i_3'>
+      <static>1</static>
+      <link name='link'>
+        <pose>-5.025 5.5 1.4 0 -0 0</pose>
+        <collision name='collision'>
+          <geometry>
+            <box>
+              <size>0.15 0.05 2.8</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>0.15 0.05 2.8</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+    
+    <model name='h'>
+      <static>1</static>
+      <link name='link'>
+        <pose>1.0 -0.7000000000000002 1.4 0 -0 0</pose>
+        <collision name='collision'>
+          <geometry>
+            <box>
+              <size>9 0.05 2.8</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>9 0.05 2.8</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+    
+    <model name='h_oriz'>
+      <static>1</static>
+      <link name='link'>
+        <pose>-3.5 4.800000000000001 1.4 0 -0 1.57</pose>
+        <collision name='collision'>
+          <geometry>
+            <box>
+              <size>1.4 0.05 2.8</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>1.4 0.05 2.8</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+    
+    <model name='j'>
+      <static>1</static>
+      <link name='link'>
+        <pose>1.0 -6.5 1.4 0 -0 0</pose>
+        <collision name='collision'>
+          <geometry>
+            <box>
+              <size>9 0.05 2.8</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>9 0.05 2.8</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+    
+    <model name='j_h_oriz'>
+      <static>1</static>
+      <link name='link'>
+        <pose>-3.5 -1.0 1.4 0 -0 1.57</pose>
+        <collision name='collision'>
+          <geometry>
+            <box>
+              <size>7.9 0.05 2.8</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>7.9 0.05 2.8</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+    
+    <model name='j_oriz'>
+      <static>1</static>
+      <link name='link'>
+        <pose>-3.5 -6.5 1.4 0 -0 1.57</pose>
+        <collision name='collision'>
+          <geometry>
+            <box>
+              <size>0.8 0.05 2.8</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>0.8 0.05 2.8</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+    
+    <model name='k'>
+      <static>1</static>
+      <link name='link'>
+        <pose>1.0 -11.4 1.4 0 -0 0</pose>
+        <collision name='collision'>
+          <geometry>
+            <box>
+              <size>9 0.05 2.8</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>9 0.05 2.8</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+    
+    <model name='pratica'>
+      <static>1</static>
+      <link name='link'>
+        <pose>2.575 -16.6 1.4 0 -0 0</pose>
+        <collision name='collision'>
+          <geometry>
+            <box>
+              <size>5.85 0.05 2.8</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>5.85 0.05 2.8</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+    
+    <model name='pratica2'>
+      <static>1</static>
+      <link name='link'>
+        <pose>-2.5 -16.6 1.4 0 -0 0</pose>
+        <collision name='collision'>
+          <geometry>
+            <box>
+              <size>2 0.05 2.8</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>2 0.05 2.8</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+
+    <model name='k_pratica_oriz'>
+      <static>1</static>
+      <link name='link'>
+        <pose>-3.5 -12.325 1.4 0 -0 1.57</pose>
+        <collision name='collision'>
+          <geometry>
+            <box>
+              <size>8.55 0.05 2.8</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>8.55 0.05 2.8</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+
+    <model name='quadrupedi'>
+      <static>1</static>
+      <link name='link'>
+        <pose>2.0 -18.8 1.4 0 -0 0</pose>
+        <collision name='collision'>
+          <geometry>
+            <box>
+              <size>7 0.05 2.8</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>7 0.05 2.8</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+    
+    <model name='quadrupedi_oriz1'>
+      <static>1</static>
+      <link name='link'>
+        <pose>-1.5 -19.2 1.4 0 -0 1.57</pose>
+        <collision name='collision'>
+          <geometry>
+            <box>
+              <size>0.8 0.05 2.8</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>0.8 0.05 2.8</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+    
+    <model name='quadrupedi_oriz2'>
+      <static>1</static>
+      <link name='link'>
+        <pose>-1.5 -22.4 1.4 0 -0 1.57</pose>
+        <collision name='collision'>
+          <geometry>
+            <box>
+              <size>3.3 0.05 2.8</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>3.3 0.05 2.8</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+    
+    <model name='quadrupedi_oriz3'>
+      <static>1</static>
+      <link name='link'>
+        <pose>-1.0 -26.15 1.4 0 -0 1.57</pose>
+        <collision name='collision'>
+          <geometry>
+            <box>
+              <size>4.2 0.05 2.8</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>4.2 0.05 2.8</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+
+
+
+    <model name="table1">
+      <static>1</static>
+      <link name="link">
+        <pose>-3.0 1.0 0.0 0 0 0</pose>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.8 3.5 0.8</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.8 3.5 0.8</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+            
+    </model>
+
+    <model name="work_table_2">
+        <static>1</static>
+        <!-- table top -->
+        <link name="table_top">
+            <pose>-1.0 1.0 0.0 0 0 0</pose>
+            <collision name="collision">
+            <geometry>
+                <box>
+                <size>0.8 3.5 0.8</size>
+                </box>
+            </geometry>
+            </collision>
+            <visual name="visual">
+            <geometry>
+                <box>
+                <size>0.8 3.5 0.8</size>
+                </box>
+            </geometry>
+            </visual>
+        </link>
+    </model>
+
+    
+    <model name="work_table_3">
+        <static>1</static>
+        <link name="table_top">
+            <pose>1.7 0.8 0.0 0 0 0</pose>
+            <collision name="collision">
+            <geometry>
+                <box>
+                <size>1.75 0.8 0.8</size>
+                </box>
+            </geometry>
+            </collision>
+            <visual name="visual">
+            <geometry>
+                <box>
+                <size>1.75 0.8 0.8</size>
+                </box>
+            </geometry>
+            </visual>
+        </link>
+    </model>
+
+    
+    <model name="work_table_4">
+        <static>1</static>
+
+        <link name="table_top">
+            <pose>4.7 0.8 0.0 0 0 0</pose>
+            <collision name="collision">
+            <geometry>
+                <box>
+                <size>1.75 0.8 0.8</size>
+                </box>
+            </geometry>
+            </collision>
+            <visual name="visual">
+            <geometry>
+                <box>
+                <size>1.75 0.8 0.8</size>
+                </box>
+            </geometry>
+            </visual>
+        </link>
+    </model>
+
+    
+    <model name="work_table_5">
+        <static>1</static>
+
+        <link name="table_top">
+            <pose>3.2 2.7 0.0 0 0 0</pose>
+            <collision name="collision">
+            <geometry>
+                <box>
+                <size>4.6 0.8 0.8</size>
+                </box>
+            </geometry>
+            </collision>
+            <visual name="visual">
+            <geometry>
+                <box>
+                <size>4.6 0.8 0.8</size>
+                </box>
+            </geometry>
+            </visual>
+        </link>
+    </model>
+  </world>
+</sdf>

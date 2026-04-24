@@ -6,6 +6,7 @@ from launch_ros.substitutions import FindPackageShare
 
 def generate_launch_description():
 
+
     ticare_navigation_dir = PathJoinSubstitution([FindPackageShare("ticare_navigation"), "launch"])
 
     ticare_sim_launch = IncludeLaunchDescription(

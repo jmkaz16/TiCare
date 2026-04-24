@@ -8,9 +8,15 @@ def generate_launch_description():
 
     tiago_dir = PathJoinSubstitution([FindPackageShare("tiago_gazebo"), "launch"])
 
+    world_path = PathJoinSubstitution(
+        [FindPackageShare("ticare_navigation"), "worlds", "car_shifted_final_block"]
+    )
+
     tiago_gazebo_launch = IncludeLaunchDescription(
         PathJoinSubstitution([tiago_dir, "tiago_gazebo.launch.py"]),
         launch_arguments={
+            "world_name": world_path,
+            "slam": "True",
             "arm_type": "no-arm",
             "navigation": "True",
             "is_public_sim": "True",
