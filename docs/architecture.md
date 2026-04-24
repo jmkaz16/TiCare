@@ -26,10 +26,15 @@
     - **Description:** High-level orchestrator that monitors localization quality (AMCL) and manages state transitions (Search, Navigation, Emergency).
         
     - **Interfaces:**
-        
+        - **Publishers:**
+            
+            - `/nav2vis` (`std_msgs/msg/String`): Sends commands (_"start_vis"_) to the `ticare_vision` package to activate the camera during the search phase.
+            - `/nav2com` (`std_msgs/msg/String`): Communicates mission status (_"home"_, _"object_point"_) to the `ticare_communication` package.
         - **Subscribers:**
             
             - `/amcl_pose` (`geometry_msgs/msg/PoseWithCovarianceStamped`): Monitor localization metrics.
+            - `/vis2nav` (`std_msgs/msg/String`): Receives object detection status (_"object_detected"_) from `ticare_vision` package.
+            - `/com2nav` (`std_msgs/msg/String`): Receives mission start commands (_"start_nav"_, _"return"_) from `ticare_communication` package.
                 
         - **Service Clients:**
             
