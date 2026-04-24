@@ -9,7 +9,7 @@ def generate_launch_description():
     tiago_dir = PathJoinSubstitution([FindPackageShare("tiago_gazebo"), "launch"])
 
     world_path = PathJoinSubstitution(
-        [FindPackageShare("ticare_navigation"), "worlds", "car_shifted_final"]
+        [FindPackageShare("ticare_navigation"), "worlds", "car_shifted_final_block"]
     )
 
     tiago_gazebo_launch = IncludeLaunchDescription(
