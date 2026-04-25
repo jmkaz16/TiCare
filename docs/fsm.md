@@ -46,7 +46,7 @@ This document outlines the high-level logic and state transitions for the `nav_m
 
 - **Description:** Records the exact location of the identified object.
     
-- **Actions:** Request the `pose_recorder` service to save the current pose as `"object_point"`. Publish `"object_point"` to `/nav2com` to notify the Communication module.
+- **Actions:** Request the `pose_recorder` service to save the current pose as `"object_point"`. Publish `"object_point"` to `/nav2com` to notify the Communication module and `"stop_vis"`to `/nav2vision`to stop the camera.
     
 - **Transition:** Move to **RETURNING_HOME**.
     
