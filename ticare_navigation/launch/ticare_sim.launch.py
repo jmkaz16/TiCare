@@ -16,7 +16,7 @@ def generate_launch_description():
         PathJoinSubstitution([tiago_dir, "tiago_gazebo.launch.py"]),
         launch_arguments={
             "world_name": world_path,
-            "slam": "True",
+            # "slam": "True",
             "arm_type": "no-arm",
             "navigation": "True",
             "is_public_sim": "True",
