@@ -1,11 +1,11 @@
 # stt/whisper_stt.py
 
-import whisper
+import speech_recognition as sr
 
-model = whisper.load_model("small", device="cpu")
+
 def transcribe_audio(audio_data):
     
-    result = model.transcribe(audio_data, language="es")
+    result = sr.Recognizer().recognize_google(audio_data, language='es-ES')
     
     text = result["text"]
     print("Transcripción:", text)
