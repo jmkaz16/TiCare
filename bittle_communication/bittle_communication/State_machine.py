@@ -66,7 +66,6 @@ def main():
             command_text = result
             state = 2
 
-
         # ---------------------------
         # ESTADO 2 — ¿Wake-word + comando?
         # ---------------------------
@@ -155,13 +154,13 @@ def main():
                 art = "el "
                 
             if place:
-                text=f"Perfecto, buscaré {art} {obj} en {place}."
+                text=f"Perfecto, buscaré {art}{obj} en {place}."
             else:
-                text=f"Perfecto, buscaré {art} {obj}."
+                text=f"Perfecto, buscaré {art}{obj}."
 
             speak_audio(text)
 
-            state = 0
+            break
 
         else:
             state = 0
