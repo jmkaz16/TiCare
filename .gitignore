@@ -15,3 +15,4 @@ tiago_navigation/
 tiago_robot/
 tiago_simulation/
 urdf_test/
+/ticare_navigation/data/pos0.yaml
