@@ -9,7 +9,7 @@ from stt.whisper_stt import transcribe_audio
 from stt.tiago_spacy import parse_command
 from input.command_map import COMMAND_MAP, PLACES_MAP
 
-WAKE_WORD = "tiago"
+WAKE_WORD = "Hola"
 INTERRUPT_WORDS = ["para", "detente", "stop", "quieto", "basta"]
 
 # ---------------------------
@@ -59,9 +59,9 @@ def main():
             break
 
         # Salida por comando de voz
-        if detect_interrupt(text):
-                print("Comando de interrupción detectado. Reiniciando sistema.")
-                state = 0
+        # if detect_interrupt(text):
+        #         print("Comando de interrupción detectado. Reiniciando sistema.")
+        #         state = 0
 
         # ---------------------------
         # ESTADO 0
