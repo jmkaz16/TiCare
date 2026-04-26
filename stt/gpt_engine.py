@@ -1,40 +1,37 @@
 from google import genai
-from gtts import gTTS
-import pygame
 import os
-import time
+from dotenv import load_dotenv
 
-# 1. Configuración con el nuevo SDK
-client = genai.Client(api_key="api kei")
-MODEL_ID = "gemini-2.0-flash" # El modelo más rápido de 2026
+# 1. Cargamos llave
+with open("stt/API.txt", "r") as f:
+    MI_CLAVE = f.read().strip()
+
+# 2. Configurar el cliente y el modelo más estable/rápido
+client = genai.Client(api_key=MI_CLAVE)
+
+
+#MODEL_ID = "gemini-3.1-flash-live-preview" # Sigue sin funcionar
 
 def chat_and_speak(text):
     try:
-        # 2. Generar respuesta (Sintaxis nueva)
-        prompt = f"Responde en una sola frase corta como un perro robótico simpático: {text}"
+# 3. Gemini que interpreta y responde
         response = client.models.generate_content(
-            model=MODEL_ID,
-            contents=prompt
+            model="gemini-3-flash-preview",
+            contents=f"Responde de forma muy breve y simpática: {text}"
         )
-        answer = response.text
-        print(f"🤖 Bittle dice: {answer}")
-
-        # 3. Voz (gTTS sigue igual, funciona perfecto)
-        tts = gTTS(text=answer, lang='es')
-        filename = "response.mp3"
-        tts.save(filename)
-
-        # 4. Reproducir
-        pygame.mixer.init()
-        pygame.mixer.music.load(filename)
-        pygame.mixer.music.play()
-
-        while pygame.mixer.music.get_busy():
-            time.sleep(0.1)
-        
-        pygame.mixer.quit()
-        if os.path.exists(filename):
-            os.remove(filename)
-
+        print(f"\n🤖 Tiago: {response.text}\n")
     except Exception as e:
-        print(f"❌ Error en el cerebro de Tiago: {e}")
+        print(f"❌ Error en Gemini: {e}")    
+
+# def chat_and_speak(text): # Mantenemos el nombre para no tener que tocar main.py
+#     try:
+#         # Solo generamos texto y lo imprimimos
+#         prompt = f"Responde en una sola frase corta como un perro robótico simpático: {text}"
+#         response = client.models.generate_content(
+#             model=MODEL_ID,
+#             contents=prompt
+#         )
+#         print(f"\n🤖 Tiago dice: {response.text}\n")
+
+#     except Exception as e:
+#         print(f"\n❌ Error en el cerebro de Tiago: {e}\n")

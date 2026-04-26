@@ -1,5 +1,5 @@
 SpeechRecognition
 PyAudio
-google-generativeai
+google-genai
 gTTS
 pygame

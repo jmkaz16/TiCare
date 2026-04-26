@@ -1,55 +1,68 @@
 import os
-
 from stt.stt_engine import listen_to_google
-from input.commands import COMMAND_MAP
+from stt.gpt_engine import chat_and_speak  
+from input.command_map import COMMAND_MAP
 
+# def main():
+#     print("🤖 TiCare Active. Di una orden o di 'Tiago' para hablar conmigo.")
+    
+#     while True:
+#         text = listen_to_google()
+        
+#         if text:
+#             text = text.lower().strip()
+#             print(f"He oído: '{text}'")
+
+#             # 1. Buscamos si es una orden exacta
+#             found_cmd = None
+#             for phrase, cmd_code in COMMAND_MAP.items():    #cambiar a lista de objetos
+#                 if phrase in text:
+#                     found_cmd = cmd_code
+#                     break
+            
+#             if found_cmd:
+#                 print(f"🎯 ORDEN DETECTADA: {found_cmd}")
+#                 save_to_state(found_cmd)
+                
+#             # 2. EL NUEVO FILTRO: ¿Ha dicho mi nombre?
+#             elif "tiago" in text:
+#                 print("💬 ¡Me ha llamado a mí! Pensando respuesta...")
+#                 # Quitamos el nombre para que a Gemini solo le llegue la pregunta
+#                 texto_limpio = text.replace("tiago", "").replace("perro", "").strip()
+#                 if texto_limpio == "":
+#                     texto_limpio = "¡Dime hola!" # Por si solo dices "Tiago" y te callas
+                
+#                 chat_and_speak(texto_limpio)
+                
+#             # 3. Si no es orden ni me llama por mi nombre...
+#             else:
+#                 print("☁️ (Ignorando ruido de fondo...)")
+
+# def save_to_state(command):
+#     if not os.path.exists("state"): os.makedirs("state")
+#     with open("state/order.txt", "w", encoding="utf-8") as f:
+#         f.write(command)
+#     print(f"💾 '{command}' guardado.")
+
+# if __name__ == "__main__":
+#     main()
 
 def main():
-    print("🤖 TiCare System Active. Say 'STOP' to exit.")
-    
+    print("---------------------------------------")
+    print("🚀 TIAGO ESTÁ ESCUCHANDO...")
+    print(" (Habla ahora y él te responderá) ")
+    print("---------------------------------------")
+
     while True:
-        text = listen_to_google()
-        
-        if text:
-            text = text.lower() # Pasamos a minúsculas para comparar
-            print(f"I heard: {text}")
-
-            found_cmd= None
-
-            sorted_phrases = sorted(COMMAND_MAP.keys(), key=len, reverse=True)
-
-            for phrase in sorted_phrases:
-                if phrase in text:
-                    found_cmd = COMMAND_MAP[phrase]
-                    break # En cuanto encontramos la coincidencia más larga, paramos
-
-
-            if found_cmd:
-                print(f"🎯 ORDEN RECONOCIDA: {found_cmd}")
-                save_to_state(found_cmd)
-
-
-            # BOTÓN DE SALIDA POR VOZ
-            if "stop" in text or "exit" in text or "adiós" in text:
-                print("👋 Closing TiCare. Goodbye!")
-                break # Esto rompe el bucle y cierra el programa
+            # 1. Llamamos a la función que escucha por el micro
+            text = listen_to_google()
             
-
-            else:
-                print("💬 Conversación general (No es una orden para Bittle)")
-            
-def save_to_state(command):
-    """Guarda el código corto del comando en el archivo de estado"""
-    folder = "state"
-    if not os.path.exists(folder):
-        os.makedirs(folder)
-        
-    file_path = os.path.join(folder, "order.txt")
-    with open(file_path, "w", encoding="utf-8") as f:
-        f.write(command)
-    print(f"💾 '{command}' escrito en {file_path}")
-
-
+            # 2. Si el micro ha pillado algo de texto...
+            if text:
+                print(f"👤 Tú dijiste: {text}")
+                
+                # 3. Llamamos a la función de Gemini para que interprete y responda
+                chat_and_speak(text)
 
 if __name__ == "__main__":
-    main() 
+    main()

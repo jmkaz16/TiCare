@@ -12,3 +12,8 @@ env/
 
 
 test_API.py
+stt/API.txt
+
+
+#hasta arreglarlo
+stt/stt_engine.py
