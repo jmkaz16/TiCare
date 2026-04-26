@@ -5,7 +5,7 @@ import os
 import time
 
 # 1. Configuración con el nuevo SDK
-client = genai.Client(api_key="API.txt")
+client = genai.Client(api_key="api kei")
 MODEL_ID = "gemini-2.0-flash" # El modelo más rápido de 2026
 
 def chat_and_speak(text):
