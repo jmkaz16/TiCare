@@ -4,7 +4,6 @@ import sounddevice as sd
 import numpy as np
 
 def record_audio(duration=5, fs=16000):
-    print("Grabando audio...")
     audio = sd.rec(
         int(duration * fs),
         samplerate=fs,
@@ -12,7 +11,6 @@ def record_audio(duration=5, fs=16000):
         dtype='float32'
     )
     sd.wait()
-    print("Grabación completada.")
 
     # Asegurar formato correcto
     audio = audio.flatten().astype(np.float32)

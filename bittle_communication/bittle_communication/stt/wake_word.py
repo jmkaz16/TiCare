@@ -1,9 +1,7 @@
-# stt/wake_word.py
-
-import sounddevice as sd
 import numpy as np
 from rapidfuzz import fuzz
 from stt.whisper_stt import transcribe_audio
+from stt.record_audio import record_audio
 
 TARGET_WAKE = "tiago"
 
@@ -27,21 +25,10 @@ def is_wake_word(text):
     return score > 70
 
 def listen_for_wake_word(duration=3, fs=16000):
-    print("Escuchando la palabra clave ... (Ctrl+C para salir)")
-
     while True:
         print("Grabando fragmento ... ")
-        audio = sd.rec(
-            int(duration * fs),
-            samplerate=fs,
-            channels=1,
-            dtype='float32'
-        )
-        sd.wait()
+        fs, audio = record_audio(duration=duration, fs=fs)
 
-        audio = audio.flatten().astype(np.float32)
-
-        # Usamos transcribe_audio() en vez de cargar Whisper aquí
         text = transcribe_audio(audio).lower().strip()
         print(f"Detectado: {text}")
 

@@ -1,15 +1,17 @@
-
+# State_machine.py
 
 import keyboard
 import time
 import numpy as np
-import sounddevice as sd
 
 from stt.whisper_stt import transcribe_audio
+from stt.record_audio import record_audio
+from stt.wake_word import listen_for_wake_word
 from stt.tiago_spacy import parse_command
 from input.command_map import COMMAND_MAP, PLACES_MAP
 
-WAKE_WORD = "Hola"
+
+WAKE_WORD = "tiago"
 INTERRUPT_WORDS = ["para", "detente", "stop", "quieto", "basta"]
 
 # ---------------------------
@@ -19,26 +21,6 @@ INTERRUPT_WORDS = ["para", "detente", "stop", "quieto", "basta"]
 WAKE_LISTEN_DURATION = 2      # Duración de cada fragmento mientras escucha la wake-word
 COMMAND_RECORD_DURATION = 7   # Duración de la grabación del comando completo
 CONFIRM_DURATION = 2          # Duración de la confirmación por voz
-
-
-# ---------------------------
-# Funciones auxiliares
-# ---------------------------
-
-def record_audio(duration, fs=16000):
-    audio = sd.rec(int(duration * fs), samplerate=fs, channels=1, dtype='float32')
-    sd.wait()
-    return audio.flatten().astype(np.float32)
-
-def detect_interrupt(text):
-    text = text.lower()
-    for w in INTERRUPT_WORDS:
-        if w in text:
-            return True
-    return False
-
-def detect_wake_word(text):
-    return WAKE_WORD in text.lower()
 
 
 # ---------------------------
@@ -58,11 +40,6 @@ def main():
             print("Saliendo del sistema.")
             break
 
-        # Salida por comando de voz
-        # if detect_interrupt(text):
-        #         print("Comando de interrupción detectado. Reiniciando sistema.")
-        #         state = 0
-
         # ---------------------------
         # ESTADO 0
         # ---------------------------
@@ -76,15 +53,17 @@ def main():
         # ESTADO 1 — Escucha continua de wake-word
         # ---------------------------
         elif state == 1:
-            print("Escuchando wake-word... (di 'tiago' para activar, o 'para' para cancelar)")
-            audio = record_audio(duration=WAKE_LISTEN_DURATION)
-            text = transcribe_audio(audio)
+            print("Escuchando wake-word...")
 
-            print("→", text)   # Mostrar lo que está transcribiendo
+            result = listen_for_wake_word(duration=WAKE_LISTEN_DURATION)
 
-            if detect_wake_word(text):
-                command_text = text.replace(WAKE_WORD, "").strip()
-                state = 2
+            if result is None:
+                state = 0
+                continue 
+
+            command_text = result
+            state = 2
+
 
         # ---------------------------
         # ESTADO 2 — ¿Wake-word + comando?
@@ -99,7 +78,7 @@ def main():
         # ESTADO 3 — Procesar comando 
         # ---------------------------
         elif state == 3:
-            print("Transcibiendo mensaje...")
+            print("Transcribiendo mensaje...")
             parsed = parse_command(command_text)
             state = 8
 
@@ -108,7 +87,7 @@ def main():
         # ---------------------------
         elif state == 4:
             print("Grabando mensaje...")
-            audio = record_audio(duration=COMMAND_RECORD_DURATION)
+            fs, audio = record_audio(duration=COMMAND_RECORD_DURATION)
             command_text = transcribe_audio(audio)
             state = 5
 
@@ -125,7 +104,7 @@ def main():
         # ESTADO 7 — No se detectó nada
         # ---------------------------
         elif state == 7:
-            print("No he entendido nada, repite por favor.")
+            print("No he entendido bien, repite por favor.")
             state = 4
 
         # ---------------------------
@@ -144,12 +123,12 @@ def main():
         elif state == 9:
             print("¿Es correcto? (di 'sí' o 'no')")
 
-            audio = record_audio(duration=CONFIRM_DURATION)
+            fs, audio = record_audio(duration=CONFIRM_DURATION)
             answer = transcribe_audio(audio).lower()
 
             if "sí" in answer or "si" in answer:
                 state = 10
-            else:
+            elif "no" in answer:
                 print("De acuerdo, dime otra vez qué querías decir.")
                 state = 4
 
@@ -170,6 +149,7 @@ def main():
 
         else:
             state = 0
+
 
 if __name__ == "__main__":
     main()
