@@ -1,6 +1,7 @@
-import numpy as np
+# stt/wake_word.py
+
 from rapidfuzz import fuzz
-from stt.whisper_stt import transcribe_audio
+from stt.google_stt import transcribe_audio
 from stt.record_audio import record_audio
 
 TARGET_WAKE = "tiago"
@@ -9,8 +10,8 @@ def clean_wake_word(text):
     text = text.lower().strip()
     if TARGET_WAKE in text:
         cleaned = text.replace(TARGET_WAKE, "").strip(" ,.")
-        return cleaned if cleaned else None
-    return None
+        return cleaned or ""   # Nunca devuelve None
+    return ""
 
 def is_wake_word(text):
     text = text.lower().strip()
@@ -24,12 +25,17 @@ def is_wake_word(text):
 
     return score > 70
 
-def listen_for_wake_word(duration=3, fs=16000):
+def listen_for_wake_word(duration=3):
     while True:
         print("Grabando fragmento ... ")
-        fs, audio = record_audio(duration=duration, fs=fs)
+        audio = record_audio(duration=duration)
 
-        text = transcribe_audio(audio).lower().strip()
+        text = transcribe_audio(audio)
+        if not text:
+            print("No se entendió nada.")
+            continue
+
+        text = text.lower().strip()
         print(f"Detectado: {text}")
 
         if is_wake_word(text):

@@ -2,7 +2,7 @@
 
 import warnings
 from stt.record_audio import record_audio
-from stt.whisper_stt import transcribe_audio
+from stt.google_stt import transcribe_audio
 from stt.wake_word import listen_for_wake_word
 from stt.tiago_spacy import parse_command
 

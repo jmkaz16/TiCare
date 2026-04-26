@@ -1,21 +1,13 @@
 # stt/record_audio.py
 
-import sounddevice as sd
-import numpy as np
+import speech_recognition as sr
 
-def record_audio(duration=5, fs=16000):
-    audio = sd.rec(
-        int(duration * fs),
-        samplerate=fs,
-        channels=1,
-        dtype='float32'
-    )
-    sd.wait()
-
-    # Asegurar formato correcto
-    audio = audio.flatten().astype(np.float32)
-
-    return fs, audio
+def record_audio(duration=3):
+    r = sr.Recognizer()
+    with sr.Microphone() as source:
+        r.adjust_for_ambient_noise(source, duration=0.5)
+        audio = r.record(source, duration=duration)
+    return audio
 
 
 if __name__ == "__main__":

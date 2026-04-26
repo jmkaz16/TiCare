@@ -4,7 +4,9 @@ import keyboard
 import time
 import numpy as np
 
-from stt.whisper_stt import transcribe_audio
+from stt.google_stt import transcribe_audio
+from stt.google_stt import reproduce_audio
+from stt.google_stt import generate_audio
 from stt.record_audio import record_audio
 from stt.wake_word import listen_for_wake_word
 from stt.tiago_spacy import parse_command
@@ -87,7 +89,7 @@ def main():
         # ---------------------------
         elif state == 4:
             print("Grabando mensaje...")
-            fs, audio = record_audio(duration=COMMAND_RECORD_DURATION)
+            audio = record_audio(duration=COMMAND_RECORD_DURATION)
             command_text = transcribe_audio(audio)
             state = 5
 
@@ -121,9 +123,10 @@ def main():
         # ESTADO 9 — Confirmación por voz
         # ---------------------------
         elif state == 9:
+
             print("¿Es correcto? (di 'sí' o 'no')")
 
-            fs, audio = record_audio(duration=CONFIRM_DURATION)
+            audio = record_audio(duration=CONFIRM_DURATION)
             answer = transcribe_audio(audio).lower()
 
             if "sí" in answer or "si" in answer:
@@ -141,9 +144,12 @@ def main():
             place = parsed["place"]
 
             if place:
-                print(f"Perfecto, buscaré {obj} en {place}.")
+                text=f"Perfecto, buscaré {obj} en {place}."
             else:
-                print(f"Perfecto, ejecutaré la acción {action} con {obj}.")
+                text=f"Perfecto, buscaré {obj}."
+
+            audio_buffer = generate_audio(text)
+            reproduce_audio(audio_buffer)
 
             state = 0
 
