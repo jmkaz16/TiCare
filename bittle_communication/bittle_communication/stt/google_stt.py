@@ -13,20 +13,16 @@ def transcribe_audio(audio_data):
         print("Transcripción:", text)
         return text
     except Exception as e:
-        print("Error en Google STT:", e)
-        return ""
+        return "Errr"
 
-def generate_audio(texto):
+def speak_audio(texto):
     tts = gTTS(text=texto, lang='es')
     fp = io.BytesIO()
     tts.write_to_fp(fp)
     fp.seek(0)
-    return fp
-
-
-def reproduce_audio(audio_buffer):
+    
     pygame.mixer.init()
-    pygame.mixer.music.load(audio_buffer)
+    pygame.mixer.music.load(fp)
     pygame.mixer.music.play()
 
     # Esperar a que termine

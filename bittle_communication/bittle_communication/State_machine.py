@@ -5,8 +5,7 @@ import time
 import numpy as np
 
 from stt.google_stt import transcribe_audio
-from stt.google_stt import reproduce_audio
-from stt.google_stt import generate_audio
+from stt.google_stt import speak_audio
 from stt.record_audio import record_audio
 from stt.wake_word import listen_for_wake_word
 from stt.tiago_spacy import parse_command
@@ -106,7 +105,7 @@ def main():
         # ESTADO 7 — No se detectó nada
         # ---------------------------
         elif state == 7:
-            print("No he entendido bien, repite por favor.")
+            speak_audio("No he entendido bien, repite por favor.")
             state = 4
 
         # ---------------------------
@@ -116,7 +115,7 @@ def main():
             if parsed["action"] is not None and parsed["object"] is not None:
                 state = 9
             else:
-                print("No he entendido bien, repite por favor.")
+                speak_audio("No he entendido bien, repite por favor.")
                 state = 4
 
         # ---------------------------
@@ -124,32 +123,34 @@ def main():
         # ---------------------------
         elif state == 9:
 
-            print("¿Es correcto? (di 'sí' o 'no')")
-
-            audio = record_audio(duration=CONFIRM_DURATION)
-            answer = transcribe_audio(audio).lower()
-
-            if "sí" in answer or "si" in answer:
-                state = 10
-            elif "no" in answer:
-                print("De acuerdo, dime otra vez qué querías decir.")
-                state = 4
-
-        # ---------------------------
-        # ESTADO 10 — Confirmación final
-        # ---------------------------
-        elif state == 10:
             action = parsed["action"]
             obj = parsed["object"]
             place = parsed["place"]
 
+            speak_audio(f"¿Quieres que busque la {obj}?")
+
+            audio = record_audio(duration=CONFIRM_DURATION)
+            answer = transcribe_audio(audio).lower()
+
+            print(answer)
+            if "sí" in answer or "si" in answer:
+                state = 10
+            elif "no" in answer:
+                speak_audio("De acuerdo, dime otra vez qué querías decir.")
+                state = 4
+            elif "Errr" in answer:    
+                speak_audio("No he entendido tu respuesta, repite por favor.")
+                
+        # ---------------------------
+        # ESTADO 10 — Confirmación final
+        # ---------------------------
+        elif state == 10:
             if place:
                 text=f"Perfecto, buscaré {obj} en {place}."
             else:
-                text=f"Perfecto, buscaré {obj}."
+                text=f"Perfecto, buscaré la {obj}."
 
-            audio_buffer = generate_audio(text)
-            reproduce_audio(audio_buffer)
+            speak_audio(text)
 
             state = 0
 

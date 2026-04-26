@@ -12,7 +12,6 @@ def get_nlp():
         return _nlp
     try:
         _nlp = spacy.load("es_core_news_sm")
-        print("spaCy cargado correctamente.")
     except Exception as e:
         print("spaCy no disponible, usando modelo en blanco:", e)
         _nlp = spacy.blank("es")
