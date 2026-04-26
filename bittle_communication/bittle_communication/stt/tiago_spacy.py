@@ -38,6 +38,20 @@ def map_place(word: str):
         return PLACES_MAP[match[0]]
     return None
 
+def detect_gender(palabra: str):
+    nlp = get_nlp()
+    doc = nlp(palabra)
+    token = doc[0]
+
+    genero = token.morph.get("Gender")
+
+    if "Fem" in genero:
+        return "femenino"
+    elif "Masc" in genero:
+        return "masculino"
+    else:
+        return "desconocido"
+
 def parse_command(text: str):
     text_norm = normalize(text)
     nlp = get_nlp()

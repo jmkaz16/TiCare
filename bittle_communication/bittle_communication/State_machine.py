@@ -9,6 +9,7 @@ from stt.google_stt import speak_audio
 from stt.record_audio import record_audio
 from stt.wake_word import listen_for_wake_word
 from stt.tiago_spacy import parse_command
+from stt.tiago_spacy import detect_gender
 from input.command_map import COMMAND_MAP, PLACES_MAP
 
 
@@ -140,15 +141,23 @@ def main():
                 state = 4
             elif "Errr" in answer:    
                 speak_audio("No he entendido tu respuesta, repite por favor.")
-                
+
         # ---------------------------
         # ESTADO 10 — Confirmación final
         # ---------------------------
         elif state == 10:
-            if place:
-                text=f"Perfecto, buscaré {obj} en {place}."
+
+            gender=detect_gender(obj)
+            
+            if gender == "femenino":
+                art = "la "
             else:
-                text=f"Perfecto, buscaré la {obj}."
+                art = "el "
+                
+            if place:
+                text=f"Perfecto, buscaré {art} {obj} en {place}."
+            else:
+                text=f"Perfecto, buscaré {art} {obj}."
 
             speak_audio(text)
 
