@@ -6,6 +6,7 @@ from rclpy.node import Node
 
 from ticare_interfaces.srv import SavePose
 from geometry_msgs.msg import PoseWithCovarianceStamped
+from geometry_msgs.msg import PoseStamped
 
 from rosidl_runtime_py.convert import message_to_yaml
 
@@ -35,10 +36,14 @@ class PoseRecorder(Node):
         if not os.path.exists(self.data_dir):  # In case the 'data' folder doesn't exist
             os.makedirs(self.data_dir)
 
-    def pose_callback(self, msg):
+    def pose_callback(self, msg: PoseWithCovarianceStamped) -> None:
         self.current_pose = msg
-        
-    def save_pose_callback(self, request, response):
+        self.covariance = (self.current_pose.pose.covariance[0] + self.current_pose.pose.covariance[7] + self.current_pose.pose.covariance[35])/3
+        self.data_to_save = PoseStamped()
+        self.data_to_save.header = self.current_pose.header
+        self.data_to_save.pose = self.current_pose.pose.pose
+
+    def save_pose_callback(self, request: SavePose.Request, response: SavePose.Response) -> SavePose.Response:
         if self.current_pose is None:
             response.success = False
             response.message = 'No pose data available to save.'
@@ -46,26 +51,34 @@ class PoseRecorder(Node):
             
             return response
 
-        file_name = f'{request.label}.yaml'
-        file_path = os.path.join(self.data_dir, file_name)
-
-        try:
-            # Save the current pose to a YAML file
-            with open(file_path, 'w') as file:
-                file.write(message_to_yaml(self.current_pose))
+        if self.covariance < 0.5:
+            response.success = False
+            response.message = 'Covariance is too high to save pose.'
+            self.get_logger().warn(response.message)
             
-            response.success = True
-            response.message = f'Pose saved successfully: {request.label}'
-            self.get_logger().info(f'Incoming request: {request.label}')
-
             return response
         
-        except Exception as e:
-            response.success = False
-            response.message = f'Error occurred while saving pose: {str(e)}'
-            self.get_logger().error(response.message)
+        else:
+            file_name = f'{request.label}.yaml'
+            file_path = os.path.join(self.data_dir, file_name)
+
+            try:
+                # Save the current pose to a YAML file
+                with open(file_path, 'w') as file:
+                    file.write(message_to_yaml(self.data_to_save))
             
-            return response
+                response.success = True
+                response.message = f'Pose saved successfully: {request.label}'
+                self.get_logger().info(f'Incoming request: {request.label}')
+
+                return response
+        
+            except Exception as e:
+                response.success = False
+                response.message = f'Error occurred while saving pose: {str(e)}'
+                self.get_logger().error(response.message)
+            
+                return response
 
 # ros2 service call /save_pose ticare_interfaces/srv/SavePose "{label: 'juan'}"
 
