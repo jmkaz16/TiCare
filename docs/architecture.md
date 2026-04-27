@@ -70,20 +70,25 @@
         
     - **Dependencies:** `rclpy`, `ticare_interfaces`, `geometry_msgs`, `rosidl_runtime_py`.
 
-- **Maps:**
-    This folder contains the various iterations of maps that have been created. Each map is defined by a `.pgm` and a `.yaml` file:
-
-    - **.pgm:** A grayscale occupancy grid image representing the environment, where pixels denote obstacles (black), free space (white), or unknown areas (gray).
-    - **.yaml:** A metadata file defining the map's scale (resolution), origin, and thresholds to map image pixels to real-world coordinates.
-
-    The final iteration of the map, hence the one used for navigation in the simulation is `final_map` for both the `.pgm` and the `.yaml` files.
-
 - **Worlds:**
-    This folder contains the Gazebo environment definitions used to synchronize the simulation with reality and ensure safe navigation:
 
-    - **`original` / `shifted_car`**: Aligns the simulation coordinate system with the physical lab environment, ensuring the TIAGo robot spawns at its exact real-world starting coordinates.
+    - **`car`**: Original world.
     
-    - **`shifted_block`**: The primary world used for simulation and mapping. It replaces tables with solid blocks to ensure the LIDAR detects them as impassable obstacles, preventing the robot from attempting to plan paths underneath them.
+    - **`car_shifted_final_block`**: Shifted world to match the spawning point with the real world location of TiaGo, using tables as blocks to ensure robust navigation.
+
+    There are other iterations of the maps that have been obtained by hand editing or implementing python scripts.
+
+- **Scripts:**
+    - **`modify_poses.py`**: Shifts the original `car.world`by modifying the poses of each block.
+
+- **Maps:**
+    Each map is defined by a `.pgm` and a `.yaml` file:
+    - **`final_map`**: Map used for navigation in the simulation, merge of `map`and `map_juan`.
+    - **`map`**: Map of the entire CAR with some errors.
+    - **`map_juan`**: Map of the Lab in the CAR.
+    - **`lab`**: Map of the Lab, first iteration.
+
+
 
 
     

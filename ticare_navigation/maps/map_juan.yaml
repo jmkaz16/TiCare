@@ -1,4 +1,4 @@
-image: mapa_juan.pgm
+image: map_juan.pgm
 mode: trinary
 resolution: 0.05
 origin: [-5.11, -0.749, 0]
