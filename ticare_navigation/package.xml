@@ -9,7 +9,11 @@
 
     <exec_depend>rclpy</exec_depend>
     <exec_depend>ros2launch</exec_depend>
+
+    <exec_depend>std_msgs</exec_depend>
     <exec_depend>ticare_interfaces</exec_depend>
+    <exec_depend>nav2_msgs</exec_depend>
+
     <exec_depend>geometry_msgs</exec_depend>
     <exec_depend>rosidl_runtime_py</exec_depend>
 
