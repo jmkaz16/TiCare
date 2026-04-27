@@ -8,7 +8,7 @@
     - Request: `string label` 
     - Response: `bool success`, `string message`
     
-- **Dependencies:** `rosidl_default_generators` (buildtool_depend), `rosidl_default_runtime`(exec_depend), `rosidl_interface_packages` (member_of_group)
+- **Dependencies:** `rosidl_default_generators` (buildtool_depend), `rosidl_default_runtime` (exec_depend), `rosidl_interface_packages` (member_of_group)
     
 
 ### `ticare_navigation`
@@ -17,22 +17,22 @@
 
 - **Launch:** 
     - `ticare_navigation.launch.py`:  Main launch file. Aggregates both simulation and internal nodes.
-    - `ticare_nodes.launch.py:` Launches the `nav_manager` and `pose_recorder` nodes.
-    - `ticare_sim.launch.py`: Launches Pal Robotics packages simulation  with specific arguments. 
+    - `ticare_nodes.launch.py`: Launches the `nav_manager` and `pose_recorder` nodes.
+    - `ticare_sim.launch.py`: Launches PAL Robotics packages simulation  with specific arguments. 
 
 - **Worlds:**
 
     - `car`: Original world.
-    - `car_shifted_final_block`: Shifted world to match the spawning point with the real world location of TiaGo, using tables as blocks to ensure robust navigation.
+    - `car_shifted_final_block`: Shifted world to match the spawning point with the real world location of TIAGo, using tables as blocks to ensure robust navigation.
 
     There are other iterations of the maps that have been obtained by hand editing or implementing python scripts.
 
 - **Scripts:**
-    - `modify_poses.py`: Shifts the original `car.world`by modifying the poses of each block.
+    - `modify_poses.py`: Shifts the original `car.world` by modifying the poses of each block.
 
 - **Maps:**
     Each map is defined by a `.pgm` and a `.yaml` file:
-    - `final_map`: Map used for navigation in the simulation, merge of `map`and `map_juan`.
+    - `final_map`: Map used for navigation in the simulation, merge of `map` and `map_juan`.
     - `map`: Map of the entire CAR with some errors.
     - `map_juan`: Map of the Lab in the CAR.
     - `lab`: Map of the Lab, first iteration.
@@ -47,6 +47,7 @@
             
             - `/nav2vis` (`std_msgs/msg/String`): Sends commands (_"start_vis", "stop_vis"_) to the `ticare_vision` package to activate or deactivate the camera during the search phase.
             - `/nav2com` (`std_msgs/msg/String`): Communicates mission status (_"home"_, _"object_point"_) to the `ticare_communication` package.
+        
         - **Subscribers:**
             
             - `/vis2nav` (`std_msgs/msg/String`): Receives object detection status (_"object_detected"_) from `ticare_vision` package.
@@ -74,7 +75,7 @@
     - **Interfaces:**
         - **Subscribers:**
         
-            - `amcl_pose` (`geometry_msgs/msg/PoseWithCovarianceStamped`): Caches the current pose for immediate saving.
+            - `amcl_pose` (`geometry_msgs/msg/PoseWithCovarianceStamped`): Catches the current pose for immediate saving.
         
         - **Service Servers:**
             
