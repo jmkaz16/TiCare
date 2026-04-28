@@ -1,0 +1,10 @@
+/**:
+  ros__parameters:
+    model_path: "/home/luisgfgetino/ticare_ws/src/ticare_vision/data/weights.pt"
+    confidence_threshold: 0.6
+    # TIAGo head joints
+    head_pan_joint: "head_1_joint"
+    head_tilt_joint: "head_2_joint"
+    # Approximate values in radians (0.0 is center, positive is down/left typically)
+    head_up_tilt: -0.5
+    head_down_tilt: 0.5
