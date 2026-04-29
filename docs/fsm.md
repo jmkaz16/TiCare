@@ -42,14 +42,14 @@ This document outlines the high-level logic and state transitions for the `nav_m
     
 - **Transition A:** If `"object_detected"` is received from `/vis2nav`, cancel navigation and move to **SAVING_OBJECT_POSE**.
     
-- **Transition B:** If the search timer expires (Timeout), move to **RETURNING_HOME**.
+- **Transition B:** If the search timer expires (Timeout), publish `"stop_vis"`to `/nav2vision`to stop the camera and move to **RETURNING_HOME**. 
     
 
 ### 5. SAVING_OBJECT_POSE
 
 - **Description:** Records the exact location of the identified object.
     
-- **Actions:** Request the `pose_recorder` service to save the current pose as `"object_point"`. Publish `"object_point"` to `/nav2com` to notify the Communication module and `"stop_vis"`to `/nav2vision`to stop the camera.
+- **Actions:** Request the `pose_recorder` service to save the current pose as `"object_point"`. Publish `"object_point"` to `/nav2com` to notify the Communication module.
     
 - **Transition:** Move to **RETURNING_HOME**.
     
