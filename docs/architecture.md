@@ -47,6 +47,7 @@
             
             - `/nav2vis` (`std_msgs/msg/String`): Sends commands (_"start_vis", "stop_vis"_) to the `ticare_vision` package to activate or deactivate the camera during the search phase.
             - `/nav2com` (`std_msgs/msg/String`): Communicates mission status (_"home"_, _"object_point"_) to the `ticare_communication` package.
+            - `/cmd_vel` (`geometry_msgs/msg/Twist`): Sends velocity commands to rotate if the initial localization accuracy is insufficient. 
         
         - **Subscribers:**
             
@@ -56,7 +57,6 @@
         - **Service Clients:**
             
             - `/save_pose` (`ticare_interfaces/srv/SavePose`): Request to record start or target points.
-            - `/map_server/load_map` (`nav2_msgs/srv/LoadMap`): Loads the map prior to search initialization.
                 
         - **Action Clients:**
             
