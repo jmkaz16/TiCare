@@ -12,21 +12,19 @@ from rosidl_runtime_py.convert import message_to_yaml
 
 
 class PoseRecorder(Node):
-    """
-    Node that subscribes to the /amcl_pose topic to receive the robot's current pose
-    and saves it to a YAML file when requested via a service call.
+    """Node responsible for receiving poses and storing them in YAML format.
 
-    Atributes:
-        current_pose (PoseWithCovarianceStamped): The latest pose received from the /amcl_pose topic.
+    Attributes:
+        current_pose (PoseWithCovarianceStamped): The latest pose received from the /amcl_pose
+        topic.
+        srv (Service): Receives a label and saves the current pose.
+        subscription (Subscription): Catches the current pose for immediate saving.
+        data_dir (str): The directory path where the YAML files will be saved.
         covariance (float): The average covariance calculated from the pose's covariance matrix.
         data_to_save (PoseStamped): The pose data formatted for saving to a YAML file.
-        data_dir (str): The directory path where the YAML files will be saved.
-
-        subscription (Subscription): The ROS subscription object for the /amcl_pose topic.
-        srv (Service): The ROS service object for the save_pose service.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
         Initializes the PoseRecorder node, sets up the subscription to the /amcl_pose topic,
         and creates the save_pose service.
@@ -58,14 +56,16 @@ class PoseRecorder(Node):
 
         Args:
             msg (PoseWithCovarianceStamped): The message received from the /amcl_pose topic,
-            containing the robot's current pose and covariance information.
+                containing the robot's current pose and covariance information.
         """
         self.current_pose = msg
+
         self.covariance = (
             self.current_pose.pose.covariance[0]
             + self.current_pose.pose.covariance[7]
             + self.current_pose.pose.covariance[35]
         ) / 3
+
         self.data_to_save = PoseStamped()
         self.data_to_save.header = self.current_pose.header
         self.data_to_save.pose = self.current_pose.pose.pose
@@ -79,9 +79,9 @@ class PoseRecorder(Node):
 
         Args:
             request (SavePose.Request): The service request containing the label for the pose
-            to be saved.
+                to be saved.
             response (SavePose.Response): The service response indicating the success or failure
-            of the save operation.
+                of the save operation.
 
         Returns:
             SavePose.Response: The response object containing the result of the save operation.
@@ -126,9 +126,12 @@ class PoseRecorder(Node):
 # ros2 service call /save_pose ticare_interfaces/srv/SavePose "{label: 'juan'}"
 
 
-def main():
-    rclpy.init()
-
+def main(args=None) -> None:
+    """
+    Main function that initializes the ROS node and starts spinning to process incoming messages
+    and service requests.
+    """
+    rclpy.init(args=args)
     pose_recorder = PoseRecorder()
 
     try:
