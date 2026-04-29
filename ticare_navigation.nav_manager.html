@@ -1,0 +1,399 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ticare_navigation.nav_manager module &mdash; ticare_navigation: Humble 0.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=7026087e"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="ticare_navigation.pose_recorder module" href="ticare_navigation.pose_recorder.html" />
+    <link rel="prev" title="ticare_navigation package" href="ticare_navigation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            ticare_navigation: Humble
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="__links.html">Links</a><ul>
+<li class="toctree-l2"><a class="reference external" href="https://index.ros.org/p/ticare_navigation">Rosindex</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">Python API</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="ticare_navigation.html">ticare_navigation package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="ticare_navigation.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">ticare_navigation.nav_manager module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ticare_navigation.pose_recorder.html">ticare_navigation.pose_recorder module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ticare_navigation.html#module-ticare_navigation">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="__standards.html">Standard Documents</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="__LICENSE.html">LICENSE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="__PACKAGE.html">PACKAGE</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="__ros_package_dependencies.html">ROS Package Dependencies</a><ul>
+<li class="toctree-l2"><a class="reference external" href="https://docs.ros.org/en/humble/p/rclpy/">rclpy</a></li>
+<li class="toctree-l2"><a class="reference external" href="https://docs.ros.org/en/humble/p/ros2launch/">ros2launch</a></li>
+<li class="toctree-l2"><a class="reference external" href="https://docs.ros.org/en/humble/p/std_msgs/">std_msgs</a></li>
+<li class="toctree-l2"><a class="reference external" href="https://docs.ros.org/en/humble/p/geometry_msgs/">geometry_msgs</a></li>
+<li class="toctree-l2"><a class="reference external" href="https://docs.ros.org/en/humble/p/nav2_msgs/">nav2_msgs</a></li>
+<li class="toctree-l2"><a class="reference external" href="https://docs.ros.org/en/humble/p/rosidl_runtime_py/">rosidl_runtime_py</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="genindex.html">Index</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">ticare_navigation: Humble</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">ticare_navigation</a></li>
+          <li class="breadcrumb-item"><a href="ticare_navigation.html">ticare_navigation package</a></li>
+      <li class="breadcrumb-item active">ticare_navigation.nav_manager module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/ticare_navigation.nav_manager.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-ticare_navigation.nav_manager">
+<span id="ticare-navigation-nav-manager-module"></span><h1>ticare_navigation.nav_manager module<a class="headerlink" href="#module-ticare_navigation.nav_manager" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="ticare_navigation.nav_manager.ComStatus">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ticare_navigation.nav_manager.</span></span><span class="sig-name descname"><span class="pre">ComStatus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ticare_navigation.nav_manager.ComStatus" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>Defines the communication statuses sent from NavManager to the ticare_communication package.</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><p>HOME: The robot has returned to the starting point.
+OBJECT_POINT: The robot has reached the location of the identified object.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ticare_navigation.nav_manager.ComStatus.HOME">
+<span class="sig-name descname"><span class="pre">HOME</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'home'</span></em><a class="headerlink" href="#ticare_navigation.nav_manager.ComStatus.HOME" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ticare_navigation.nav_manager.ComStatus.OBJECT_POINT">
+<span class="sig-name descname"><span class="pre">OBJECT_POINT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'object_point'</span></em><a class="headerlink" href="#ticare_navigation.nav_manager.ComStatus.OBJECT_POINT" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ticare_navigation.nav_manager.NavManager">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ticare_navigation.nav_manager.</span></span><span class="sig-name descname"><span class="pre">NavManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ticare_navigation.nav_manager.NavManager" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Node</span></code></p>
+<p>High-level orchestrator that monitors localization quality (AMCL) and manages state transitions
+(Search, Navigation, Emergency).</p>
+<dl>
+<dt>Attributes:</dt><dd><p>state (NavigationState): The current state of the navigation FSM.</p>
+<p>vision_pub (Publisher): Sends commands (“start_vis”, “stop_vis”) to the ticare_vision
+package to activate or deactivate the camera during the search phase.
+communication_pub (Publisher): Communicates mission status (“home”, “object_point”) to the
+ticare_communication package.</p>
+<p>vision_sub (Subscription): Receives object detection status (“object_detected”) from
+ticare_vision package.
+communication_sub (Subscription): Receives mission start commands (“start_nav”, “return”)
+from ticare_communication package.</p>
+<p>save_pose_client (Client): Request to record start or target points.</p>
+<p>nav_to_pose_client (ActionClient): Sends the robot to the target using A* algorithm.
+follow_waypoints_client (ActionClient): Executes coverage path planning.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="ticare_navigation.nav_manager.NavManager.communication_callback">
+<span class="sig-name descname"><span class="pre">communication_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">std_msgs.msg.String</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ticare_navigation.nav_manager.NavManager.communication_callback" title="Link to this definition"></a></dt>
+<dd><p>Handles mission commands from the communication package.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>msg (String): The message data containing the command.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ticare_navigation.nav_manager.NavManager.control_loop_callback">
+<span class="sig-name descname"><span class="pre">control_loop_callback</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ticare_navigation.nav_manager.NavManager.control_loop_callback" title="Link to this definition"></a></dt>
+<dd><p>Main control loop that orchestrates FSM transitions based on the current state.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ticare_navigation.nav_manager.NavManager.follow_waypoints_response_callback">
+<span class="sig-name descname"><span class="pre">follow_waypoints_response_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">future</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ticare_navigation.nav_manager.NavManager.follow_waypoints_response_callback" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ticare_navigation.nav_manager.NavManager.follow_waypoints_result_callback">
+<span class="sig-name descname"><span class="pre">follow_waypoints_result_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">future</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ticare_navigation.nav_manager.NavManager.follow_waypoints_result_callback" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ticare_navigation.nav_manager.NavManager.nav_to_pose_response_callback">
+<span class="sig-name descname"><span class="pre">nav_to_pose_response_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">future</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ticare_navigation.nav_manager.NavManager.nav_to_pose_response_callback" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ticare_navigation.nav_manager.NavManager.nav_to_pose_result_callback">
+<span class="sig-name descname"><span class="pre">nav_to_pose_result_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">future</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ticare_navigation.nav_manager.NavManager.nav_to_pose_result_callback" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ticare_navigation.nav_manager.NavManager.perform_recovery_rotation">
+<span class="sig-name descname"><span class="pre">perform_recovery_rotation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ticare_navigation.nav_manager.NavManager.perform_recovery_rotation" title="Link to this definition"></a></dt>
+<dd><p>Executes a recovery rotation to improve AMCL localization.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ticare_navigation.nav_manager.NavManager.publish_cmd_vel_msg">
+<span class="sig-name descname"><span class="pre">publish_cmd_vel_msg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">linear_x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">angular_z</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ticare_navigation.nav_manager.NavManager.publish_cmd_vel_msg" title="Link to this definition"></a></dt>
+<dd><p>Publishes a Twist message to the cmd_vel topic.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>linear_x (float): The linear velocity in the x direction [m/s].
+angular_z (float): The angular velocity around the z axis [rad/s].</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ticare_navigation.nav_manager.NavManager.publish_communication_status">
+<span class="sig-name descname"><span class="pre">publish_communication_status</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">status</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#ticare_navigation.nav_manager.ComStatus" title="ticare_navigation.nav_manager.ComStatus"><span class="pre">ComStatus</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ticare_navigation.nav_manager.NavManager.publish_communication_status" title="Link to this definition"></a></dt>
+<dd><p>Publishes a communication status to the ticare_communication package.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>status (ComStatus): The communication status to be published (e.g., HOME, OBJECT_POINT).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ticare_navigation.nav_manager.NavManager.publish_vision_command">
+<span class="sig-name descname"><span class="pre">publish_vision_command</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#ticare_navigation.nav_manager.VisionCommand" title="ticare_navigation.nav_manager.VisionCommand"><span class="pre">VisionCommand</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ticare_navigation.nav_manager.NavManager.publish_vision_command" title="Link to this definition"></a></dt>
+<dd><p>Publishes a vision command to the ticare_vision package.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>command (VisionCommand): The vision command to be published (e.g., START_VIS, STOP_VIS).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ticare_navigation.nav_manager.NavManager.save_pose_response_callback">
+<span class="sig-name descname"><span class="pre">save_pose_response_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">future</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ticare_navigation.nav_manager.NavManager.save_pose_response_callback" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ticare_navigation.nav_manager.NavManager.send_save_pose_request">
+<span class="sig-name descname"><span class="pre">send_save_pose_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#ticare_navigation.nav_manager.SavePoseLabel" title="ticare_navigation.nav_manager.SavePoseLabel"><span class="pre">SavePoseLabel</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ticare_navigation.nav_manager.NavManager.send_save_pose_request" title="Link to this definition"></a></dt>
+<dd><p>Sends a service request to save the current pose with the specified label.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>label (SavePoseLabel): The label for the pose to be saved (e.g., START_POSE, 
+OBJECT_POSE).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ticare_navigation.nav_manager.NavManager.vision_callback">
+<span class="sig-name descname"><span class="pre">vision_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">std_msgs.msg.String</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ticare_navigation.nav_manager.NavManager.vision_callback" title="Link to this definition"></a></dt>
+<dd><p>Handles object detection status from the vision package.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>msg (String): The message data from the vision node.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ticare_navigation.nav_manager.NavigationState">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ticare_navigation.nav_manager.</span></span><span class="sig-name descname"><span class="pre">NavigationState</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ticare_navigation.nav_manager.NavigationState" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>Defines the states for the TiCare Navigation FSM.</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><p>IDLE: System is initialized and waiting for a mission.
+LOCALIZING: Checks if a recovery rotation is needed to improve AMCL localization before 
+proceeding.
+SAVING_START_POSE: Records the starting position for the “Returning Home” phase.
+SEARCHING: Executes the search pattern in the target room.
+SAVING_OBJECT_POSE: Records the exact location of the identified object.
+RETURNING_HOME: Robot returns to the mission starting point.
+AWAITING_RETURN: Passive state waiting for the user confirmation to guide them to the
+object.
+NAV_TO_OBJECT: Robot guides the user to the detected object’s location.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ticare_navigation.nav_manager.NavigationState.AWAITING_RETURN">
+<span class="sig-name descname"><span class="pre">AWAITING_RETURN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">7</span></em><a class="headerlink" href="#ticare_navigation.nav_manager.NavigationState.AWAITING_RETURN" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ticare_navigation.nav_manager.NavigationState.IDLE">
+<span class="sig-name descname"><span class="pre">IDLE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#ticare_navigation.nav_manager.NavigationState.IDLE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ticare_navigation.nav_manager.NavigationState.LOCALIZING">
+<span class="sig-name descname"><span class="pre">LOCALIZING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#ticare_navigation.nav_manager.NavigationState.LOCALIZING" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ticare_navigation.nav_manager.NavigationState.NAV_TO_OBJECT">
+<span class="sig-name descname"><span class="pre">NAV_TO_OBJECT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">8</span></em><a class="headerlink" href="#ticare_navigation.nav_manager.NavigationState.NAV_TO_OBJECT" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ticare_navigation.nav_manager.NavigationState.RETURNING_HOME">
+<span class="sig-name descname"><span class="pre">RETURNING_HOME</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">6</span></em><a class="headerlink" href="#ticare_navigation.nav_manager.NavigationState.RETURNING_HOME" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ticare_navigation.nav_manager.NavigationState.SAVING_OBJECT_POSE">
+<span class="sig-name descname"><span class="pre">SAVING_OBJECT_POSE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">5</span></em><a class="headerlink" href="#ticare_navigation.nav_manager.NavigationState.SAVING_OBJECT_POSE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ticare_navigation.nav_manager.NavigationState.SAVING_START_POSE">
+<span class="sig-name descname"><span class="pre">SAVING_START_POSE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#ticare_navigation.nav_manager.NavigationState.SAVING_START_POSE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ticare_navigation.nav_manager.NavigationState.SEARCHING">
+<span class="sig-name descname"><span class="pre">SEARCHING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></em><a class="headerlink" href="#ticare_navigation.nav_manager.NavigationState.SEARCHING" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ticare_navigation.nav_manager.SavePoseLabel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ticare_navigation.nav_manager.</span></span><span class="sig-name descname"><span class="pre">SavePoseLabel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ticare_navigation.nav_manager.SavePoseLabel" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>Defines the labels for the poses saved by the SavePose service.</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><p>START_POSE: The starting position of the robot at the beginning of the mission.
+OBJECT_POSE: The position of the identified object after the search phase.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ticare_navigation.nav_manager.SavePoseLabel.OBJECT_POSE">
+<span class="sig-name descname"><span class="pre">OBJECT_POSE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'object_pose'</span></em><a class="headerlink" href="#ticare_navigation.nav_manager.SavePoseLabel.OBJECT_POSE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ticare_navigation.nav_manager.SavePoseLabel.START_POSE">
+<span class="sig-name descname"><span class="pre">START_POSE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'start_pose'</span></em><a class="headerlink" href="#ticare_navigation.nav_manager.SavePoseLabel.START_POSE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ticare_navigation.nav_manager.VisionCommand">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ticare_navigation.nav_manager.</span></span><span class="sig-name descname"><span class="pre">VisionCommand</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ticare_navigation.nav_manager.VisionCommand" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>Defines the vision commands sent from NavManager to the ticare_vision package.</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><p>START_VIS: The robot has localized itself and activates the camera to start the search 
+protocol.
+STOP_VIS: The search protocol has finished, deactivate the camera.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ticare_navigation.nav_manager.VisionCommand.START_VIS">
+<span class="sig-name descname"><span class="pre">START_VIS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'start_vis'</span></em><a class="headerlink" href="#ticare_navigation.nav_manager.VisionCommand.START_VIS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ticare_navigation.nav_manager.VisionCommand.STOP_VIS">
+<span class="sig-name descname"><span class="pre">STOP_VIS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'stop_vis'</span></em><a class="headerlink" href="#ticare_navigation.nav_manager.VisionCommand.STOP_VIS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ticare_navigation.nav_manager.main">
+<span class="sig-prename descclassname"><span class="pre">ticare_navigation.nav_manager.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ticare_navigation.nav_manager.main" title="Link to this definition"></a></dt>
+<dd><p>Main function to initialize the NavManager node and start spinning.</p>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="ticare_navigation.html" class="btn btn-neutral float-left" title="ticare_navigation package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="ticare_navigation.pose_recorder.html" class="btn btn-neutral float-right" title="ticare_navigation.pose_recorder module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright The &lt;ticare_navigation&gt; Contributors. License: Apache-2.0.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

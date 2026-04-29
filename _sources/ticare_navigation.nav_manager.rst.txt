@@ -1,0 +1,7 @@
+ticare\_navigation.nav\_manager module
+======================================
+
+.. automodule:: ticare_navigation.nav_manager
+   :members:
+   :undoc-members:
+   :show-inheritance:

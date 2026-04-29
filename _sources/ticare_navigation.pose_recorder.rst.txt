@@ -1,0 +1,7 @@
+ticare\_navigation.pose\_recorder module
+========================================
+
+.. automodule:: ticare_navigation.pose_recorder
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,7 @@
+ticare_navigation
+=================
+
+.. toctree::
+   :maxdepth: 4
+
+   ticare_navigation

@@ -1,0 +1,19 @@
+ticare\_navigation package
+==========================
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   ticare_navigation.nav_manager
+   ticare_navigation.pose_recorder
+
+Module contents
+---------------
+
+.. automodule:: ticare_navigation
+   :members:
+   :undoc-members:
+   :show-inheritance:
