@@ -25,7 +25,7 @@ setup(
     zip_safe=True,
     maintainer="catalina",
     maintainer_email="ketamoran@gmail.com",
-    description="Implementación del stack de navegación para el proyecto TiCare",
+    description="Implementation of the navigation stack, pose recording, and state management.",
     license="Apache-2.0",
     extras_require={
         "test": [
