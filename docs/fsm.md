@@ -16,8 +16,8 @@ This document outlines the high-level logic and state transitions for the `nav_m
 ### 2. LOCALIZING
 
 - **Description:** Checks if a recovery rotation is needed to improve AMCL localization before proceeding.
-- 
-- **Actions:** - Check the `recovery_rotation_active` flag. 
+
+- **Actions:** Check the `recovery_rotation_active` flag. 
     - **If False:** Immediate transition to **SAVING_START_POSE**. 
     - **If True:** Publish a rotation command to `/cmd_vel` for a short duration (e.g., 2-3 seconds). Once finished, set `recovery_rotation_active` to `False`.
     
@@ -30,7 +30,7 @@ This document outlines the high-level logic and state transitions for the `nav_m
 - **Actions:** Send an asynchronous request to the `pose_recorder` service with the label `"start_point"`. Once confirmed, publish `"start_vis"` to `/nav2vis` to activate the camera.
     
 - **Transition A (Success):** If confirmed, publish `"start_vis"` to `/nav2vis` and move to **SEARCHING**.
-- 
+  
 - **Transition B (Failure):** If the service indicates localization is not ready, set `recovery_rotation_active = True` and return to **LOCALIZING**.
     
 
@@ -87,4 +87,6 @@ This document outlines the high-level logic and state transitions for the `nav_m
 
 - [ ] **Error/Recovery State:** Implement a dedicated state to handle failures in linear flow (e.g., navigation goal unreachable, service timeout, or localization loss).
     
-- [ ] **Dynamic Re-localization:** Add a recovery behavior in the **LOCALIZING** state if the robot remains static with high covariance for too long.
+- [x] **Dynamic Re-localization:** Add a recovery behavior in the **LOCALIZING** state if the robot remains static with high covariance for too long.
+    
+- [ ] **Manual State Override:** Implement a subscriber (e.g., `/nav_manager/debug_set_state`) to manually force transitions between states for testing purposes without needing inputs from Vision or Communication packages.
