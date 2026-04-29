@@ -1,6 +1,6 @@
 # TiCare Navigation Architecture
 
-### `ticare_interfaces`
+## `ticare_interfaces`
 
 - **Description:** Custom service and message definitions for the TiCare ecosystem.
     
@@ -11,7 +11,7 @@
 - **Dependencies:** `rosidl_default_generators` (buildtool_depend), `rosidl_default_runtime` (exec_depend), `rosidl_interface_packages` (member_of_group)
     
 
-### `ticare_navigation`
+## `ticare_navigation`
 
 - **Description:** Implementation of the navigation stack, pose recording, and state management.
 
