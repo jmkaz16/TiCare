@@ -1,0 +1,253 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TiCare Navigation Architecture &mdash; TiCare - Navigation 0.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=7026087e"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="TiCare Navigation FSM" href="fsm.html" />
+    <link rel="prev" title="Documentation" href="../user_docs.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            TiCare - Navigation
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../__links.html">Links</a><ul>
+<li class="toctree-l2"><a class="reference external" href="https://index.ros.org/p/ticare_navigation">Rosindex</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">Python API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../ticare_navigation.html">ticare_navigation package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../ticare_navigation.html#submodules">Submodules</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../ticare_navigation.nav_manager.html">ticare_navigation.nav_manager module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../ticare_navigation.pose_recorder.html">ticare_navigation.pose_recorder module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../ticare_navigation.html#module-ticare_navigation">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../__standards.html">Standard Documents</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../__LICENSE.html">LICENSE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../__PACKAGE.html">PACKAGE</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../__ros_package_dependencies.html">ROS Package Dependencies</a><ul>
+<li class="toctree-l2"><a class="reference external" href="https://docs.ros.org/en/humble/p/rclpy/">rclpy</a></li>
+<li class="toctree-l2"><a class="reference external" href="https://docs.ros.org/en/humble/p/ros2launch/">ros2launch</a></li>
+<li class="toctree-l2"><a class="reference external" href="https://docs.ros.org/en/humble/p/std_msgs/">std_msgs</a></li>
+<li class="toctree-l2"><a class="reference external" href="https://docs.ros.org/en/humble/p/geometry_msgs/">geometry_msgs</a></li>
+<li class="toctree-l2"><a class="reference external" href="https://docs.ros.org/en/humble/p/nav2_msgs/">nav2_msgs</a></li>
+<li class="toctree-l2"><a class="reference external" href="https://docs.ros.org/en/humble/p/rosidl_runtime_py/">rosidl_runtime_py</a></li>
+</ul>
+</li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../user_docs.html">Documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">TiCare Navigation Architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fsm.html">TiCare Navigation FSM</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../genindex.html">Index</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">TiCare - Navigation</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../user_docs.html">Documentation</a></li>
+      <li class="breadcrumb-item active">TiCare Navigation Architecture</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/doc/architecture.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="ticare-navigation-architecture">
+<h1>TiCare Navigation Architecture<a class="headerlink" href="#ticare-navigation-architecture" title="Link to this heading"></a></h1>
+<section id="ticare-interfaces">
+<h2><code class="docutils literal notranslate"><span class="pre">ticare_interfaces</span></code><a class="headerlink" href="#ticare-interfaces" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><strong>Description:</strong> Custom service and message definitions for the TiCare ecosystem.</p></li>
+<li><p><strong>Service:</strong> <code class="docutils literal notranslate"><span class="pre">SavePose.srv</span></code>:</p>
+<ul>
+<li><p>Request: <code class="docutils literal notranslate"><span class="pre">string</span> <span class="pre">label</span></code></p></li>
+<li><p>Response: <code class="docutils literal notranslate"><span class="pre">bool</span> <span class="pre">success</span></code>, <code class="docutils literal notranslate"><span class="pre">string</span> <span class="pre">message</span></code></p></li>
+</ul>
+</li>
+<li><p><strong>Dependencies:</strong> <code class="docutils literal notranslate"><span class="pre">rosidl_default_generators</span></code> (buildtool_depend), <code class="docutils literal notranslate"><span class="pre">rosidl_default_runtime</span></code> (exec_depend), <code class="docutils literal notranslate"><span class="pre">rosidl_interface_packages</span></code> (member_of_group)</p></li>
+</ul>
+</section>
+<section id="ticare-navigation">
+<h2><code class="docutils literal notranslate"><span class="pre">ticare_navigation</span></code><a class="headerlink" href="#ticare-navigation" title="Link to this heading"></a></h2>
+<ul>
+<li><p><strong>Description:</strong> Implementation of the navigation stack, pose recording, and state management.</p></li>
+<li><p><strong>Launch:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ticare_navigation.launch.py</span></code>:  Main launch file. Aggregates both simulation and internal nodes.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ticare_nodes.launch.py</span></code>: Launches the <code class="docutils literal notranslate"><span class="pre">nav_manager</span></code> and <code class="docutils literal notranslate"><span class="pre">pose_recorder</span></code> nodes.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ticare_sim.launch.py</span></code>: Launches PAL Robotics packages simulation  with specific arguments.</p></li>
+</ul>
+</li>
+<li><p><strong>Worlds:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">car</span></code>: Original world.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">car_shifted_final_block</span></code>: Shifted world to match the spawning point with the real world location of TIAGo, using tables as blocks to ensure robust navigation.</p></li>
+</ul>
+<p>There are other iterations of the maps that have been obtained by hand editing or implementing python scripts.</p>
+</li>
+<li><p><strong>Scripts:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">modify_poses.py</span></code>: Shifts the original <code class="docutils literal notranslate"><span class="pre">car.world</span></code> by modifying the poses of each block.</p></li>
+</ul>
+</li>
+<li><p><strong>Maps:</strong>
+Each map is defined by a <code class="docutils literal notranslate"><span class="pre">.pgm</span></code> and a <code class="docutils literal notranslate"><span class="pre">.yaml</span></code> file:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">final_map</span></code>: Map used for navigation in the simulation, merge of <code class="docutils literal notranslate"><span class="pre">map</span></code> and <code class="docutils literal notranslate"><span class="pre">map_juan</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">map</span></code>: Map of the entire CAR with some errors.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">map_juan</span></code>: Map of the Lab in the CAR.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">lab</span></code>: Map of the Lab, first iteration.</p></li>
+</ul>
+</li>
+<li><p><strong>Node:</strong> <code class="docutils literal notranslate"><span class="pre">nav_manager</span></code></p>
+<ul class="simple">
+<li><p><strong>Description:</strong> High-level orchestrator that monitors localization quality (AMCL) and manages state transitions (Search, Navigation, Emergency).</p></li>
+<li><p><strong>Interfaces:</strong></p>
+<ul>
+<li><p><strong>Publishers:</strong></p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">/nav2vis</span></code> (<code class="docutils literal notranslate"><span class="pre">std_msgs/msg/String</span></code>): Sends commands (<em>“start_vis”, “stop_vis”</em>) to the <code class="docutils literal notranslate"><span class="pre">ticare_vision</span></code> package to activate or deactivate the camera during the search phase.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/nav2com</span></code> (<code class="docutils literal notranslate"><span class="pre">std_msgs/msg/String</span></code>): Communicates mission status (<em>“home”</em>, <em>“object_point”</em>) to the <code class="docutils literal notranslate"><span class="pre">ticare_communication</span></code> package.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/cmd_vel</span></code> (<code class="docutils literal notranslate"><span class="pre">geometry_msgs/msg/Twist</span></code>): Sends velocity commands to rotate if the initial localization accuracy is insufficient.</p></li>
+</ul>
+</li>
+<li><p><strong>Subscribers:</strong></p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">/vis2nav</span></code> (<code class="docutils literal notranslate"><span class="pre">std_msgs/msg/String</span></code>): Receives object detection status (<em>“object_detected”</em>) from <code class="docutils literal notranslate"><span class="pre">ticare_vision</span></code> package.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/com2nav</span></code> (<code class="docutils literal notranslate"><span class="pre">std_msgs/msg/String</span></code>): Receives mission start commands (<em>“start_nav”</em>, <em>“return”</em>) from <code class="docutils literal notranslate"><span class="pre">ticare_communication</span></code> package.</p></li>
+</ul>
+</li>
+<li><p><strong>Service Clients:</strong></p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">/save_pose</span></code> (<code class="docutils literal notranslate"><span class="pre">ticare_interfaces/srv/SavePose</span></code>): Request to record start or target points.</p></li>
+</ul>
+</li>
+<li><p><strong>Action Clients:</strong></p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">/navigate_to_pose</span></code> (<code class="docutils literal notranslate"><span class="pre">nav2_msgs/action/NavigateToPose</span></code>): Sends the robot to the target using A* algorithm.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/follow_waypoints</span></code> (<code class="docutils literal notranslate"><span class="pre">nav2_msgs/action/FollowWaypoints</span></code>): Executes coverage path planning.</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong>Entry Point:</strong> <code class="docutils literal notranslate"><span class="pre">ticare_navigation.nav_manager:main</span></code></p></li>
+<li><p><strong>Dependencies:</strong> <code class="docutils literal notranslate"><span class="pre">rclpy</span></code>, <code class="docutils literal notranslate"><span class="pre">ticare_interfaces</span></code>, <code class="docutils literal notranslate"><span class="pre">geometry_msgs</span></code>.</p></li>
+</ul>
+</li>
+<li><p><strong>Node:</strong> <code class="docutils literal notranslate"><span class="pre">pose_recorder</span></code></p>
+<ul class="simple">
+<li><p><strong>Description:</strong> Persistence node responsible for receiving poses and storing them in YAML format.</p></li>
+<li><p><strong>Interfaces:</strong></p>
+<ul>
+<li><p><strong>Subscribers:</strong></p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">amcl_pose</span></code> (<code class="docutils literal notranslate"><span class="pre">geometry_msgs/msg/PoseWithCovarianceStamped</span></code>): Catches the current pose for immediate saving.</p></li>
+</ul>
+</li>
+<li><p><strong>Service Servers:</strong></p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">save_pose</span></code> (<code class="docutils literal notranslate"><span class="pre">ticare_interfaces/srv/SavePose</span></code>): Receives a label and saves the current pose.</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong>Entry Point:</strong> <code class="docutils literal notranslate"><span class="pre">ticare_navigation.pose_recorder:main</span></code></p></li>
+<li><p><strong>Dependencies:</strong> <code class="docutils literal notranslate"><span class="pre">rclpy</span></code>, <code class="docutils literal notranslate"><span class="pre">ticare_interfaces</span></code>, <code class="docutils literal notranslate"><span class="pre">geometry_msgs</span></code>, <code class="docutils literal notranslate"><span class="pre">rosidl_runtime_py</span></code>.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../user_docs.html" class="btn btn-neutral float-left" title="Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="fsm.html" class="btn btn-neutral float-right" title="TiCare Navigation FSM" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright The &lt;ticare_navigation&gt; Contributors. License: Apache-2.0.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

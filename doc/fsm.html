@@ -1,0 +1,234 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TiCare Navigation FSM &mdash; TiCare - Navigation 0.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=7026087e"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Index" href="../genindex.html" />
+    <link rel="prev" title="TiCare Navigation Architecture" href="architecture.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            TiCare - Navigation
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../__links.html">Links</a><ul>
+<li class="toctree-l2"><a class="reference external" href="https://index.ros.org/p/ticare_navigation">Rosindex</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">Python API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../ticare_navigation.html">ticare_navigation package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../ticare_navigation.html#submodules">Submodules</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../ticare_navigation.nav_manager.html">ticare_navigation.nav_manager module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../ticare_navigation.pose_recorder.html">ticare_navigation.pose_recorder module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../ticare_navigation.html#module-ticare_navigation">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../__standards.html">Standard Documents</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../__LICENSE.html">LICENSE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../__PACKAGE.html">PACKAGE</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../__ros_package_dependencies.html">ROS Package Dependencies</a><ul>
+<li class="toctree-l2"><a class="reference external" href="https://docs.ros.org/en/humble/p/rclpy/">rclpy</a></li>
+<li class="toctree-l2"><a class="reference external" href="https://docs.ros.org/en/humble/p/ros2launch/">ros2launch</a></li>
+<li class="toctree-l2"><a class="reference external" href="https://docs.ros.org/en/humble/p/std_msgs/">std_msgs</a></li>
+<li class="toctree-l2"><a class="reference external" href="https://docs.ros.org/en/humble/p/geometry_msgs/">geometry_msgs</a></li>
+<li class="toctree-l2"><a class="reference external" href="https://docs.ros.org/en/humble/p/nav2_msgs/">nav2_msgs</a></li>
+<li class="toctree-l2"><a class="reference external" href="https://docs.ros.org/en/humble/p/rosidl_runtime_py/">rosidl_runtime_py</a></li>
+</ul>
+</li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../user_docs.html">Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="architecture.html">TiCare Navigation Architecture</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">TiCare Navigation FSM</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../genindex.html">Index</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">TiCare - Navigation</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../user_docs.html">Documentation</a></li>
+      <li class="breadcrumb-item active">TiCare Navigation FSM</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/doc/fsm.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="ticare-navigation-fsm">
+<h1>TiCare Navigation FSM<a class="headerlink" href="#ticare-navigation-fsm" title="Link to this heading"></a></h1>
+<p>This document outlines the high-level logic and state transitions for the <code class="docutils literal notranslate"><span class="pre">nav_manager</span></code> node. The system follows a “Black Box” integration model using ROS 2 topics for inter-package communication.</p>
+<section id="state-definitions">
+<h2>State Definitions<a class="headerlink" href="#state-definitions" title="Link to this heading"></a></h2>
+<section id="idle">
+<h3>1. IDLE<a class="headerlink" href="#idle" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Description:</strong> System is initialized and waiting for a mission.</p></li>
+<li><p><strong>Actions:</strong> Load the environment map (CAR model) via <code class="docutils literal notranslate"><span class="pre">/map_server/load_map</span></code>.</p></li>
+<li><p><strong>Transition:</strong> Move to <strong>LOCALIZING</strong> upon receiving the <code class="docutils literal notranslate"><span class="pre">&quot;start_nav&quot;</span></code> message on the <code class="docutils literal notranslate"><span class="pre">/com2nav</span></code> topic.</p></li>
+</ul>
+</section>
+<section id="localizing">
+<h3>2. LOCALIZING<a class="headerlink" href="#localizing" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Description:</strong> Checks if a recovery rotation is needed to improve AMCL localization before proceeding.</p></li>
+<li><p><strong>Actions:</strong> Check the <code class="docutils literal notranslate"><span class="pre">recovery_rotation_active</span></code> flag.</p>
+<ul>
+<li><p><strong>If False:</strong> Immediate transition to <strong>SAVING_START_POSE</strong>.</p></li>
+<li><p><strong>If True:</strong> Publish a rotation command to <code class="docutils literal notranslate"><span class="pre">/cmd_vel</span></code> for a short duration (e.g., 2-3 seconds). Once finished, set <code class="docutils literal notranslate"><span class="pre">recovery_rotation_active</span></code> to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+</ul>
+</li>
+<li><p><strong>Transition:</strong> Move to <strong>SAVING_START_POSE</strong> after the optional rotation.</p></li>
+</ul>
+</section>
+<section id="saving-start-pose">
+<h3>3. SAVING_START_POSE<a class="headerlink" href="#saving-start-pose" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Description:</strong> Records the starting position for the “Return Home” phase.</p></li>
+<li><p><strong>Actions:</strong> Send an asynchronous request to the <code class="docutils literal notranslate"><span class="pre">pose_recorder</span></code> service with the label <code class="docutils literal notranslate"><span class="pre">&quot;start_point&quot;</span></code>. Once confirmed, publish <code class="docutils literal notranslate"><span class="pre">&quot;start_vis&quot;</span></code> to <code class="docutils literal notranslate"><span class="pre">/nav2vis</span></code> to activate the camera.</p></li>
+<li><p><strong>Transition A (Success):</strong> If confirmed, publish <code class="docutils literal notranslate"><span class="pre">&quot;start_vis&quot;</span></code> to <code class="docutils literal notranslate"><span class="pre">/nav2vis</span></code> and move to <strong>SEARCHING</strong>.</p></li>
+<li><p><strong>Transition B (Failure):</strong> If the service indicates localization is not ready, set <code class="docutils literal notranslate"><span class="pre">recovery_rotation_active</span> <span class="pre">=</span> <span class="pre">True</span></code> and return to <strong>LOCALIZING</strong>.</p></li>
+</ul>
+</section>
+<section id="searching">
+<h3>4. SEARCHING<a class="headerlink" href="#searching" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Description:</strong> Executes the search pattern in the target room.</p></li>
+<li><p><strong>Actions:</strong> Start the <code class="docutils literal notranslate"><span class="pre">/follow_waypoints</span></code> action using points from <code class="docutils literal notranslate"><span class="pre">coverage_points.yaml</span></code>.</p></li>
+<li><p><strong>Transition A:</strong> If <code class="docutils literal notranslate"><span class="pre">&quot;object_detected&quot;</span></code> is received from <code class="docutils literal notranslate"><span class="pre">/vis2nav</span></code>, cancel navigation and move to <strong>SAVING_OBJECT_POSE</strong>.</p></li>
+<li><p><strong>Transition B:</strong> If the search timer expires (Timeout), publish <code class="docutils literal notranslate"><span class="pre">&quot;stop_vis&quot;</span></code>to <code class="docutils literal notranslate"><span class="pre">/nav2vision</span></code>to stop the camera and move to <strong>RETURNING_HOME</strong>.</p></li>
+</ul>
+</section>
+<section id="saving-object-pose">
+<h3>5. SAVING_OBJECT_POSE<a class="headerlink" href="#saving-object-pose" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Description:</strong> Records the exact location of the identified object.</p></li>
+<li><p><strong>Actions:</strong> Request the <code class="docutils literal notranslate"><span class="pre">pose_recorder</span></code> service to save the current pose as <code class="docutils literal notranslate"><span class="pre">&quot;object_point&quot;</span></code>. Publish <code class="docutils literal notranslate"><span class="pre">&quot;object_point&quot;</span></code> to <code class="docutils literal notranslate"><span class="pre">/nav2com</span></code> to notify the Communication module.</p></li>
+<li><p><strong>Transition:</strong> Move to <strong>RETURNING_HOME</strong>.</p></li>
+</ul>
+</section>
+<section id="returning-home">
+<h3>6. RETURNING_HOME<a class="headerlink" href="#returning-home" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Description:</strong> Robot returns to the mission starting point.</p></li>
+<li><p><strong>Actions:</strong> Execute the <code class="docutils literal notranslate"><span class="pre">/navigate_to_pose</span></code> action toward the stored <code class="docutils literal notranslate"><span class="pre">&quot;start_point&quot;</span></code>. Upon arrival, publish <code class="docutils literal notranslate"><span class="pre">&quot;home&quot;</span></code> to <code class="docutils literal notranslate"><span class="pre">/nav2com</span></code>.</p></li>
+<li><p><strong>Transition A:</strong> If an <code class="docutils literal notranslate"><span class="pre">&quot;object_point&quot;</span></code> was successfully saved during this mission, move to <strong>AWAITING_RETURN</strong>.</p></li>
+<li><p><strong>Transition B:</strong> If no object was found (Search Timeout), reset mission data and return to <strong>IDLE</strong>.</p></li>
+</ul>
+</section>
+<section id="awaiting-return">
+<h3>7. AWAITING_RETURN<a class="headerlink" href="#awaiting-return" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Description:</strong> Passive state waiting for user confirmation to guide them to the object.</p></li>
+<li><p><strong>Actions:</strong> Wait for the <code class="docutils literal notranslate"><span class="pre">&quot;return&quot;</span></code> message on the <code class="docutils literal notranslate"><span class="pre">/com2nav</span></code> topic.</p></li>
+<li><p><strong>Transition:</strong> Upon receiving <code class="docutils literal notranslate"><span class="pre">&quot;return&quot;</span></code>, move to <strong>NAV_TO_OBJECT</strong>.</p></li>
+</ul>
+</section>
+<section id="nav-to-object">
+<h3>8. NAV_TO_OBJECT<a class="headerlink" href="#nav-to-object" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Description:</strong> Robot guides the user to the detected object’s location.</p></li>
+<li><p><strong>Actions:</strong> Execute <code class="docutils literal notranslate"><span class="pre">/navigate_to_pose</span></code> using the stored <code class="docutils literal notranslate"><span class="pre">&quot;object_point&quot;</span></code>.</p></li>
+<li><p><strong>Transition:</strong> Once the goal is reached, reset mission context and return to <strong>IDLE</strong>.</p></li>
+</ul>
+</section>
+</section>
+<section id="to-do-future-improvements">
+<h2>TO-DO / Future Improvements<a class="headerlink" href="#to-do-future-improvements" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>[ ] <strong>Error/Recovery State:</strong> Implement a dedicated state to handle failures in linear flow (e.g., navigation goal unreachable, service timeout, or localization loss).</p></li>
+<li><p>[x] <strong>Dynamic Re-localization:</strong> Add a recovery behavior in the <strong>LOCALIZING</strong> state if the robot remains static with high covariance for too long.</p></li>
+<li><p>[ ] <strong>Manual State Override:</strong> Implement a subscriber (e.g., <code class="docutils literal notranslate"><span class="pre">/nav_manager/debug_set_state</span></code>) to manually force transitions between states for testing purposes without needing inputs from Vision or Communication packages.</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="architecture.html" class="btn btn-neutral float-left" title="TiCare Navigation Architecture" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../genindex.html" class="btn btn-neutral float-right" title="Index" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright The &lt;ticare_navigation&gt; Contributors. License: Apache-2.0.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
