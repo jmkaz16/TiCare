@@ -26,7 +26,7 @@ jobs:
           python3 -m pip install 'git+https://github.com/ros-infrastructure/rosdoc2@main'
           pip install numpy
           rosdep update
-          rosdep install --from-paths . -y --rosdistro humble
+          rosdep install --from-paths ticare_navigation ticare_interfaces -y --ignore-src --rosdistro humble
 
       - name: Build with rosdoc2
         run: |
