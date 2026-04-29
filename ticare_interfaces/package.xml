@@ -3,7 +3,7 @@
 <package format="3">
     <name>ticare_interfaces</name>
     <version>0.0.0</version>
-    <description>Custom service and message definitions for the TiCare ecosystem</description>
+    <description>Custom service and message definitions for the TiCare ecosystem.</description>
     <maintainer email="ketamoran@gmail.com">catalina</maintainer>
     <license>Apache-2.0</license>
 

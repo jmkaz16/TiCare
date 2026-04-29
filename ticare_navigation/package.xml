@@ -3,7 +3,7 @@
 <package format="3">
     <name>ticare_navigation</name>
     <version>0.0.0</version>
-    <description>Implementation of the navigation stack, pose recording, and state management</description>
+    <description>Implementation of the navigation stack, pose recording, and state management.</description>
     <maintainer email="ketamoran@gmail.com">catalina</maintainer>
     <license>Apache-2.0</license>
 
