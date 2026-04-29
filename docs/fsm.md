@@ -15,12 +15,13 @@ This document outlines the high-level logic and state transitions for the `nav_m
 
 ### 2. LOCALIZING
 
-- **Description:** Ensures the robot is properly situated in the environment.
+- **Description:** Checks if a recovery rotation is needed to improve AMCL localization before proceeding.
+- 
+- **Actions:** - Check the `recovery_rotation_active` flag. 
+    - **If False:** Immediate transition to **SAVING_START_POSE**. 
+    - **If True:** Publish a rotation command to `/cmd_vel` for a short duration (e.g., 2-3 seconds). Once finished, set `recovery_rotation_active` to `False`.
     
-- **Actions:** Monitor the `/amcl_pose` topic.
-    
-- **Transition:** Move to **SAVING_START_POSE** once the pose covariance falls below the predefined safety threshold.
-    
+- **Transition:** Move to **SAVING_START_POSE** after the optional rotation. 
 
 ### 3. SAVING_START_POSE
 
@@ -28,7 +29,9 @@ This document outlines the high-level logic and state transitions for the `nav_m
     
 - **Actions:** Send an asynchronous request to the `pose_recorder` service with the label `"start_point"`. Once confirmed, publish `"start_vis"` to `/nav2vis` to activate the camera.
     
-- **Transition:** Move to **SEARCHING**.
+- **Transition A (Success):** If confirmed, publish `"start_vis"` to `/nav2vis` and move to **SEARCHING**.
+- 
+- **Transition B (Failure):** If the service indicates localization is not ready, set `recovery_rotation_active = True` and return to **LOCALIZING**.
     
 
 ### 4. SEARCHING
