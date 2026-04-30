@@ -1,7 +1,7 @@
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
 from launch.actions import IncludeLaunchDescription
-from launch.actions import LaunchConfiguration
+from launch.substitutions import LaunchConfiguration
 from launch.substitutions import PathJoinSubstitution
 from launch_ros.substitutions import FindPackageShare
 from launch.conditions import UnlessCondition
@@ -9,9 +9,10 @@ from launch.conditions import UnlessCondition
 
 def generate_launch_description():
 
-    use_default_map = DeclareLaunchArgument(
-        "use_default_map", default_value="False", description="Whether or not to use the Pal Office" \
-        " map for navigation."
+    use_default_map_arg = DeclareLaunchArgument(
+        "use_default_map",
+        default_value="False",
+        description="Whether or not to use the Pal Office" " map for navigation.",
     )
 
     tiago_dir = PathJoinSubstitution([FindPackageShare("tiago_gazebo"), "launch"])
@@ -32,7 +33,11 @@ def generate_launch_description():
 
     ticare_nav_stack = IncludeLaunchDescription(
         PathJoinSubstitution(
-            [FindPackageShare("ticare_navigation"), "launch", "nav_public_sim_ticare.launch.py"]
+            [
+                FindPackageShare("ticare_navigation"),
+                "launch",
+                "navigation_public_sim_ticare.launch.py",
+            ]
         ),
         launch_arguments={
             "world_name": world_path,
@@ -44,9 +49,7 @@ def generate_launch_description():
         condition=UnlessCondition(LaunchConfiguration("use_default_map")),
     )
 
-
-
-    return LaunchDescription([tiago_gazebo_launch, ticare_nav_stack])
+    return LaunchDescription([use_default_map_arg, tiago_gazebo_launch, ticare_nav_stack])
 
 
 # Possible arguments to pass to the launch file:
