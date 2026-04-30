@@ -18,7 +18,8 @@
 - **Launch:** 
     - `ticare_navigation.launch.py`:  Main launch file. Aggregates both simulation and internal nodes.
     - `ticare_nodes.launch.py`: Launches the `nav_manager` and `pose_recorder` nodes.
-    - `ticare_sim.launch.py`: Launches PAL Robotics packages simulation  with specific arguments. 
+    - `ticare_sim.launch.py`: Launches PAL Robotics packages simulation  with specific arguments.
+    - `navigation_public_sim_ticare.launch.py`: Configures Tiago simulation with custom map.
 
 - **Worlds:**
 
@@ -75,11 +76,11 @@
     - **Interfaces:**
         - **Subscribers:**
         
-            - `amcl_pose` (`geometry_msgs/msg/PoseWithCovarianceStamped`): Catches the current pose for immediate saving.
+            - `/amcl_pose` (`geometry_msgs/msg/PoseWithCovarianceStamped`): Catches the current pose for immediate saving.
         
         - **Service Servers:**
             
-            - `save_pose` (`ticare_interfaces/srv/SavePose`): Receives a label and saves the current pose.
+            - `/save_pose` (`ticare_interfaces/srv/SavePose`): Receives a label and saves the current pose.
                 
     - **Entry Point:** `ticare_navigation.pose_recorder:main`
         
