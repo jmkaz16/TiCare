@@ -5,9 +5,11 @@ from std_msgs.msg import String
 from sensor_msgs.msg import Image
 from control_msgs.action import FollowJointTrajectory
 from trajectory_msgs.msg import JointTrajectoryPoint
+from builtin_interfaces.msg import Duration  # <--- NUEVA IMPORTACIÓN
 from cv_bridge import CvBridge
 from ultralytics import YOLO
 import cv2
+from rclpy.qos import qos_profile_sensor_data
 from enum import Enum
 
 class VisionState(Enum):
@@ -22,16 +24,12 @@ class VisionState(Enum):
 class VisionNode(Node):
     """
     Manages object detection and TIAGo head control using a State Machine.
-
-    This node subscribes to communication and navigation topics to coordinate 
-    vision tasks and head movements following a strict state flow.
     """
 
     def __init__(self):
-        """Initialize the node, parameters, state machine, and ROS 2 interfaces."""
         super().__init__("vision_node")
 
-        # Configuration Parameters
+        # # Configuration Parameters
         self.declare_parameter("model_path", "/home/luisgfgetino/ticare_ws/src/ticare_vision/data/weights.pt")
         self.declare_parameter("confidence_threshold", 0.6)
         
@@ -41,31 +39,27 @@ class VisionNode(Node):
         # Internal State
         self.target_object = ""
         self.bridge = CvBridge()
+        self.window_name = "TIAGo Vision - YOLO v11"
         
         # State Machine Initialization
         self.current_state = VisionState.ESPERANDO_ORDEN
         self.get_logger().info(f"--- [STATE] Initialized in state: {self.current_state.name} ---")
         
-        # Load YOLO Model (Architecture YOLO v11) - Commented out for mock testing
+        # Load YOLO Model (Commented out for mock testing)
         self.get_logger().info(f"--- [INIT] Loading YOLO v11 model: {model_path} ---")
         self.model = YOLO(model_path)
 
         # --- SUBSCRIBERS ---
-        self.sub_com2vis = self.create_subscription(
-            String, "/com2vis", self.com2vis_callback, 10
-        )
-        self.sub_nav2vis = self.create_subscription(
-            String, "/nav2vis", self.nav2vis_callback, 10
-        )
-        self.sub_camera = self.create_subscription(
-            Image, "/xtion/rgb/image_rect_color", self.camera_callback, 10
-        )
+        self.sub_com2vis = self.create_subscription(String, "/com2vis", self.com2vis_callback, 10)
+        self.sub_nav2vis = self.create_subscription(String, "/nav2vis", self.nav2vis_callback, 10)
+        self.sub_camera = self.create_subscription(Image, "/head_front_camera/rgb/image_raw", self.camera_callback, 10) ## en la realidad la documentación pone como /head_front_camer/color/image_raw/*
 
         # --- PUBLISHERS ---
         self.pub_vis2com = self.create_publisher(String, "/vis2com", 10)
         self.pub_vis2nav = self.create_publisher(String, "/vis2nav", 10)
 
-        # Action Client for TIAGo Head
+        # --- ACTION CLIENT FOR TIAGo HEAD ---
+        # Este es el canal de comunicación hacia el controlador de Gazebo
         self.head_action_client = ActionClient(
             self, FollowJointTrajectory, "/head_controller/follow_joint_trajectory"
         )
@@ -73,27 +67,15 @@ class VisionNode(Node):
         self.get_logger().info("--- [STATUS] Vision Node is READY and listening ---")
 
     def change_state(self, new_state: VisionState) -> None:
-        """
-        Handles state transitions safely and logs them.
-        
-        Args:
-            new_state (VisionState): The target state to transition to.
-        """
-        self.get_logger().info(
-            f"--- [STATE TRANSITION] {self.current_state.name} -> {new_state.name} ---"
-        )
+    
+        if self.current_state == VisionState.BUSQUEDA_ACTIVA and new_state != VisionState.BUSQUEDA_ACTIVA:
+            self.get_logger().info("--- [CLEANUP] Closing vision window ---")
+            cv2.destroyAllWindows()
+
+        self.get_logger().info(f"--- [STATE TRANSITION] {self.current_state.name} -> {new_state.name} ---")
         self.current_state = new_state
 
     def check_emergency(self, cmd: str) -> bool:
-        """
-        Checks for emergency commands to trigger an immediate state change.
-        
-        Args:
-            cmd (str): The received command string.
-            
-        Returns:
-            bool: True if an emergency was triggered, False otherwise.
-        """
         if cmd == "PE":
             self.get_logger().error("!!! [EMERGENCY] Parada de Emergencia Triggered !!!")
             self.change_state(VisionState.EMERGENCIA)
@@ -101,12 +83,6 @@ class VisionNode(Node):
         return False
 
     def com2vis_callback(self, msg: String) -> None:
-        """
-        Handles messages from the Communication module acting as state triggers. 
-        
-        Args:
-            msg (String): Message received (head_up, head_down, object_X, PE, rearme manual).
-        """
         cmd = msg.data
         self.get_logger().info(f"--- [IN] Received from COM (/com2vis): '{cmd}' ---")
 
@@ -116,7 +92,7 @@ class VisionNode(Node):
         # State Machine Logic for Communication Commands       
         if self.current_state == VisionState.ESPERANDO_ORDEN:
             if cmd == "head_up":
-                #self.move_head(-0.5)
+                self.move_head(0.0)  # <--- DESCOMENTADO
                 self.change_state(VisionState.PREPARANDO_VISION)
 
         elif self.current_state == VisionState.PREPARANDO_VISION:
@@ -127,96 +103,116 @@ class VisionNode(Node):
 
         elif self.current_state == VisionState.VISION_DETENIDA:
             if cmd == "head_down":
-                #self.move_head(0.5)
+                self.move_head(-0.5)   # <--- DESCOMENTADO
                 self.change_state(VisionState.ESPERANDO_ORDEN)
 
     def nav2vis_callback(self, msg: String) -> None:
-        """
-        Handles messages from the Navigation module acting as state triggers. 
-        
-        Args:
-            msg (String): Message received (start_vis, stop_vis, PE).
-        """
         cmd = msg.data
         self.get_logger().info(f"--- [IN] Received from NAV (/nav2vis): '{cmd}' ---")
 
         if self.check_emergency(cmd):
             return
 
-        # State Machine Logic for Navigation Commands
         if self.current_state == VisionState.ESPERANDO_OBJETO:
             if cmd == "start_vis":
                 self.change_state(VisionState.BUSQUEDA_ACTIVA)
-                self.trigger_mock_detection() # Descomentar para test manual sin cámara
+                self.move_head(-0.2)
+                #self.trigger_mock_detection()
 
         elif self.current_state == VisionState.BUSQUEDA_ACTIVA:
             if cmd == "stop_vis":
                 self.change_state(VisionState.VISION_DETENIDA)
-
-    def trigger_mock_detection(self) -> None:
-        """Simulates finding the object immediately after activating vision."""
-        if self.current_state == VisionState.BUSQUEDA_ACTIVA:
-            self.get_logger().info(f"*** [MOCK] Simulando deteccion de: {self.target_object} ***")
-            
-            out_msg = String()
-            out_msg.data = "object_detected"
-            self.pub_vis2com.publish(out_msg)
-            self.pub_vis2nav.publish(out_msg)
-            
-            self.get_logger().info("--- [OUT] Publicado 'object_detected' a COM y NAV ---")
-            self.change_state(VisionState.VISION_DETENIDA)
+                self.move_head(0.0)
+    # def trigger_mock_detection(self) -> None:
+    #     if self.current_state == VisionState.BUSQUEDA_ACTIVA:
+    #         self.get_logger().info(f"*** [MOCK] Simulando deteccion de: {self.target_object} ***")
+    #         out_msg = String()
+    #         out_msg.data = "object_detected"
+    #         self.pub_vis2com.publish(out_msg)
+    #         self.pub_vis2nav.publish(out_msg)
+    #         self.get_logger().info("--- [OUT] Publicado 'object_detected' a COM y NAV ---")
+    #         self.change_state(VisionState.VISION_DETENIDA)
 
     def camera_callback(self, msg: Image) -> None:
-        """
-        Processes frames. Only executes inference if in BUSQUEDA_ACTIVA state.
-        """
-        # Protegemos el callback: solo evalúa imágenes si está en el estado correcto
+
         if self.current_state != VisionState.BUSQUEDA_ACTIVA:
             return
 
-        # # --- MOCK LOGIC (from your code) ---
-        # self.get_logger().info(f"*** [MOCK DETECTION] Simulando que he encontrado: {self.target_object}! ***")
-        
-        # out_msg = String()
-        # out_msg.data = "object_detected"
-        # self.pub_vis2com.publish(out_msg)
-        # self.pub_vis2nav.publish(out_msg)
-        
-        # # Actualizamos la máquina de estados
-        # self.change_state(VisionState.VISION_DETENIDA)
-        # return 
+#1. Convertir el mensaje de ROS a una imagen de OpenCV
+        try:
+            cv_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
+        except Exception as e:
+            self.get_logger().error(f"Error convirtiendo la imagen: {e}")
+            return
 
-        # --- REAL YOLO LOGIC (Commented out) ---
-        cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
-        results = self.model(cv_image, conf=self.conf_thresh, verbose=False)
-        
+        # 2. Mostrar la imagen en una ventana
+        cv2.imshow("Lo que ve TIAGo", cv_image)
+        cv2.waitKey(1) # Necesario para que OpenCV actualice la ventana
+
+
+# 3. Run YOLO v11 Inference
+        results = self.model.predict(cv_image, conf=self.conf_thresh, verbose=False)
+
+        # 4. Visualization: Plot results and show window
+        # .plot() returns a BGR numpy array with boxes and labels drawn
+        annotated_frame = results[0].plot()
+        cv2.imshow(self.window_name, annotated_frame)
+        cv2.waitKey(1)
+
+        # 5. Logic to detect target object in the results
         for result in results:
             for box in result.boxes:
-                class_name = self.model.names[int(box.cls[0])]
+                class_id = int(box.cls[0])
+                class_name = self.model.names[class_id]
+
                 if class_name == self.target_object:
                     self.get_logger().info(f"*** [DETECTION] Found: {class_name}! ***")
+                    
+                    # Notify other modules
                     out_msg = String()
                     out_msg.data = "object_detected"
                     self.pub_vis2com.publish(out_msg)
                     self.pub_vis2nav.publish(out_msg)
-                    self.get_logger().info("--- [OUT] Publishing 'object_detected' to COM and NAV ---")
+                    
+                    self.get_logger().info("--- [OUT] Publishing 'object_detected' to COM/NAV ---")
+                    
+                    # Trigger state change (this will also close the window)
                     self.change_state(VisionState.VISION_DETENIDA)
                     return
 
+        # self.get_logger().info(f"*** [MOCK DETECTION] Simulando que he encontrado: {self.target_object}! ***")
+        # out_msg = String()
+        # out_msg.data = "object_detected"
+        # self.pub_vis2com.publish(out_msg)
+        # self.pub_vis2nav.publish(out_msg)
+        # self.change_state(VisionState.VISION_DETENIDA)
+        return 
+
     def move_head(self, tilt: float) -> None:
         """Sends a movement command to TIAGo's head via Action Server."""
-        if not self.head_action_client.wait_for_server(timeout_sec=1.0):
-            self.get_logger().warn("--- [WARN] Head controller not found! ---")
+        # 1. Esperamos a que Gazebo esté listo para recibir comandos
+        if not self.head_action_client.wait_for_server(timeout_sec=2.0):
+            self.get_logger().warn("--- [WARN] Head controller (Gazebo) not found! ---")
             return
 
+        # 2. Preparamos el mensaje de Meta (Goal)
         goal = FollowJointTrajectory.Goal()
+        
+        # 3. Definimos qué motores vamos a mover
         goal.trajectory.joint_names = ["head_1_joint", "head_2_joint"]
+        
+        # 4. Definimos a qué posición (en radianes) van a ir
         point = JointTrajectoryPoint()
-        point.positions = [0.0, tilt]
-        point.time_from_start.sec = 2
+        point.positions = [0.0, tilt] # 0.0 pan (centro), 'tilt' up/down
+        
+        # 5. Definimos el tiempo que debe tardar el movimiento (NUEVA IMPLEMENTACIÓN)
+        point.time_from_start = Duration(sec=2, nanosec=0) 
+        
+        # Añadimos el punto a la trayectoria
         goal.trajectory.points = [point]
 
-        self.get_logger().info(f"--- [ACTION] Sending head movement goal: {tilt} rad ---")
+        # 6. Enviamos el comando de forma asíncrona
+        self.get_logger().info(f"--- [ACTION] Sending head movement goal: {tilt} rad to Gazebo ---")
         self.head_action_client.send_goal_async(goal)
 
 def main(args=None):
@@ -229,3 +225,6 @@ def main(args=None):
     finally:
         node.destroy_node()
         rclpy.shutdown()
+
+if __name__ == '__main__':
+    main()
