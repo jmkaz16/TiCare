@@ -1,11 +1,13 @@
+import os
 import rclpy
 from rclpy.node import Node
 from rclpy.action import ActionClient
+from ament_index_python.packages import get_package_share_directory
 from std_msgs.msg import String
 from sensor_msgs.msg import Image
 from control_msgs.action import FollowJointTrajectory
 from trajectory_msgs.msg import JointTrajectoryPoint
-from builtin_interfaces.msg import Duration  # <--- NUEVA IMPORTACIÓN
+from builtin_interfaces.msg import Duration
 from cv_bridge import CvBridge
 from ultralytics import YOLO
 import cv2
@@ -30,11 +32,16 @@ class VisionNode(Node):
         super().__init__("vision_node")
 
         # # Configuration Parameters
-        self.declare_parameter("model_path", "/home/luisgfgetino/ticare_ws/src/ticare_vision/data/weights.pt")
+        default_model_path = os.path.join(
+    	get_package_share_directory("ticare_vision"),
+    	"data",
+    	"weights.pt"
+	)
+
+        self.declare_parameter("model_path", default_model_path)
         self.declare_parameter("confidence_threshold", 0.6)
-        
         model_path = self.get_parameter("model_path").value
-        self.conf_thresh = self.get_parameter("confidence_threshold").value
+        self.conf_thresh =  self.get_parameter("confidence_threshold").value
 
         # Internal State
         self.target_object = ""
