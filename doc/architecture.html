@@ -136,6 +136,7 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">ticare_navigation.launch.py</span></code>:  Main launch file. Aggregates both simulation and internal nodes.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">ticare_nodes.launch.py</span></code>: Launches the <code class="docutils literal notranslate"><span class="pre">nav_manager</span></code> and <code class="docutils literal notranslate"><span class="pre">pose_recorder</span></code> nodes.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">ticare_sim.launch.py</span></code>: Launches PAL Robotics packages simulation  with specific arguments.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">navigation_public_sim_ticare.launch.py</span></code>: Configures Tiago simulation with custom map.</p></li>
 </ul>
 </li>
 <li><p><strong>Worlds:</strong></p>
@@ -201,12 +202,12 @@ Each map is defined by a <code class="docutils literal notranslate"><span class=
 <ul>
 <li><p><strong>Subscribers:</strong></p>
 <ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">amcl_pose</span></code> (<code class="docutils literal notranslate"><span class="pre">geometry_msgs/msg/PoseWithCovarianceStamped</span></code>): Catches the current pose for immediate saving.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/amcl_pose</span></code> (<code class="docutils literal notranslate"><span class="pre">geometry_msgs/msg/PoseWithCovarianceStamped</span></code>): Catches the current pose for immediate saving.</p></li>
 </ul>
 </li>
 <li><p><strong>Service Servers:</strong></p>
 <ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">save_pose</span></code> (<code class="docutils literal notranslate"><span class="pre">ticare_interfaces/srv/SavePose</span></code>): Receives a label and saves the current pose.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/save_pose</span></code> (<code class="docutils literal notranslate"><span class="pre">ticare_interfaces/srv/SavePose</span></code>): Receives a label and saves the current pose.</p></li>
 </ul>
 </li>
 </ul>
