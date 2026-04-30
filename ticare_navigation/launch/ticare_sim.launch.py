@@ -1,13 +1,20 @@
 from launch import LaunchDescription
+from launch.actions import DeclareLaunchArgument
 from launch.actions import IncludeLaunchDescription
+from launch.actions import LaunchConfiguration
 from launch.substitutions import PathJoinSubstitution
 from launch_ros.substitutions import FindPackageShare
+from launch.conditions import UnlessCondition
 
 
 def generate_launch_description():
 
-    tiago_dir = PathJoinSubstitution([FindPackageShare("tiago_gazebo"), "launch"])
+    use_default_map = DeclareLaunchArgument(
+        "use_default_map", default_value="False", description="Whether or not to use the Pal Office" \
+        " map for navigation."
+    )
 
+    tiago_dir = PathJoinSubstitution([FindPackageShare("tiago_gazebo"), "launch"])
     world_path = PathJoinSubstitution(
         [FindPackageShare("ticare_navigation"), "worlds", "car_shifted_final_block"]
     )
@@ -18,12 +25,28 @@ def generate_launch_description():
             "world_name": world_path,
             # "slam": "True",
             "arm_type": "no-arm",
-            "navigation": "True",
+            "navigation": LaunchConfiguration("use_default_map"),
             "is_public_sim": "True",
         }.items(),
     )
 
-    return LaunchDescription([tiago_gazebo_launch])
+    ticare_nav_stack = IncludeLaunchDescription(
+        PathJoinSubstitution(
+            [FindPackageShare("ticare_navigation"), "launch", "nav_public_sim_ticare.launch.py"]
+        ),
+        launch_arguments={
+            "world_name": world_path,
+            "slam": "False",
+            "use_sim_time": "True",
+            "rviz": "True",
+            "base_type": "pmb2",
+        }.items(),
+        condition=UnlessCondition(LaunchConfiguration("use_default_map")),
+    )
+
+
+
+    return LaunchDescription([tiago_gazebo_launch, ticare_nav_stack])
 
 
 # Possible arguments to pass to the launch file:
