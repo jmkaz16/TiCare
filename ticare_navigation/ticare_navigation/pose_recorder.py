@@ -105,7 +105,6 @@ class PoseRecorder(Node):
             file_path = os.path.join(self.data_dir, file_name)
 
             try:
-                # Save the current pose to a YAML file
                 with open(file_path, "w") as file:
                     file.write(message_to_yaml(self.data_to_save))
 
