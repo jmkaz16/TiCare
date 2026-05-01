@@ -190,15 +190,7 @@ class NavManager(Node):
 
                     self.get_logger().info("Search duration exceeded: Moving to RETURNING_HOME.")
                     self.state = NavigationState.RETURNING_HOME
-                    self.send_nav_to_pose_goal()
-
-                if self.object_detected:
-
-                    self.get_logger().info(
-                        "Object detected during search: Moving to SAVING_OBJECT_POSE."
-                    )
-                    self.state = NavigationState.SAVING_OBJECT_POSE
-                    self.send_save_pose_request(SavePoseLabel.OBJECT_POSE)
+                    self.send_nav_to_pose_goal(label=SavePoseLabel.START_POSE)
 
             case NavigationState.SAVING_OBJECT_POSE:
                 pass
@@ -279,9 +271,8 @@ class NavManager(Node):
             label (SavePoseLabel): The label for the pose to be saved (e.g., START_POSE,
             OBJECT_POSE).
         """
-        if not self.save_pose_client.service_is_ready():
+        while not self.save_pose_client.wait_for_service(timeout_sec=1.0):
             self.get_logger().warning("SavePose service is not available.")
-            return None
 
         match label:
             case SavePoseLabel.START_POSE:
@@ -292,21 +283,21 @@ class NavManager(Node):
 
             case _:
                 self.get_logger().warning(f"Unknown SavePose label: {label}")
-                return None
+                return
 
         future = self.save_pose_client.call_async(SavePose.Request(label=label.value))
         future.add_done_callback(self.save_pose_response_callback)
 
-    def send_nav_to_pose_goal(self) -> None:
+    def send_nav_to_pose_goal(self, label: SavePoseLabel) -> None:
         """Sends a goal to the NavigateToPose action server to navigate to the specified pose."""
-        match self.state:
-            case NavigationState.RETURNING_HOME:
+        match label:
+            case SavePoseLabel.START_POSE:
                 self.get_logger().info("Sending NavigateToPose goal to return home.")
-                file_name = os.path.join(self.data_dir, f"{SavePoseLabel.START_POSE.value}.yaml")
+                file_name = os.path.join(self.data_dir, f"{label.value}.yaml")
 
-            case NavigationState.NAV_TO_OBJECT:
+            case SavePoseLabel.OBJECT_POSE:
                 self.get_logger().info("Sending NavigateToPose goal to navigate to object.")
-                file_name = os.path.join(self.data_dir, f"{SavePoseLabel.OBJECT_POSE.value}.yaml")
+                file_name = os.path.join(self.data_dir, f"{label.value}.yaml")
 
         with open(file_name, "r") as file:
             yaml_data = yaml.safe_load(file)
@@ -349,11 +340,13 @@ class NavManager(Node):
         status = msg.data
         match status:
             case "object_detected":
-                if self.state is NavigationState.SEARCHING:
+                if self.state == NavigationState.SEARCHING:
                     self.object_detected = True
                     self.search_start_time = 0.0
+                    # TODO: Cancel nav
                     self.get_logger().info("Object found: Moving to SAVING_OBJECT_POSE.")
                     self.state = NavigationState.SAVING_OBJECT_POSE
+                    self.send_save_pose_request(SavePoseLabel.OBJECT_POSE)
 
             case _:
                 self.get_logger().warn(f"Unknown vision status: {status}")
@@ -368,14 +361,15 @@ class NavManager(Node):
         command = msg.data
         match command:
             case "start_nav":
-                if self.state is NavigationState.IDLE:
+                if self.state == NavigationState.IDLE:
                     self.get_logger().info("Mission started: Moving to LOCALIZING")
                     self.state = NavigationState.LOCALIZING
 
             case "return":
-                if self.state is NavigationState.AWAITING_RETURN:
+                if self.state == NavigationState.AWAITING_RETURN:
                     self.get_logger().info("User request: Moving to NAV_TO_OBJECT")
                     self.state = NavigationState.NAV_TO_OBJECT
+                    self.send_nav_to_pose_goal(label=SavePoseLabel.OBJECT_POSE)
 
             case _:
                 self.get_logger().warning(f"Unknown communication command: {command}")
@@ -396,16 +390,21 @@ class NavManager(Node):
 
                 if self.state == NavigationState.SAVING_START_POSE:
                     self.publish_vision_command(VisionCommand.START_VIS)
-                    self.search_start_time = self.get_clock().now()
                     self.get_logger().info("Starting search: Moving to SEARCHING.")
                     self.state = NavigationState.SEARCHING
+                    self.search_start_time = self.get_clock().now()
                     self.send_follow_waypoints_goal()
 
                 elif self.state == NavigationState.SAVING_OBJECT_POSE:
-                    self.publish_vision_command(VisionCommand.STOP_VIS)
                     self.get_logger().info("Object pose saved: Moving to RETURNING_HOME.")
                     self.state = NavigationState.RETURNING_HOME
-                    self.send_nav_to_pose_goal()
+                    self.send_nav_to_pose_goal(label=SavePoseLabel.START_POSE)
+
+            else:
+                self.get_logger().error(f"Failed to save pose: {response.message}")
+                self.get_logger().info("No pose saved: Moving to LOCALIZING.")
+                self.state = NavigationState.LOCALIZING
+                self.recovery_rotation_active = True
 
         except Exception as e:
             self.get_logger().error(f"Service call failed: {e}")
@@ -438,13 +437,18 @@ class NavManager(Node):
 
         if self.state == NavigationState.RETURNING_HOME:
             self.publish_communication_status(ComStatus.HOME)
-            self.get_logger().info("Returned home: Moving to AWAITING_RETURN.")
-            self.state = NavigationState.AWAITING_RETURN
+            if self.object_detected:
+                self.get_logger().info("Returned home: Moving to AWAITING_RETURN.")
+                self.state = NavigationState.AWAITING_RETURN
+            else:
+                self.get_logger().info("Returned home and no object detected: Moving to IDLE.")
+                self.state = NavigationState.IDLE
 
         elif self.state == NavigationState.NAV_TO_OBJECT:
             self.publish_communication_status(ComStatus.OBJECT_POINT)
             self.get_logger().info("Arrived at object location.")
             self.state = NavigationState.IDLE
+            self.object_detected = False
 
     def nav_to_pose_feedback_callback(self, feedback_msg) -> None:
         """
@@ -483,6 +487,8 @@ class NavManager(Node):
         result = future.result().result
         self.get_logger().info(f"FollowWaypoints result received: {result}")
 
+        # TODO: When finished
+
     def follow_waypoints_feedback_callback(self, feedback_msg) -> None:
         """
         Handles feedback from the FollowWaypoints action server.
@@ -500,7 +506,7 @@ def main(args=None) -> None:
     nav_manager = NavManager()
 
     try:
-        rclpy.spin()
+        rclpy.spin(nav_manager)
 
     except KeyboardInterrupt:
         pass
