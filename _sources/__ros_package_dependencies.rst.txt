@@ -14,5 +14,7 @@ ROS Package Dependencies
     
     nav2_msgs <https://docs.ros.org/en/humble/p/nav2_msgs/>
     
+    ament_index_python <https://docs.ros.org/en/humble/p/ament_index_python/>
+    
     rosidl_runtime_py <https://docs.ros.org/en/humble/p/rosidl_runtime_py/>
     

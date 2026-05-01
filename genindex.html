@@ -69,6 +69,7 @@
 <li class="toctree-l2"><a class="reference external" href="https://docs.ros.org/en/humble/p/std_msgs/">std_msgs</a></li>
 <li class="toctree-l2"><a class="reference external" href="https://docs.ros.org/en/humble/p/geometry_msgs/">geometry_msgs</a></li>
 <li class="toctree-l2"><a class="reference external" href="https://docs.ros.org/en/humble/p/nav2_msgs/">nav2_msgs</a></li>
+<li class="toctree-l2"><a class="reference external" href="https://docs.ros.org/en/humble/p/ament_index_python/">ament_index_python</a></li>
 <li class="toctree-l2"><a class="reference external" href="https://docs.ros.org/en/humble/p/rosidl_runtime_py/">rosidl_runtime_py</a></li>
 </ul>
 </li>
@@ -152,10 +153,12 @@
 <h2 id="F">F</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="ticare_navigation.nav_manager.html#ticare_navigation.nav_manager.NavManager.follow_waypoints_response_callback">follow_waypoints_response_callback() (ticare_navigation.nav_manager.NavManager method)</a>
+      <li><a href="ticare_navigation.nav_manager.html#ticare_navigation.nav_manager.NavManager.follow_waypoints_feedback_callback">follow_waypoints_feedback_callback() (ticare_navigation.nav_manager.NavManager method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="ticare_navigation.nav_manager.html#ticare_navigation.nav_manager.NavManager.follow_waypoints_response_callback">follow_waypoints_response_callback() (ticare_navigation.nav_manager.NavManager method)</a>
+</li>
       <li><a href="ticare_navigation.nav_manager.html#ticare_navigation.nav_manager.NavManager.follow_waypoints_result_callback">follow_waypoints_result_callback() (ticare_navigation.nav_manager.NavManager method)</a>
 </li>
   </ul></td>
@@ -189,7 +192,11 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ticare_navigation.nav_manager.html#ticare_navigation.nav_manager.main">main() (in module ticare_navigation.nav_manager)</a>
+
+      <ul>
+        <li><a href="ticare_navigation.pose_recorder.html#ticare_navigation.pose_recorder.main">(in module ticare_navigation.pose_recorder)</a>
 </li>
+      </ul></li>
       <li>
     module
 
@@ -197,6 +204,8 @@
         <li><a href="ticare_navigation.html#module-ticare_navigation">ticare_navigation</a>
 </li>
         <li><a href="ticare_navigation.nav_manager.html#module-ticare_navigation.nav_manager">ticare_navigation.nav_manager</a>
+</li>
+        <li><a href="ticare_navigation.pose_recorder.html#module-ticare_navigation.pose_recorder">ticare_navigation.pose_recorder</a>
 </li>
       </ul></li>
   </ul></td>
@@ -206,6 +215,8 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ticare_navigation.nav_manager.html#ticare_navigation.nav_manager.NavigationState.NAV_TO_OBJECT">NAV_TO_OBJECT (ticare_navigation.nav_manager.NavigationState attribute)</a>
+</li>
+      <li><a href="ticare_navigation.nav_manager.html#ticare_navigation.nav_manager.NavManager.nav_to_pose_feedback_callback">nav_to_pose_feedback_callback() (ticare_navigation.nav_manager.NavManager method)</a>
 </li>
       <li><a href="ticare_navigation.nav_manager.html#ticare_navigation.nav_manager.NavManager.nav_to_pose_response_callback">nav_to_pose_response_callback() (ticare_navigation.nav_manager.NavManager method)</a>
 </li>
@@ -237,10 +248,14 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ticare_navigation.nav_manager.html#ticare_navigation.nav_manager.NavManager.perform_recovery_rotation">perform_recovery_rotation() (ticare_navigation.nav_manager.NavManager method)</a>
 </li>
-      <li><a href="ticare_navigation.nav_manager.html#ticare_navigation.nav_manager.NavManager.publish_cmd_vel_msg">publish_cmd_vel_msg() (ticare_navigation.nav_manager.NavManager method)</a>
+      <li><a href="ticare_navigation.pose_recorder.html#ticare_navigation.pose_recorder.PoseRecorder.pose_callback">pose_callback() (ticare_navigation.pose_recorder.PoseRecorder method)</a>
+</li>
+      <li><a href="ticare_navigation.pose_recorder.html#ticare_navigation.pose_recorder.PoseRecorder">PoseRecorder (class in ticare_navigation.pose_recorder)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="ticare_navigation.nav_manager.html#ticare_navigation.nav_manager.NavManager.publish_cmd_vel_msg">publish_cmd_vel_msg() (ticare_navigation.nav_manager.NavManager method)</a>
+</li>
       <li><a href="ticare_navigation.nav_manager.html#ticare_navigation.nav_manager.NavManager.publish_communication_status">publish_communication_status() (ticare_navigation.nav_manager.NavManager method)</a>
 </li>
       <li><a href="ticare_navigation.nav_manager.html#ticare_navigation.nav_manager.NavManager.publish_vision_command">publish_vision_command() (ticare_navigation.nav_manager.NavManager method)</a>
@@ -259,6 +274,8 @@
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="ticare_navigation.pose_recorder.html#ticare_navigation.pose_recorder.PoseRecorder.save_pose_callback">save_pose_callback() (ticare_navigation.pose_recorder.PoseRecorder method)</a>
+</li>
       <li><a href="ticare_navigation.nav_manager.html#ticare_navigation.nav_manager.NavManager.save_pose_response_callback">save_pose_response_callback() (ticare_navigation.nav_manager.NavManager method)</a>
 </li>
       <li><a href="ticare_navigation.nav_manager.html#ticare_navigation.nav_manager.SavePoseLabel">SavePoseLabel (class in ticare_navigation.nav_manager)</a>
@@ -267,9 +284,13 @@
 </li>
       <li><a href="ticare_navigation.nav_manager.html#ticare_navigation.nav_manager.NavigationState.SAVING_START_POSE">SAVING_START_POSE (ticare_navigation.nav_manager.NavigationState attribute)</a>
 </li>
+      <li><a href="ticare_navigation.nav_manager.html#ticare_navigation.nav_manager.NavigationState.SEARCHING">SEARCHING (ticare_navigation.nav_manager.NavigationState attribute)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="ticare_navigation.nav_manager.html#ticare_navigation.nav_manager.NavigationState.SEARCHING">SEARCHING (ticare_navigation.nav_manager.NavigationState attribute)</a>
+      <li><a href="ticare_navigation.nav_manager.html#ticare_navigation.nav_manager.NavManager.send_follow_waypoints_goal">send_follow_waypoints_goal() (ticare_navigation.nav_manager.NavManager method)</a>
+</li>
+      <li><a href="ticare_navigation.nav_manager.html#ticare_navigation.nav_manager.NavManager.send_nav_to_pose_goal">send_nav_to_pose_goal() (ticare_navigation.nav_manager.NavManager method)</a>
 </li>
       <li><a href="ticare_navigation.nav_manager.html#ticare_navigation.nav_manager.NavManager.send_save_pose_request">send_save_pose_request() (ticare_navigation.nav_manager.NavManager method)</a>
 </li>
@@ -292,13 +313,20 @@
         <li><a href="ticare_navigation.html#module-ticare_navigation">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     ticare_navigation.nav_manager
 
       <ul>
         <li><a href="ticare_navigation.nav_manager.html#module-ticare_navigation.nav_manager">module</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    ticare_navigation.pose_recorder
+
+      <ul>
+        <li><a href="ticare_navigation.pose_recorder.html#module-ticare_navigation.pose_recorder">module</a>
 </li>
       </ul></li>
   </ul></td>

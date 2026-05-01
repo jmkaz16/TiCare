@@ -72,6 +72,7 @@
 <li class="toctree-l2"><a class="reference external" href="https://docs.ros.org/en/humble/p/std_msgs/">std_msgs</a></li>
 <li class="toctree-l2"><a class="reference external" href="https://docs.ros.org/en/humble/p/geometry_msgs/">geometry_msgs</a></li>
 <li class="toctree-l2"><a class="reference external" href="https://docs.ros.org/en/humble/p/nav2_msgs/">nav2_msgs</a></li>
+<li class="toctree-l2"><a class="reference external" href="https://docs.ros.org/en/humble/p/ament_index_python/">ament_index_python</a></li>
 <li class="toctree-l2"><a class="reference external" href="https://docs.ros.org/en/humble/p/rosidl_runtime_py/">rosidl_runtime_py</a></li>
 </ul>
 </li>
@@ -127,8 +128,10 @@
 <li class="toctree-l2"><a class="reference internal" href="ticare_navigation.nav_manager.html#ticare_navigation.nav_manager.NavManager"><code class="docutils literal notranslate"><span class="pre">NavManager</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="ticare_navigation.nav_manager.html#ticare_navigation.nav_manager.NavManager.communication_callback"><code class="docutils literal notranslate"><span class="pre">NavManager.communication_callback()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ticare_navigation.nav_manager.html#ticare_navigation.nav_manager.NavManager.control_loop_callback"><code class="docutils literal notranslate"><span class="pre">NavManager.control_loop_callback()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ticare_navigation.nav_manager.html#ticare_navigation.nav_manager.NavManager.follow_waypoints_feedback_callback"><code class="docutils literal notranslate"><span class="pre">NavManager.follow_waypoints_feedback_callback()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ticare_navigation.nav_manager.html#ticare_navigation.nav_manager.NavManager.follow_waypoints_response_callback"><code class="docutils literal notranslate"><span class="pre">NavManager.follow_waypoints_response_callback()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ticare_navigation.nav_manager.html#ticare_navigation.nav_manager.NavManager.follow_waypoints_result_callback"><code class="docutils literal notranslate"><span class="pre">NavManager.follow_waypoints_result_callback()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ticare_navigation.nav_manager.html#ticare_navigation.nav_manager.NavManager.nav_to_pose_feedback_callback"><code class="docutils literal notranslate"><span class="pre">NavManager.nav_to_pose_feedback_callback()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ticare_navigation.nav_manager.html#ticare_navigation.nav_manager.NavManager.nav_to_pose_response_callback"><code class="docutils literal notranslate"><span class="pre">NavManager.nav_to_pose_response_callback()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ticare_navigation.nav_manager.html#ticare_navigation.nav_manager.NavManager.nav_to_pose_result_callback"><code class="docutils literal notranslate"><span class="pre">NavManager.nav_to_pose_result_callback()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ticare_navigation.nav_manager.html#ticare_navigation.nav_manager.NavManager.perform_recovery_rotation"><code class="docutils literal notranslate"><span class="pre">NavManager.perform_recovery_rotation()</span></code></a></li>
@@ -136,6 +139,8 @@
 <li class="toctree-l3"><a class="reference internal" href="ticare_navigation.nav_manager.html#ticare_navigation.nav_manager.NavManager.publish_communication_status"><code class="docutils literal notranslate"><span class="pre">NavManager.publish_communication_status()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ticare_navigation.nav_manager.html#ticare_navigation.nav_manager.NavManager.publish_vision_command"><code class="docutils literal notranslate"><span class="pre">NavManager.publish_vision_command()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ticare_navigation.nav_manager.html#ticare_navigation.nav_manager.NavManager.save_pose_response_callback"><code class="docutils literal notranslate"><span class="pre">NavManager.save_pose_response_callback()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ticare_navigation.nav_manager.html#ticare_navigation.nav_manager.NavManager.send_follow_waypoints_goal"><code class="docutils literal notranslate"><span class="pre">NavManager.send_follow_waypoints_goal()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ticare_navigation.nav_manager.html#ticare_navigation.nav_manager.NavManager.send_nav_to_pose_goal"><code class="docutils literal notranslate"><span class="pre">NavManager.send_nav_to_pose_goal()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ticare_navigation.nav_manager.html#ticare_navigation.nav_manager.NavManager.send_save_pose_request"><code class="docutils literal notranslate"><span class="pre">NavManager.send_save_pose_request()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ticare_navigation.nav_manager.html#ticare_navigation.nav_manager.NavManager.vision_callback"><code class="docutils literal notranslate"><span class="pre">NavManager.vision_callback()</span></code></a></li>
 </ul>
@@ -164,7 +169,15 @@
 <li class="toctree-l2"><a class="reference internal" href="ticare_navigation.nav_manager.html#ticare_navigation.nav_manager.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="ticare_navigation.pose_recorder.html">ticare_navigation.pose_recorder module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ticare_navigation.pose_recorder.html">ticare_navigation.pose_recorder module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ticare_navigation.pose_recorder.html#ticare_navigation.pose_recorder.PoseRecorder"><code class="docutils literal notranslate"><span class="pre">PoseRecorder</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ticare_navigation.pose_recorder.html#ticare_navigation.pose_recorder.PoseRecorder.pose_callback"><code class="docutils literal notranslate"><span class="pre">PoseRecorder.pose_callback()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ticare_navigation.pose_recorder.html#ticare_navigation.pose_recorder.PoseRecorder.save_pose_callback"><code class="docutils literal notranslate"><span class="pre">PoseRecorder.save_pose_callback()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ticare_navigation.pose_recorder.html#ticare_navigation.pose_recorder.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </div>
 </section>
