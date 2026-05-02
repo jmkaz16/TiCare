@@ -14,7 +14,8 @@ from nav2_msgs.action import NavigateToPose
 from nav2_msgs.action import FollowWaypoints
 
 import yaml
-from rosidl_runtime_py.convert import yaml_to_msg
+
+from rosidl_runtime_py.set_message import set_message_fields
 
 
 class NavigationState(Enum):
@@ -289,7 +290,12 @@ class NavManager(Node):
         future.add_done_callback(self.save_pose_response_callback)
 
     def send_nav_to_pose_goal(self, label: SavePoseLabel) -> None:
-        """Sends a goal to the NavigateToPose action server to navigate to the specified pose."""
+        """Sends a goal to the NavigateToPose action server to navigate to the specified pose.
+
+        Args:
+            label (SavePoseLabel): The label of the pose to navigate to (e.g., START_POSE,
+            OBJECT_POSE).
+        """
         match label:
             case SavePoseLabel.START_POSE:
                 self.get_logger().info("Sending NavigateToPose goal to return home.")
@@ -302,7 +308,8 @@ class NavManager(Node):
         with open(file_name, "r") as file:
             yaml_data = yaml.safe_load(file)
 
-        goal_pose = yaml_to_msg(yaml_data, PoseStamped)
+        goal_pose = PoseStamped()
+        set_message_fields(goal_pose, yaml_data)
         goal_msg = NavigateToPose.Goal()
         goal_msg.pose = goal_pose
 
@@ -312,14 +319,39 @@ class NavManager(Node):
         )
         future.add_done_callback(self.nav_to_pose_response_callback)
 
-    def send_follow_waypoints_goal(self) -> None:
-        """Sends a goal to the FollowWaypoints action server to execute a coverage path."""
+    def send_follow_waypoints_goal(self, room: str = "all") -> None:
+        """Sends a goal to the FollowWaypoints action server to execute a coverage path.
+
+        Args:
+            room (str): The room for which to execute the coverage path. Default is "all",
+            which executes the full path, other options (Lab_Paloma, Sala_D, etc.).
+        """
         file_name = os.path.join(self.config_dir, "coverage_points.yaml")
 
         with open(file_name, "r") as file:
             yaml_data = yaml.safe_load(file)
 
-        waypoints = [yaml_to_msg(point, PoseStamped) for point in yaml_data["waypoints"]]
+        raw_points = []
+
+        if room == "all":
+            for room_list in yaml_data.values():
+                raw_points.extend(room_list)
+
+        else:
+            if room in yaml_data:
+                raw_points = yaml_data[room]
+
+            else:
+                self.get_logger().warning(
+                    f"Room '{room}' not found in coverage_points.yaml. No waypoints sent."
+                )
+                return
+
+        waypoints = []
+        for point in raw_points:
+            msg = PoseStamped()
+            set_message_fields(msg, point)
+            waypoints.append(msg)
 
         goal_msg = FollowWaypoints.Goal()
         goal_msg.poses = waypoints
@@ -412,6 +444,7 @@ class NavManager(Node):
     def nav_to_pose_response_callback(self, future) -> None:
         """
         Handles the response from the NavigateToPose action server.
+
         Args:
             future: The future object representing the action goal response.
         """
