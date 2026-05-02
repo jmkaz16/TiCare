@@ -223,11 +223,11 @@ config_dir (str): The directory path where the YAML file of the coverage points 
 <dl class="py method">
 <dt class="sig sig-object py" id="ticare_navigation.nav_manager.NavManager.nav_to_pose_response_callback">
 <span class="sig-name descname"><span class="pre">nav_to_pose_response_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">future</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ticare_navigation.nav_manager.NavManager.nav_to_pose_response_callback" title="Link to this definition"></a></dt>
-<dd><p>Handles the response from the NavigateToPose action server.
-Args:</p>
-<blockquote>
-<div><p>future: The future object representing the action goal response.</p>
-</div></blockquote>
+<dd><p>Handles the response from the NavigateToPose action server.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>future: The future object representing the action goal response.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -289,14 +289,24 @@ angular_z (float): The angular velocity around the z axis [rad/s].</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="ticare_navigation.nav_manager.NavManager.send_follow_waypoints_goal">
-<span class="sig-name descname"><span class="pre">send_follow_waypoints_goal</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ticare_navigation.nav_manager.NavManager.send_follow_waypoints_goal" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">send_follow_waypoints_goal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">room</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'all'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ticare_navigation.nav_manager.NavManager.send_follow_waypoints_goal" title="Link to this definition"></a></dt>
 <dd><p>Sends a goal to the FollowWaypoints action server to execute a coverage path.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>room (str): The room for which to execute the coverage path. Default is “all”,
+which executes the full path, other options (Lab_Paloma, Sala_D, etc.).</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="ticare_navigation.nav_manager.NavManager.send_nav_to_pose_goal">
 <span class="sig-name descname"><span class="pre">send_nav_to_pose_goal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#ticare_navigation.nav_manager.SavePoseLabel" title="ticare_navigation.nav_manager.SavePoseLabel"><span class="pre">SavePoseLabel</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ticare_navigation.nav_manager.NavManager.send_nav_to_pose_goal" title="Link to this definition"></a></dt>
 <dd><p>Sends a goal to the NavigateToPose action server to navigate to the specified pose.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>label (SavePoseLabel): The label of the pose to navigate to (e.g., START_POSE,
+OBJECT_POSE).</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
