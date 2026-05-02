@@ -1,8 +1,5 @@
-# State_machine.py
-
-import keyboard
+from pynput import keyboard
 import time
-import numpy as np
 
 from stt.stt_communication import transcribe_audio
 from stt.stt_communication import speak_audio
@@ -19,16 +16,39 @@ INTERRUPT_WORDS = ["para", "detente", "stop", "quieto", "basta"]
 # DURACIONES CONFIGURABLES
 # ---------------------------
 
-WAKE_LISTEN_DURATION = 2      # Duración de cada fragmento mientras escucha la wake-word
-COMMAND_RECORD_DURATION = 7   # Duración de la grabación del comando completo
-CONFIRM_DURATION = 2          # Duración de la confirmación por voz
+WAKE_LISTEN_DURATION = 2
+COMMAND_RECORD_DURATION = 4
+CONFIRM_DURATION = 2
 
+# ---------------------------
+# Variables de control de teclas
+# ---------------------------
+
+key_f_pressed = False
+key_c_pressed = False
+
+def on_press(key):
+    """Detecta teclas globales sin bloquear el programa."""
+    global key_f_pressed, key_c_pressed
+    try:
+        if key.char == "f":
+            key_f_pressed = True
+        elif key.char == "c":
+            key_c_pressed = True
+    except:
+        pass
+
+# Iniciar listener de teclado
+listener = keyboard.Listener(on_press=on_press)
+listener.start()
 
 # ---------------------------
 # Máquina de estados
 # ---------------------------
 
 def main():
+
+    global key_f_pressed, key_c_pressed
 
     state = 0
     command_text = ""
@@ -37,7 +57,7 @@ def main():
     while True:
 
         # Salida manual
-        if keyboard.is_pressed("c"):
+        if key_c_pressed:
             print("Saliendo del sistema.")
             break
 
@@ -46,7 +66,8 @@ def main():
         # ---------------------------
         if state == 0:
             print("Sistema listo. Pulsa 'f' para activar. Pulsa 'c' para salir.")
-            while not keyboard.is_pressed("f"):
+            key_f_pressed = False  # Reset
+            while not key_f_pressed:
                 time.sleep(0.1)
             state = 1
 
@@ -86,7 +107,8 @@ def main():
         # ESTADO 4 — Grabar mensaje completo
         # ---------------------------
         elif state == 4:
-            print("Grabando mensaje...")
+            speak_audio("¿En qué puedo ayudarte?")
+            print("Grabando audio...")
             audio = record_audio(duration=COMMAND_RECORD_DURATION)
             command_text = transcribe_audio(audio)
             state = 5
@@ -114,7 +136,12 @@ def main():
             if parsed["action"] is not None and parsed["object"] is not None:
                 state = 9
             else:
-                speak_audio("No he entendido bien, repite por favor.")
+                if parsed["action"] is None:
+                    speak_audio("No se detectó acción en el comando.")
+                elif parsed["object"] is None:
+                    speak_audio("No se detectó objeto en el comando.")
+                else:
+                    speak_audio("No se entendió el comando.")
                 state = 4
 
         # ---------------------------
@@ -145,7 +172,7 @@ def main():
         # ---------------------------
         elif state == 10:
 
-            gender=detect_gender(obj)
+            gender = detect_gender(obj)
             
             if gender == "femenino":
                 art = "la "
@@ -153,9 +180,9 @@ def main():
                 art = "el "
                 
             if place:
-                text=f"Perfecto, buscaré {art}{obj} en {place}."
+                text = f"Perfecto, buscaré {art}{obj} en {place}."
             else:
-                text=f"Perfecto, buscaré {art}{obj}."
+                text = f"Perfecto, buscaré {art}{obj}."
 
             speak_audio(text)
 

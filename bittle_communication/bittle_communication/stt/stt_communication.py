@@ -2,19 +2,44 @@ import speech_recognition as sr
 from gtts import gTTS
 import pygame
 import io
+import time
 import unicodedata
 import spacy
 from rapidfuzz import process, fuzz
-import unicodedata
-import spacy
 
 TARGET_WAKE = "tiago"
 _nlp = None
 
 
-#---------------------------
-# Funciones de STT y TTS
-#---------------------------
+# ============================================================
+#  MICRÓFONO: DETECCIÓN AUTOMÁTICA (SOLUCIÓN PARA UBUNTU)
+# ============================================================
+
+def get_microphone_index():
+    """Devuelve el índice del micrófono real evitando dispositivos fantasma de ALSA."""
+    try:
+        devices = sr.Microphone.list_microphone_names()
+        print("\n=== Dispositivos detectados ===")
+        for i, name in enumerate(devices):
+            print(f"{i}: {name}")
+
+        # Seleccionar el primer dispositivo que NO sea "Monitor"
+        for i, name in enumerate(devices):
+            if "monitor" not in name.lower():
+                print(f"\nUsando micrófono: {name} (index {i})")
+                return i
+
+        print("\nNo se encontró un micrófono claro, usando index 0")
+        return 0
+
+    except Exception as e:
+        print("Error detectando micrófono:", e)
+        return None
+
+
+# ============================================================
+#  STT — TRANSCRIPCIÓN
+# ============================================================
 
 def transcribe_audio(audio_data):
     r = sr.Recognizer()
@@ -22,40 +47,70 @@ def transcribe_audio(audio_data):
         text = r.recognize_google(audio_data, language='es-ES')
         print("Transcripción:", text)
         return text
+    except sr.UnknownValueError:
+        return "Errr"
     except Exception as e:
+        print("Error en reconocimiento:", e)
         return "Errr"
 
+
+# ============================================================
+#  TTS — SÍNTESIS DE VOZ
+# ============================================================
 
 def speak_audio(texto):
     tts = gTTS(text=texto, lang='es')
     fp = io.BytesIO()
     tts.write_to_fp(fp)
     fp.seek(0)
-    
+
     pygame.mixer.init()
     pygame.mixer.music.load(fp)
     pygame.mixer.music.play()
 
-    # Esperar a que termine
     while pygame.mixer.music.get_busy():
-        continue
+        time.sleep(0.1)
+
+
+# ============================================================
+#  GRABACIÓN DE AUDIO 
+# ============================================================
 
 def record_audio(duration=3):
     r = sr.Recognizer()
-    with sr.Microphone() as source:
-        r.adjust_for_ambient_noise(source, duration=0.5)
-        audio = r.record(source, duration=duration)
-    return audio
 
-#---------------------------
-# Wake-word y parsing
-#---------------------------
+    r.energy_threshold = 300
+    r.dynamic_energy_threshold = True
+
+    mic_index = get_microphone_index()
+
+    sample_rates = [44100, 48000, 32000, 22050, 16000]
+
+    for rate in sample_rates:
+        try:
+            with sr.Microphone(device_index=mic_index, sample_rate=rate) as source:
+                r.adjust_for_ambient_noise(source, duration=0.5)
+                print(f"Grabando {duration}s")
+                audio = r.record(source, duration=duration)
+                return audio
+
+        except Exception as e:
+            print(f"Falló sample_rate={rate}: {e}")
+            continue
+
+    print("ERROR: No se pudo abrir el micrófono con ningún sample_rate.")
+    return None
+
+
+# ============================================================
+#  WAKE WORD
+# ============================================================
 
 def clean_wake_word(text):
     text = text.lower().strip()
     if TARGET_WAKE in text:
         cleaned = text.replace(TARGET_WAKE, "").strip(" ,.")
-        return cleaned or ""   # Nunca devuelve None
+        return cleaned or ""
     return ""
 
 def is_wake_word(text):
@@ -76,7 +131,7 @@ def listen_for_wake_word(duration=3):
         audio = record_audio(duration=duration)
 
         text = transcribe_audio(audio)
-        if not text:
+        if not text or text == "Errr":
             print("No se entendió nada.")
             continue
 
@@ -93,9 +148,10 @@ def listen_for_wake_word(duration=3):
             print("¡Palabra clave detectada!")
             return ""
 
-#---------------------------
-# Standardización, mapeo y parsing de comandos
-#---------------------------
+
+# ============================================================
+#  NLP — spaCy
+# ============================================================
 
 def get_nlp():
     global _nlp
@@ -108,10 +164,20 @@ def get_nlp():
         _nlp = spacy.blank("es")
     return _nlp
 
+
+# ============================================================
+#  NORMALIZACIÓN
+# ============================================================
+
 def normalize(s: str) -> str:
     s = s.lower().strip()
     s = unicodedata.normalize("NFD", s)
     return "".join(ch for ch in s if unicodedata.category(ch) != "Mn")
+
+
+# ============================================================
+#  MAPEOS
+# ============================================================
 
 def map_action(text: str):
     from input.command_map import COMMAND_MAP
@@ -129,6 +195,11 @@ def map_place(word: str):
         return PLACES_MAP[match[0]]
     return None
 
+
+# ============================================================
+#  DETECCIÓN DE GÉNERO
+# ============================================================
+
 def detect_gender(palabra: str):
     nlp = get_nlp()
     doc = nlp(palabra)
@@ -143,15 +214,20 @@ def detect_gender(palabra: str):
     else:
         return "desconocido"
 
+
+# ============================================================
+#  PARSER DE COMANDOS
+# ============================================================
+
 def parse_command(text: str):
     text_norm = normalize(text)
     nlp = get_nlp()
     doc = nlp(text_norm)
 
-    # 1) Acción por frase completa
+    # Acción por frase completa
+    print(f"Text normalized: {text_norm}")
     action = map_action(text_norm)
-
-    # 2) Acción por palabra
+    # Acción por palabra
     if not action:
         for token in doc:
             candidate = map_action(token.lemma_)
@@ -159,14 +235,14 @@ def parse_command(text: str):
                 action = candidate
                 break
 
-    # 3) Objeto → primer sustantivo
+    # Objeto → primer sustantivo
     obj = None
     for token in doc:
         if token.pos_ == "NOUN":
             obj = token.lemma_
             break
 
-    # 4) Lugar → fuzzy matching con PLACES_MAP
+    # Lugar → fuzzy matching
     place = None
     for token in doc:
         candidate = map_place(token.lemma_)
