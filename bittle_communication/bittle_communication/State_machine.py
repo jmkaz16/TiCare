@@ -4,14 +4,13 @@ import keyboard
 import time
 import numpy as np
 
-from stt.google_stt import transcribe_audio
-from stt.google_stt import speak_audio
-from stt.record_audio import record_audio
-from stt.wake_word import listen_for_wake_word
-from stt.tiago_spacy import parse_command
-from stt.tiago_spacy import detect_gender
+from stt.stt_communication import transcribe_audio
+from stt.stt_communication import speak_audio
+from stt.stt_communication import record_audio
+from stt.stt_communication import listen_for_wake_word
+from stt.stt_communication import parse_command
+from stt.stt_communication import detect_gender
 from input.command_map import COMMAND_MAP, PLACES_MAP
-
 
 WAKE_WORD = "tiago"
 INTERRUPT_WORDS = ["para", "detente", "stop", "quieto", "basta"]
