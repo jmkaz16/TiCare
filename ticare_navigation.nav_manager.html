@@ -165,6 +165,16 @@ config_dir (str): The directory path where the YAML file of the coverage points 
 </dd>
 </dl>
 <dl class="py method">
+<dt class="sig sig-object py" id="ticare_navigation.nav_manager.NavManager.cancel_follow_waypoints_response_callback">
+<span class="sig-name descname"><span class="pre">cancel_follow_waypoints_response_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">future</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rclpy.task.Future</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ticare_navigation.nav_manager.NavManager.cancel_follow_waypoints_response_callback" title="Link to this definition"></a></dt>
+<dd><p>Handles the response from cancelling the FollowWaypoints goal.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>future (Future): The future object representing the cancel goal response.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="ticare_navigation.nav_manager.NavManager.communication_callback">
 <span class="sig-name descname"><span class="pre">communication_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">std_msgs.msg.String</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ticare_navigation.nav_manager.NavManager.communication_callback" title="Link to this definition"></a></dt>
 <dd><p>Handles mission commands from the communication package.</p>
@@ -182,60 +192,60 @@ config_dir (str): The directory path where the YAML file of the coverage points 
 
 <dl class="py method">
 <dt class="sig sig-object py" id="ticare_navigation.nav_manager.NavManager.follow_waypoints_feedback_callback">
-<span class="sig-name descname"><span class="pre">follow_waypoints_feedback_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feedback_msg</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ticare_navigation.nav_manager.NavManager.follow_waypoints_feedback_callback" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">follow_waypoints_feedback_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feedback_msg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">nav2_msgs.action.FollowWaypoints.Feedback</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ticare_navigation.nav_manager.NavManager.follow_waypoints_feedback_callback" title="Link to this definition"></a></dt>
 <dd><p>Handles feedback from the FollowWaypoints action server.</p>
 <dl class="simple">
-<dt>Args:</dt><dd><p>feedback_msg: The feedback message from the action server.</p>
+<dt>Args:</dt><dd><p>feedback_msg (FollowWaypoints.Feedback): The feedback message from the action server.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="ticare_navigation.nav_manager.NavManager.follow_waypoints_response_callback">
-<span class="sig-name descname"><span class="pre">follow_waypoints_response_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">future</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ticare_navigation.nav_manager.NavManager.follow_waypoints_response_callback" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">follow_waypoints_response_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">future</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rclpy.task.Future</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ticare_navigation.nav_manager.NavManager.follow_waypoints_response_callback" title="Link to this definition"></a></dt>
 <dd><p>Handles the response from the FollowWaypoints action server.</p>
 <dl class="simple">
-<dt>Args:</dt><dd><p>future: The future object representing the action goal response.</p>
+<dt>Args:</dt><dd><p>future (Future): The future object representing the action goal response.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="ticare_navigation.nav_manager.NavManager.follow_waypoints_result_callback">
-<span class="sig-name descname"><span class="pre">follow_waypoints_result_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">future</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ticare_navigation.nav_manager.NavManager.follow_waypoints_result_callback" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">follow_waypoints_result_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">future</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rclpy.task.Future</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ticare_navigation.nav_manager.NavManager.follow_waypoints_result_callback" title="Link to this definition"></a></dt>
 <dd><p>Handles the result from the FollowWaypoints action server.</p>
 <dl class="simple">
-<dt>Args:</dt><dd><p>future: The future object representing the action result.</p>
+<dt>Args:</dt><dd><p>future (Future): The future object representing the action result.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="ticare_navigation.nav_manager.NavManager.nav_to_pose_feedback_callback">
-<span class="sig-name descname"><span class="pre">nav_to_pose_feedback_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feedback_msg</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ticare_navigation.nav_manager.NavManager.nav_to_pose_feedback_callback" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">nav_to_pose_feedback_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feedback_msg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">nav2_msgs.action.NavigateToPose.Feedback</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ticare_navigation.nav_manager.NavManager.nav_to_pose_feedback_callback" title="Link to this definition"></a></dt>
 <dd><p>Handles feedback from the NavigateToPose action server.</p>
 <dl class="simple">
-<dt>Args:</dt><dd><p>feedback_msg: The feedback message from the action server.</p>
+<dt>Args:</dt><dd><p>feedback_msg (NavigateToPose.Feedback): The feedback message from the action server.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="ticare_navigation.nav_manager.NavManager.nav_to_pose_response_callback">
-<span class="sig-name descname"><span class="pre">nav_to_pose_response_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">future</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ticare_navigation.nav_manager.NavManager.nav_to_pose_response_callback" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">nav_to_pose_response_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">future</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rclpy.task.Future</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ticare_navigation.nav_manager.NavManager.nav_to_pose_response_callback" title="Link to this definition"></a></dt>
 <dd><p>Handles the response from the NavigateToPose action server.</p>
 <dl class="simple">
-<dt>Args:</dt><dd><p>future: The future object representing the action goal response.</p>
+<dt>Args:</dt><dd><p>future (Future): The future object representing the action goal response.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="ticare_navigation.nav_manager.NavManager.nav_to_pose_result_callback">
-<span class="sig-name descname"><span class="pre">nav_to_pose_result_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">future</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ticare_navigation.nav_manager.NavManager.nav_to_pose_result_callback" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">nav_to_pose_result_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">future</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rclpy.task.Future</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ticare_navigation.nav_manager.NavManager.nav_to_pose_result_callback" title="Link to this definition"></a></dt>
 <dd><p>Handles the result from the NavigateToPose action server.</p>
 <dl class="simple">
-<dt>Args:</dt><dd><p>future: The future object representing the action result.</p>
+<dt>Args:</dt><dd><p>future (Future): The future object representing the action result.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -279,10 +289,10 @@ angular_z (float): The angular velocity around the z axis [rad/s].</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="ticare_navigation.nav_manager.NavManager.save_pose_response_callback">
-<span class="sig-name descname"><span class="pre">save_pose_response_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">future</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ticare_navigation.nav_manager.NavManager.save_pose_response_callback" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">save_pose_response_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">future</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rclpy.task.Future</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ticare_navigation.nav_manager.NavManager.save_pose_response_callback" title="Link to this definition"></a></dt>
 <dd><p>Handles the response from the SavePose service.</p>
 <dl class="simple">
-<dt>Args:</dt><dd><p>future: The future object representing the service call.</p>
+<dt>Args:</dt><dd><p>future (Future): The future object representing the service call.</p>
 </dd>
 </dl>
 </dd></dl>
