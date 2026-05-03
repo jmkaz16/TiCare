@@ -1,0 +1,5 @@
+speechrecognition
+sounddevice
+google-cloud-speech
+spacy
+numpy
