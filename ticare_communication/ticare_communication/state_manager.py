@@ -12,30 +12,29 @@ from std_msgs.msg import String
 from rclpy.callback_groups import ReentrantCallbackGroup
 from rclpy.executors import MultiThreadedExecutor
 
-from .stt.google_stt import transcribe_audio, speak_audio
-from .stt.record_audio import record_audio
-from .stt.wake_word import listen_for_wake_word, INTERRUPT_WORDS
-from .stt.tiago_spacy import parse_command, detect_gender
+# === IMPORTAMOS LAS FUNCIONES EXACTAMENTE COMO EN LA OLD STATE MACHINE ===
+from scripts.stt_communication import (
+    transcribe_audio,
+    speak_audio,
+    record_audio,
+    listen_for_wake_word,
+    parse_command,
+    get_article,
+    classify_answer,
+    classify_stop,
+)
+
+from ticare_communication.scripts.command_map import (
+    COMMAND_MAP,
+    PLACES_MAP,
+)
+
+WAKE_WORD = "tiago"
 
 
 class TiagoStateMachine(Node):
-    """
-    Main State Machine for the TiCare Communication package.
-
-    Orchestrates the robot's lifecycle by publishing commands to /com2vis and /com2nav
-    based on voice input and module feedback.
-
-    Attributes:
-        vis_pub (Publisher): Publisher for Vision commands.
-        nav_pub (Publisher): Publisher for Navigation commands.
-        state (str): Current state of the state machine.
-        object_name (str): Name of the object extracted from NLP.
-        command_text (str): Raw transcribed user command.
-        parsed_data (dict): Parsed NLP structure.
-    """
 
     def __init__(self):
-        """Initialize publishers, subscribers, timers, and emergency thread."""
         super().__init__("state_machine_node")
 
         self.group = ReentrantCallbackGroup()
@@ -52,6 +51,7 @@ class TiagoStateMachine(Node):
             10,
             callback_group=self.group,
         )
+
         self.nav_sub = self.create_subscription(
             String,
             "/nav2com",
@@ -72,75 +72,56 @@ class TiagoStateMachine(Node):
         # --- EMERGENCY LISTENER THREAD ---
         threading.Thread(target=self.emergency_listener, daemon=True).start()
 
-        self.get_logger().info("TiCare State Manager: Logic engine started (English mode).")
+        self.get_logger().info("TiCare State Manager: Logic engine started (Spanish mode).")
 
-    # -------------------------------------------------------------------------
+    # ============================================================
     # EMERGENCY HANDLING
-    # -------------------------------------------------------------------------
+    # ============================================================
 
     def emergency_listener(self):
         """
-        Continuously listens for emergency stop keywords in a parallel thread.
-
-        This thread runs independently from the main ROS executor to ensure
-        that emergency commands are detected even during audio recording,
-        navigation, or other blocking operations.
+        Escucha continuamente palabras de parada usando fuzzy logic.
         """
         while rclpy.ok() and self.state != "EMERGENCY_STOP":
-            text = listen_for_wake_word(duration=1)
+            text = listen_for_wake_word(WAKE_WORD, duration=1)
 
-            if text and any(word in text.lower() for word in INTERRUPT_WORDS):
+            if text and classify_stop(text):
                 self.send_emergency()
                 break
 
     def send_emergency(self):
-        """
-        Trigger the EMERGENCY_STOP state and notify all modules.
-
-        Sends the emergency_stop command to both Vision and Navigation modules.
-        """
         self.state = "EMERGENCY_STOP"
         msg = String(data="emergency_stop")
-
         self.vis_pub.publish(msg)
         self.nav_pub.publish(msg)
-
         speak_audio("Parada de emergencia activada.")
         self.get_logger().error("emergency_stop sent to Vision and Navigation.")
 
     def check_stop(self, text: str) -> bool:
-        """
-        Check if the given text contains any emergency keywords.
-
-        Args:
-            text (str): Transcribed audio text.
-
-        Returns:
-            bool: True if an emergency keyword is detected.
-        """
-        if any(word in text.lower() for word in INTERRUPT_WORDS):
+        if classify_stop(text):
             self.send_emergency()
             return True
         return False
 
-    # -------------------------------------------------------------------------
+    # ============================================================
     # MAIN STATE MACHINE
-    # -------------------------------------------------------------------------
+    # ============================================================
 
     def run_machine(self):
-        """Execute the state machine logic transitions."""
+
         if self.state == "EMERGENCY_STOP":
             return
 
         # --- STATE 1: IDLE ---
         if self.state == "IDLE":
-            result = listen_for_wake_word(duration=2)
+            result = listen_for_wake_word(WAKE_WORD, duration=2)
+
             if result is not None:
                 if self.check_stop(result):
                     return
                 self.state = "WAKE_WORD_DETECTED"
 
-        # --- STATE 2: WAKE_WORD_DETECTED ---
+        # --- STATE 2: WAKE WORD DETECTED ---
         elif self.state == "WAKE_WORD_DETECTED":
             self.vis_pub.publish(String(data="head_up"))
             self.state = "GREETING"
@@ -164,7 +145,7 @@ class TiagoStateMachine(Node):
                 self.command_text = text
                 self.state = "PROCESSING_REQUEST"
 
-        # --- STATE 5: PROCESSING_REQUEST ---
+        # --- STATE 5: PROCESSING REQUEST ---
         elif self.state == "PROCESSING_REQUEST":
             self.parsed_data = parse_command(self.command_text)
 
@@ -174,19 +155,18 @@ class TiagoStateMachine(Node):
             else:
                 self.state = "ERROR_NOT_FOUND"
 
-        # --- STATE 6: RETRY_SPEECH ---
+        # --- STATE 6: RETRY SPEECH ---
         elif self.state == "RETRY_SPEECH":
             speak_audio("No he entendido, ¿puedes repetirlo?")
             self.state = "LISTENING"
 
-        # --- STATE 9: OBJECT_FOUND ---
+        # --- STATE 9: OBJECT FOUND ---
         elif self.state == "OBJECT_FOUND":
-            gender = detect_gender(self.object_name)
-            article = "el" if gender == "masculino" else "la"
-            speak_audio(f"Ok, iré a buscar {article} {self.object_name}")
+            article = get_article(self.object_name)
+            speak_audio(f"Ok, iré a buscar {article} {self.object_name}.")
             self.state = "SEND_TO_VISION"
 
-        # --- STATE 7: SEND_TO_VISION ---
+        # --- STATE 7: SEND TO VISION ---
         elif self.state == "SEND_TO_VISION":
             self.vis_pub.publish(String(data=f"object_{self.object_name}"))
             self.nav_pub.publish(String(data="start_nav"))
@@ -196,32 +176,20 @@ class TiagoStateMachine(Node):
         elif self.state == "SEARCHING":
             pass
 
-        # --- STATE 10: ERROR_NOT_FOUND ---
+        # --- STATE 10: ERROR NOT FOUND ---
         elif self.state == "ERROR_NOT_FOUND":
-            speak_audio("No he encontrado el objeto")
+            speak_audio("No he encontrado el objeto.")
             self.state = "IDLE"
 
-    # -------------------------------------------------------------------------
+    # ============================================================
     # CALLBACKS
-    # -------------------------------------------------------------------------
+    # ============================================================
 
     def vision_callback(self, msg: String):
-        """
-        Process incoming feedback from /vis2com.
-
-        Args:
-            msg (String): Vision module message.
-        """
         if msg.data == "object_detected":
             self.nav_pub.publish(String(data="return"))
 
     def navigation_callback(self, msg: String):
-        """
-        Process incoming feedback from /nav2com.
-
-        Args:
-            msg (String): Navigation module message.
-        """
         if msg.data == "object_point":
             self.state = "POINTING"
             speak_audio("Aquí está.")
@@ -234,10 +202,8 @@ class TiagoStateMachine(Node):
 
 
 def main(args=None):
-    """Entry point for the state manager node."""
     rclpy.init(args=args)
     node = TiagoStateMachine()
-
     executor = MultiThreadedExecutor()
     executor.add_node(node)
 

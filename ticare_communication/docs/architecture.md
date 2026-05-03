@@ -28,11 +28,7 @@ ticare_communication/
 ├── launch/                 # Launch files for the communication stack
 ├── resource/               # Package metadata
 ├── scripts/                # Helper scripts
-│   └── stt/                # Speech processing modules
-│       ├── google_stt.py
-│       ├── record_audio.py
-│       ├── wake_word.py
-│       └── tiago_spacy.py
+│   └── stt_communitation   # Speech processing modules
 ├── ticare_communication/   # Python source code
 │   ├── __init__.py
 │   ├── state_manager.py    # Main communication node
