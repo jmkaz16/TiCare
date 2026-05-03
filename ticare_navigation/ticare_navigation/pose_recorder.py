@@ -62,9 +62,24 @@ class PoseRecorder(Node):
 
         self.covariance = (
             self.current_pose.pose.covariance[0]
-            + self.current_pose.pose.covariance[7]
-            + self.current_pose.pose.covariance[35]
-        ) / 3
+            * self.current_pose.pose.covariance[7]
+            * self.current_pose.pose.covariance[35]
+            + self.current_pose.pose.covariance[1]
+            * self.current_pose.pose.covariance[11]
+            * self.current_pose.pose.covariance[30]
+            + self.current_pose.pose.covariance[5]
+            * self.current_pose.pose.covariance[6]
+            * self.current_pose.pose.covariance[31]
+            - self.current_pose.pose.covariance[1]
+            * self.current_pose.pose.covariance[7]
+            * self.current_pose.pose.covariance[30]
+            - self.current_pose.pose.covariance[1]
+            * self.current_pose.pose.covariance[5]
+            * self.current_pose.pose.covariance[35]
+            - self.current_pose.pose.covariance[0]
+            * self.current_pose.pose.covariance[11]
+            * self.current_pose.pose.covariance[31]
+        )
 
         self.data_to_save = PoseStamped()
         self.data_to_save.header = self.current_pose.header
