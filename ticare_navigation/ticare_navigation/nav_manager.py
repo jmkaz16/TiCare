@@ -3,7 +3,10 @@ from ament_index_python.packages import get_package_share_directory
 
 import rclpy
 from rclpy.node import Node
+from rclpy.time import Time
 from rclpy.action import ActionClient
+from rclpy.action.client import ClientGoalHandle
+from rclpy.task import Future
 
 from enum import Enum
 from std_msgs.msg import String
@@ -14,7 +17,6 @@ from nav2_msgs.action import NavigateToPose
 from nav2_msgs.action import FollowWaypoints
 
 import yaml
-
 from rosidl_runtime_py.set_message import set_message_fields
 
 
@@ -126,13 +128,14 @@ class NavManager(Node):
 
         self.recovery_rotation_active: bool = False  # Flag to indicate if recovery rotation needed
         self.recovery_rotation_duration: float = 30.0  # [s] Duration for the recovery rotation
-        self.recovery_rotation_start_time: float = 0.0  # [s] Timestamp when the recovery starts
-        self.recovery_rotation_speed: float = 0.5  # [rad/s] Angular speed during recovery rotation
+        self.recovery_rotation_start_time: Time = Time()  # [s] Timestamp when the recovery starts
+        self.recovery_rotation_speed: float = 1.0  # [rad/s] Angular speed during recovery rotation
 
         self.object_detected: bool = False  # Flag to track if the object has been detected
+        self.cancel_goal_active: bool = False  # Flag to indicate if a cancel goal request is active
 
         self.search_duration: float = 300.0  # [s] Max duration for the search phase
-        self.search_start_time: float = 0.0  # [s] Timestamp when the search phase starts
+        self.search_start_time: Time = Time()  # [s] Timestamp when the search phase starts
 
         self.vision_pub = self.create_publisher(String, "nav2vis", 10)
         self.communication_pub = self.create_publisher(String, "nav2com", 10)
@@ -186,12 +189,16 @@ class NavManager(Node):
 
                 if elapsed_time > self.search_duration:
 
-                    self.search_start_time = 0.0
+                    self.search_start_time = Time()
                     self.publish_vision_command(VisionCommand.STOP_VIS)
 
-                    self.get_logger().info("Search duration exceeded: Moving to RETURNING_HOME.")
-                    self.state = NavigationState.RETURNING_HOME
-                    self.send_nav_to_pose_goal(label=SavePoseLabel.START_POSE)
+                    self.cancel_goal_active = True
+                    cancel_future = self.follow_waypoints_goal_handle.cancel_goal_async()
+                    cancel_future.add_done_callback(self.cancel_follow_waypoints_response_callback)
+
+                    # self.get_logger().info("Search duration exceeded: Moving to RETURNING_HOME.")
+                    # self.state = NavigationState.RETURNING_HOME
+                    # self.send_nav_to_pose_goal(label=SavePoseLabel.START_POSE)
 
             case NavigationState.SAVING_OBJECT_POSE:
                 pass
@@ -209,7 +216,7 @@ class NavManager(Node):
         """Executes a recovery rotation to improve AMCL localization."""
         now = self.get_clock().now()
 
-        if self.recovery_rotation_start_time == 0.0:
+        if self.recovery_rotation_start_time.nanoseconds == 0:
             self.recovery_rotation_start_time = now
             self.get_logger().info("Starting recovery rotation for localization.")
             return
@@ -225,7 +232,7 @@ class NavManager(Node):
         else:
             self.publish_cmd_vel_msg(0.0, 0.0)
             self.recovery_rotation_active = False
-            self.recovery_rotation_start_time = 0.0
+            self.recovery_rotation_start_time = Time()
 
             self.get_logger().info("Recovery rotation completed. Moving to SAVING_START_POSE.")
             self.state = NavigationState.SAVING_START_POSE
@@ -305,11 +312,15 @@ class NavManager(Node):
                 self.get_logger().info("Sending NavigateToPose goal to navigate to object.")
                 file_name = os.path.join(self.data_dir, f"{label.value}.yaml")
 
+            case _:
+                self.get_logger().warn("Goal not recognized.")
+
         with open(file_name, "r") as file:
             yaml_data = yaml.safe_load(file)
 
         goal_pose = PoseStamped()
         set_message_fields(goal_pose, yaml_data)
+        goal_pose.header.stamp = self.get_clock().now().to_msg()
         goal_msg = NavigateToPose.Goal()
         goal_msg.pose = goal_pose
 
@@ -326,13 +337,11 @@ class NavManager(Node):
             room (str): The room for which to execute the coverage path. Default is "all",
             which executes the full path, other options (Lab_Paloma, Sala_D, etc.).
         """
-        file_name = os.path.join(self.config_dir, "coverage_points.yaml")
-
+        file_name = os.path.join(self.config_dir, "coverage_waypoints.yaml")
         with open(file_name, "r") as file:
             yaml_data = yaml.safe_load(file)
 
         raw_points = []
-
         if room == "all":
             for room_list in yaml_data.values():
                 raw_points.extend(room_list)
@@ -348,14 +357,15 @@ class NavManager(Node):
                 return
 
         waypoints = []
+        current_time = self.get_clock().now().to_msg()
         for point in raw_points:
             msg = PoseStamped()
             set_message_fields(msg, point)
+            msg.header.stamp = current_time
             waypoints.append(msg)
 
         goal_msg = FollowWaypoints.Goal()
         goal_msg.poses = waypoints
-
         self.follow_waypoints_client.wait_for_server()
         future = self.follow_waypoints_client.send_goal_async(
             goal_msg, feedback_callback=self.follow_waypoints_feedback_callback
@@ -374,11 +384,22 @@ class NavManager(Node):
             case "object_detected":
                 if self.state == NavigationState.SEARCHING:
                     self.object_detected = True
-                    self.search_start_time = 0.0
-                    # TODO: Cancel nav
-                    self.get_logger().info("Object found: Moving to SAVING_OBJECT_POSE.")
-                    self.state = NavigationState.SAVING_OBJECT_POSE
-                    self.send_save_pose_request(SavePoseLabel.OBJECT_POSE)
+                    self.search_start_time = Time()
+                    cancel_future = self.follow_waypoints_goal_handle.cancel_goal_async()
+                    cancel_future.add_done_callback(self.cancel_follow_waypoints_response_callback)
+
+                    # self.nav_to_pose_goal_handle.cancel_goal_async()
+                    # self.get_logger().info(
+                    #     "Cancelling FollowWaypoints goal due to object detection."
+                    # )
+                    # cancel_follow_waypoints = self.follow_waypoints_client._cancel_goal_async(
+                    #     self.follow_waypoints_goal_handle
+                    # )
+                    # cancel_follow_waypoints.add_done_callback(self.cancel_follow_waypoints_callback)
+                    # self.cancel_goal_active = True
+                    # self.get_logger().info("Object found: Moving to SAVING_OBJECT_POSE.")
+                    # self.state = NavigationState.SAVING_OBJECT_POSE
+                    # self.send_save_pose_request(SavePoseLabel.OBJECT_POSE)
 
             case _:
                 self.get_logger().warn(f"Unknown vision status: {status}")
@@ -406,12 +427,12 @@ class NavManager(Node):
             case _:
                 self.get_logger().warning(f"Unknown communication command: {command}")
 
-    def save_pose_response_callback(self, future) -> None:
+    def save_pose_response_callback(self, future: Future) -> None:
         """
         Handles the response from the SavePose service.
 
         Args:
-            future: The future object representing the service call.
+            future (Future): The future object representing the service call.
         """
         try:
             response = future.result()
@@ -441,29 +462,30 @@ class NavManager(Node):
         except Exception as e:
             self.get_logger().error(f"Service call failed: {e}")
 
-    def nav_to_pose_response_callback(self, future) -> None:
+    def nav_to_pose_response_callback(self, future: Future) -> None:
         """
         Handles the response from the NavigateToPose action server.
 
         Args:
-            future: The future object representing the action goal response.
+            future (Future): The future object representing the action goal response.
         """
-        nav_to_pose_goal_handle = future.result()
+        nav_to_pose_goal_handle: ClientGoalHandle = future.result()
         if not nav_to_pose_goal_handle.accepted:
             self.get_logger().error("NavigateToPose goal was rejected.")
             return
 
         self.get_logger().info("NavigateToPose goal accepted.")
+        self.nav_to_pose_goal_handle = nav_to_pose_goal_handle
 
-        self.nav_to_pose_result_future = nav_to_pose_goal_handle.get_result_async()
+        self.nav_to_pose_result_future = self.nav_to_pose_goal_handle.get_result_async()
         self.nav_to_pose_result_future.add_done_callback(self.nav_to_pose_result_callback)
 
-    def nav_to_pose_result_callback(self, future) -> None:
+    def nav_to_pose_result_callback(self, future: Future) -> None:
         """
         Handles the result from the NavigateToPose action server.
 
         Args:
-            future: The future object representing the action result.
+            future (Future): The future object representing the action result.
         """
         result = future.result().result
         self.get_logger().info(f"NavigateToPose result received: {result}")
@@ -476,61 +498,87 @@ class NavManager(Node):
             else:
                 self.get_logger().info("Returned home and no object detected: Moving to IDLE.")
                 self.state = NavigationState.IDLE
+                self.cancel_goal_active = False
 
         elif self.state == NavigationState.NAV_TO_OBJECT:
             self.publish_communication_status(ComStatus.OBJECT_POINT)
-            self.get_logger().info("Arrived at object location.")
+            self.get_logger().info("Arrived at object location. Mission complete: Moving to IDLE.")
             self.state = NavigationState.IDLE
             self.object_detected = False
 
-    def nav_to_pose_feedback_callback(self, feedback_msg) -> None:
+    def nav_to_pose_feedback_callback(self, feedback_msg: NavigateToPose.Feedback) -> None:
         """
         Handles feedback from the NavigateToPose action server.
 
         Args:
-            feedback_msg: The feedback message from the action server.
+            feedback_msg (NavigateToPose.Feedback): The feedback message from the action server.
         """
-        feedback = feedback_msg.feedback
-        self.get_logger().info(f"NavigateToPose feedback received: {feedback}")
+        feedback = feedback_msg.feedback.distance_remaining
+        self.get_logger().debug(f"NavigateToPose feedback received: {feedback}")
 
-    def follow_waypoints_response_callback(self, future) -> None:
+    def follow_waypoints_response_callback(self, future: Future) -> None:
         """
         Handles the response from the FollowWaypoints action server.
 
         Args:
-            future: The future object representing the action goal response.
+            future (Future): The future object representing the action goal response.
         """
-        follow_waypoints_goal_handle = future.result()
+        follow_waypoints_goal_handle: ClientGoalHandle = future.result()
         if not follow_waypoints_goal_handle.accepted:
             self.get_logger().error("FollowWaypoints goal was rejected.")
             return
 
         self.get_logger().info("FollowWaypoints goal accepted.")
+        self.follow_waypoints_goal_handle = follow_waypoints_goal_handle
 
-        self.follow_waypoints_result_future = follow_waypoints_goal_handle.get_result_async()
+        self.follow_waypoints_result_future = self.follow_waypoints_goal_handle.get_result_async()
         self.follow_waypoints_result_future.add_done_callback(self.follow_waypoints_result_callback)
 
-    def follow_waypoints_result_callback(self, future) -> None:
+    def follow_waypoints_result_callback(self, future: Future) -> None:
         """
         Handles the result from the FollowWaypoints action server.
 
         Args:
-            future: The future object representing the action result.
+            future (Future): The future object representing the action result.
         """
         result = future.result().result
         self.get_logger().info(f"FollowWaypoints result received: {result}")
 
-        # TODO: When finished
+        # TODO: When finished and not canceled
 
-    def follow_waypoints_feedback_callback(self, feedback_msg) -> None:
+        if self.state == NavigationState.SEARCHING:
+            if self.object_detected:
+                self.get_logger().info("Object found: Moving to SAVING_OBJECT_POSE.")
+                self.state = NavigationState.SAVING_OBJECT_POSE
+                self.send_save_pose_request(SavePoseLabel.OBJECT_POSE)
+
+            elif self.cancel_goal_active:
+                self.get_logger().info("Search duration exceeded: Moving to RETURNING_HOME.")
+                self.state = NavigationState.RETURNING_HOME
+                self.send_nav_to_pose_goal(label=SavePoseLabel.START_POSE)
+
+    def follow_waypoints_feedback_callback(self, feedback_msg: FollowWaypoints.Feedback) -> None:
         """
         Handles feedback from the FollowWaypoints action server.
 
         Args:
-            feedback_msg: The feedback message from the action server.
+            feedback_msg (FollowWaypoints.Feedback): The feedback message from the action server.
         """
-        feedback = feedback_msg.feedback
-        self.get_logger().info(f"FollowWaypoints feedback received: {feedback}")
+        feedback = feedback_msg.feedback.current_waypoint
+        self.get_logger().debug(f"FollowWaypoints feedback received: {feedback}")
+
+    def cancel_follow_waypoints_response_callback(self, future: Future) -> None:
+        """
+        Handles the response from cancelling the FollowWaypoints goal.
+
+        Args:
+            future (Future): The future object representing the cancel goal response.
+        """
+        cancel_response = future.result()
+        if len(cancel_response.goals_canceling) > 0:
+            self.get_logger().info("FollowWaypoints goal cancelled successfully.")
+        else:
+            self.get_logger().error(f"Failed to cancel FollowWaypoints goal: {cancel_response}")
 
 
 def main(args=None) -> None:
