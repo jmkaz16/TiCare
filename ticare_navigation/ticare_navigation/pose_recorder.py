@@ -108,7 +108,7 @@ class PoseRecorder(Node):
 
             return response
 
-        if self.covariance > 0.5:
+        if self.covariance > 0.35:
             response.success = False
             response.message = "Covariance is too high to save pose."
             self.get_logger().warn(response.message)
