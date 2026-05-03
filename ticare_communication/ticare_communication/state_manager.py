@@ -13,7 +13,7 @@ from rclpy.callback_groups import ReentrantCallbackGroup
 from rclpy.executors import MultiThreadedExecutor
 
 # === IMPORTAMOS LAS FUNCIONES EXACTAMENTE COMO EN LA OLD STATE MACHINE ===
-from scripts.stt_communication import (
+from ticare_communication.scripts.stt_communication import (
     transcribe_audio,
     speak_audio,
     record_audio,
