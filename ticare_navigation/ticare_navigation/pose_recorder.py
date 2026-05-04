@@ -60,26 +60,10 @@ class PoseRecorder(Node):
         """
         self.current_pose = msg
 
-        self.covariance = (
-            self.current_pose.pose.covariance[0]
-            * self.current_pose.pose.covariance[7]
-            * self.current_pose.pose.covariance[35]
-            + self.current_pose.pose.covariance[1]
-            * self.current_pose.pose.covariance[11]
-            * self.current_pose.pose.covariance[30]
-            + self.current_pose.pose.covariance[5]
-            * self.current_pose.pose.covariance[6]
-            * self.current_pose.pose.covariance[31]
-            - self.current_pose.pose.covariance[1]
-            * self.current_pose.pose.covariance[7]
-            * self.current_pose.pose.covariance[30]
-            - self.current_pose.pose.covariance[1]
-            * self.current_pose.pose.covariance[5]
-            * self.current_pose.pose.covariance[35]
-            - self.current_pose.pose.covariance[0]
-            * self.current_pose.pose.covariance[11]
-            * self.current_pose.pose.covariance[31]
-        )
+        self.covariance_pos = (
+            self.current_pose.pose.covariance[0] + self.current_pose.pose.covariance[7]
+        ) ** 0.5
+        self.covariance_yaw = self.current_pose.pose.covariance[35] ** 0.5
 
         self.data_to_save = PoseStamped()
         self.data_to_save.header = self.current_pose.header
@@ -108,7 +92,9 @@ class PoseRecorder(Node):
 
             return response
 
-        if self.covariance > 0.35:
+        if request.label == "start_pose" and not (
+            self.covariance_pos < 0.5 and self.covariance_yaw < 0.3
+        ):
             response.success = False
             response.message = "Covariance is too high to save pose."
             self.get_logger().warn(response.message)
