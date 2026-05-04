@@ -71,10 +71,6 @@ If new terminals only show a few local topics, use the `--spin-time` flag as sho
 
 ---
 
-#### Last Resource
-If nothing of the above works, execute the command:
-source ~/tiago_ros2_env.sh
-
 ### 4. Shutting Down the Robot
 Follow this protocol to prevent damage to the motors or the arm:
 
