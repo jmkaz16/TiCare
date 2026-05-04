@@ -128,14 +128,18 @@ class NavManager(Node):
 
         self.recovery_rotation_active: bool = False  # Flag to indicate if recovery rotation needed
         self.recovery_rotation_duration: float = 30.0  # [s] Duration for the recovery rotation
-        self.recovery_rotation_start_time: Time = Time()  # [s] Timestamp when the recovery starts
+        self.recovery_rotation_start_time: Time = Time(
+            nanoseconds=0, clock_type=self.get_clock().clock_type
+        )  # [s] Timestamp when the recovery starts
         self.recovery_rotation_speed: float = 1.0  # [rad/s] Angular speed during recovery rotation
 
         self.object_detected: bool = False  # Flag to track if the object has been detected
         self.cancel_goal_active: bool = False  # Flag to indicate if a cancel goal request is active
 
         self.search_duration: float = 300.0  # [s] Max duration for the search phase
-        self.search_start_time: Time = Time()  # [s] Timestamp when the search phase starts
+        self.search_start_time: Time = Time(
+            nanoseconds=0, clock_type=self.get_clock().clock_type
+        )  # [s] Timestamp when the search phase starts
 
         self.vision_pub = self.create_publisher(String, "nav2vis", 10)
         self.communication_pub = self.create_publisher(String, "nav2com", 10)
@@ -189,7 +193,9 @@ class NavManager(Node):
 
                 if elapsed_time > self.search_duration:
 
-                    self.search_start_time = Time()
+                    self.search_start_time = Time(
+                        nanoseconds=0, clock_type=self.get_clock().clock_type
+                    )
                     self.publish_vision_command(VisionCommand.STOP_VIS)
 
                     self.cancel_goal_active = True
@@ -232,7 +238,9 @@ class NavManager(Node):
         else:
             self.publish_cmd_vel_msg(0.0, 0.0)
             self.recovery_rotation_active = False
-            self.recovery_rotation_start_time = Time()
+            self.recovery_rotation_start_time = Time(
+                nanoseconds=0, clock_type=self.get_clock().clock_type
+            )
 
             self.get_logger().info("Recovery rotation completed. Moving to SAVING_START_POSE.")
             self.state = NavigationState.SAVING_START_POSE
@@ -324,6 +332,8 @@ class NavManager(Node):
         goal_msg = NavigateToPose.Goal()
         goal_msg.pose = goal_pose
 
+        self.get_logger().info(f"Goal send: '{goal_msg}'")
+
         self.nav_to_pose_client.wait_for_server()
         future = self.nav_to_pose_client.send_goal_async(
             goal_msg, feedback_callback=self.nav_to_pose_feedback_callback
@@ -384,7 +394,9 @@ class NavManager(Node):
             case "object_detected":
                 if self.state == NavigationState.SEARCHING:
                     self.object_detected = True
-                    self.search_start_time = Time()
+                    self.search_start_time = Time(
+                        nanoseconds=0, clock_type=self.get_clock().clock_type
+                    )
                     cancel_future = self.follow_waypoints_goal_handle.cancel_goal_async()
                     cancel_future.add_done_callback(self.cancel_follow_waypoints_response_callback)
 
