@@ -22,8 +22,8 @@ This package acts as the **entry point** for human‑robot interaction in the Ti
 ```
 ticare_communication/
 │
-├── config/                 # STT/NLP configuration files
-├── data/                   # Temporary audio files, logs
+├── config/                 # STT/NLP configuration files --
+├── data/                   # Temporary audio files, logs --
 ├── docs/                   # Documentation (architecture.md)
 ├── launch/                 # Launch files for the communication stack
 ├── resource/               # Package metadata
