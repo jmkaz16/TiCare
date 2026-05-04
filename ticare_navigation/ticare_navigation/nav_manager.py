@@ -17,6 +17,7 @@ from nav2_msgs.action import NavigateToPose
 from nav2_msgs.action import FollowWaypoints
 
 import yaml
+import time
 from rosidl_runtime_py.set_message import set_message_fields
 
 
@@ -131,7 +132,7 @@ class NavManager(Node):
         self.recovery_rotation_start_time: Time = Time(
             nanoseconds=0, clock_type=self.get_clock().clock_type
         )  # [s] Timestamp when the recovery starts
-        self.recovery_rotation_speed: float = 1.0  # [rad/s] Angular speed during recovery rotation
+        self.recovery_rotation_speed: float = 0.5  # [rad/s] Angular speed during recovery rotation
 
         self.object_detected: bool = False  # Flag to track if the object has been detected
         self.cancel_goal_active: bool = False  # Flag to indicate if a cancel goal request is active
@@ -332,7 +333,7 @@ class NavManager(Node):
         goal_msg = NavigateToPose.Goal()
         goal_msg.pose = goal_pose
 
-        self.get_logger().info(f"Goal send: '{goal_msg}'")
+        # self.get_logger().info(f"Goal send: '{goal_msg}'")
 
         self.nav_to_pose_client.wait_for_server()
         future = self.nav_to_pose_client.send_goal_async(
@@ -557,7 +558,7 @@ class NavManager(Node):
         self.get_logger().info(f"FollowWaypoints result received: {result}")
 
         # TODO: When finished and not canceled
-
+        time.sleep(0.5)
         if self.state == NavigationState.SEARCHING:
             if self.object_detected:
                 self.get_logger().info("Object found: Moving to SAVING_OBJECT_POSE.")
