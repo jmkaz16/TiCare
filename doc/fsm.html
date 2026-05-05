@@ -154,7 +154,7 @@
 <li><p><strong>Description:</strong> Executes the search pattern in the target room.</p></li>
 <li><p><strong>Actions:</strong> Start the <code class="docutils literal notranslate"><span class="pre">/follow_waypoints</span></code> action using points from <code class="docutils literal notranslate"><span class="pre">coverage_points.yaml</span></code>.</p></li>
 <li><p><strong>Transition A:</strong> If <code class="docutils literal notranslate"><span class="pre">&quot;object_detected&quot;</span></code> is received from <code class="docutils literal notranslate"><span class="pre">/vis2nav</span></code>, cancel navigation and move to <strong>SAVING_OBJECT_POSE</strong>.</p></li>
-<li><p><strong>Transition B:</strong> If the search timer expires (Timeout), publish <code class="docutils literal notranslate"><span class="pre">&quot;stop_vis&quot;</span></code>to <code class="docutils literal notranslate"><span class="pre">/nav2vision</span></code>to stop the camera and move to <strong>RETURNING_HOME</strong>.</p></li>
+<li><p><strong>Transition B:</strong> If the search timer expires (Timeout), publish <code class="docutils literal notranslate"><span class="pre">&quot;stop_vis&quot;</span></code>to <code class="docutils literal notranslate"><span class="pre">/nav2vis</span></code>to stop the camera and move to <strong>RETURNING_HOME</strong>.</p></li>
 </ul>
 </section>
 <section id="saving-object-pose">
