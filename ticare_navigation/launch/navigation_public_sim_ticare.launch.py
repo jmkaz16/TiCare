@@ -52,28 +52,31 @@ def generate_launch_description():
     return ld
 
 
-def declare_actions(
-    launch_description: LaunchDescription, launch_args: LaunchArguments
-):
-    public_nav_params = PathJoinSubstitution([
-        FindPackageShare(PythonExpression(["'", LaunchConfiguration('base_type'), "_2dnav'"])),
-        'config',
-        'nav_public_sim.yaml',
-    ])
+def declare_actions(launch_description: LaunchDescription, launch_args: LaunchArguments):
+    public_nav_params = PathJoinSubstitution(
+        [
+            FindPackageShare(PythonExpression(["'", LaunchConfiguration("base_type"), "_2dnav'"])),
+            "config",
+            "nav_public_sim.yaml",
+        ]
+    )
 
     map_path = PathJoinSubstitution(
         [FindPackageShare("ticare_navigation"), "maps", "final_map.yaml"]
     )
 
+    rviz_config_path = PathJoinSubstitution(
+        [FindPackageShare("ticare_navigation"), "rviz", "rviz_ticare_config.rviz"]
+    )
 
     # Navigation
     navigation = include_scoped_launch_py_description(
-        pkg_name='nav2_bringup',
-        paths=['launch', 'navigation_launch.py'],
+        pkg_name="nav2_bringup",
+        paths=["launch", "navigation_launch.py"],
         launch_arguments={
-            'params_file': public_nav_params,
-            'use_sim_time': LaunchConfiguration('use_sim_time'),
-            'base_type': launch_args.base_type,
+            "params_file": public_nav_params,
+            "use_sim_time": LaunchConfiguration("use_sim_time"),
+            "base_type": launch_args.base_type,
         },
     )
 
@@ -81,39 +84,43 @@ def declare_actions(
 
     # Localization
     localization = include_scoped_launch_py_description(
-        pkg_name='nav2_bringup',
-        paths=['launch', 'localization_launch.py'],
+        pkg_name="nav2_bringup",
+        paths=["launch", "localization_launch.py"],
         launch_arguments={
-            'params_file': public_nav_params,
-            'map': map_path,
-            'use_sim_time': LaunchConfiguration('use_sim_time'),
-            'world_name': LaunchConfiguration('world_name'),
-            'base_type': launch_args.base_type,
+            "params_file": public_nav_params,
+            "map": map_path,
+            "use_sim_time": LaunchConfiguration("use_sim_time"),
+            "world_name": LaunchConfiguration("world_name"),
+            "base_type": launch_args.base_type,
         },
-        condition=UnlessCondition(LaunchConfiguration('slam')),
+        condition=UnlessCondition(LaunchConfiguration("slam")),
     )
 
     launch_description.add_action(localization)
 
     # SLAM
     slam = include_scoped_launch_py_description(
-        pkg_name='nav2_bringup',
-        paths=['launch', 'slam_launch.py'],
+        pkg_name="nav2_bringup",
+        paths=["launch", "slam_launch.py"],
         launch_arguments={
-            'params_file': public_nav_params,
-            'use_sim_time': LaunchConfiguration('use_sim_time'),
-            'base_type': launch_args.base_type,
+            "params_file": public_nav_params,
+            "use_sim_time": LaunchConfiguration("use_sim_time"),
+            "base_type": launch_args.base_type,
         },
-        condition=IfCondition(LaunchConfiguration('slam')),
+        condition=IfCondition(LaunchConfiguration("slam")),
     )
 
     launch_description.add_action(slam)
 
     # RViz
     rviz = include_scoped_launch_py_description(
-        pkg_name='nav2_bringup',
-        paths=['launch', 'rviz_launch.py'],
-        condition=IfCondition(LaunchConfiguration('rviz')),
+        pkg_name="nav2_bringup",
+        paths=["launch", "rviz_launch.py"],
+        launch_arguments={
+            "rviz_config": rviz_config_path,
+            "use_sim_time": LaunchConfiguration("use_sim_time"),
+        },
+        condition=IfCondition(LaunchConfiguration("rviz")),
     )
 
     launch_description.add_action(rviz)
