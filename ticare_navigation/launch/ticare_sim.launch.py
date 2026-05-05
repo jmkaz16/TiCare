@@ -12,7 +12,7 @@ def generate_launch_description():
     use_default_map_arg = DeclareLaunchArgument(
         "use_default_map",
         default_value="False",
-        description="Whether or not to use the Pal Office" " map for navigation.",
+        description="Whether or not to use the Pal Office map for navigation.",
     )
 
     tiago_dir = PathJoinSubstitution([FindPackageShare("tiago_gazebo"), "launch"])

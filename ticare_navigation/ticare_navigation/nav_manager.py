@@ -9,6 +9,7 @@ from rclpy.action.client import ClientGoalHandle
 from rclpy.task import Future
 
 from enum import Enum
+from rcl_interfaces.msg import ParameterDescriptor
 from std_msgs.msg import String
 from geometry_msgs.msg import Twist
 from geometry_msgs.msg import PoseStamped
@@ -127,17 +128,39 @@ class NavManager(Node):
         self.state: NavigationState = NavigationState.IDLE
         self.control_loop_period: float = 0.1  # [s] Period for the main control loop timer
 
+        self.declare_parameter(
+            "recovery_rotation_duration",
+            30.0,
+            ParameterDescriptor(description="Duration for the recovery rotation in seconds"),
+        )
+        self.declare_parameter(
+            "recovery_rotation_speed",
+            0.5,
+            ParameterDescriptor(description="Angular speed for the recovery rotation in rad/s"),
+        )
+        self.declare_parameter(
+            "search_duration",
+            300.0,
+            ParameterDescriptor(description="Maximum duration for the search phase in seconds"),
+        )
+
         self.recovery_rotation_active: bool = False  # Flag to indicate if recovery rotation needed
-        self.recovery_rotation_duration: float = 30.0  # [s] Duration for the recovery rotation
+        self.recovery_rotation_duration: float = self.get_parameter(
+            "recovery_rotation_duration"
+        ).value  # [s] Duration for the recovery rotation
         self.recovery_rotation_start_time: Time = Time(
             nanoseconds=0, clock_type=self.get_clock().clock_type
         )  # [s] Timestamp when the recovery starts
-        self.recovery_rotation_speed: float = 0.5  # [rad/s] Angular speed during recovery rotation
+        self.recovery_rotation_speed: float = self.get_parameter(
+            "recovery_rotation_speed"
+        ).value  # [rad/s] Angular speed during recovery rotation
 
         self.object_detected: bool = False  # Flag to track if the object has been detected
         self.cancel_goal_active: bool = False  # Flag to indicate if a cancel goal request is active
 
-        self.search_duration: float = 300.0  # [s] Max duration for the search phase
+        self.search_duration: float = self.get_parameter(
+            "search_duration"
+        ).value  # [s] Max duration for the search phase
         self.search_start_time: Time = Time(
             nanoseconds=0, clock_type=self.get_clock().clock_type
         )  # [s] Timestamp when the search phase starts
