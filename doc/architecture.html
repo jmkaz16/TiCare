@@ -125,7 +125,8 @@
 <li><p>Response: <code class="docutils literal notranslate"><span class="pre">bool</span> <span class="pre">success</span></code>, <code class="docutils literal notranslate"><span class="pre">string</span> <span class="pre">message</span></code></p></li>
 </ul>
 </li>
-<li><p><strong>Dependencies:</strong> <code class="docutils literal notranslate"><span class="pre">rosidl_default_generators</span></code> (buildtool_depend), <code class="docutils literal notranslate"><span class="pre">rosidl_default_runtime</span></code> (exec_depend), <code class="docutils literal notranslate"><span class="pre">rosidl_interface_packages</span></code> (member_of_group)</p></li>
+<li><p><strong>Dependencies:</strong> <code class="docutils literal notranslate"><span class="pre">rosidl_default_generators</span></code> (buildtool_depend), <code class="docutils literal notranslate"><span class="pre">rosidl_default_runtime</span></code>
+(exec_depend), <code class="docutils literal notranslate"><span class="pre">rosidl_interface_packages</span></code> (member_of_group)</p></li>
 </ul>
 </section>
 <section id="ticare-navigation">
@@ -134,22 +135,11 @@
 <li><p><strong>Description:</strong> Implementation of the navigation stack, pose recording, and state management.</p></li>
 <li><p><strong>Launch:</strong></p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">ticare_navigation.launch.py</span></code>:  Main launch file. Aggregates both simulation and internal nodes.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ticare_navigation.launch.py</span></code>:  Main launch file. Launch rviz and <code class="docutils literal notranslate"><span class="pre">ticare_nodes.launch.py</span></code> for
+real-world operation.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">ticare_nodes.launch.py</span></code>: Launches the <code class="docutils literal notranslate"><span class="pre">nav_manager</span></code> and <code class="docutils literal notranslate"><span class="pre">pose_recorder</span></code> nodes.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">ticare_sim.launch.py</span></code>: Launches PAL Robotics packages simulation  with specific arguments.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">navigation_public_sim_ticare.launch.py</span></code>: Configures Tiago simulation with custom map.</p></li>
-</ul>
-</li>
-<li><p><strong>Worlds:</strong></p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">car</span></code>: Original world.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">car_shifted_final_block</span></code>: Shifted world to match the spawning point with the real world location of TIAGo, using tables as blocks to ensure robust navigation.</p></li>
-</ul>
-<p>There are other iterations of the maps that have been obtained by hand editing or implementing python scripts.</p>
-</li>
-<li><p><strong>Scripts:</strong></p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">modify_poses.py</span></code>: Shifts the original <code class="docutils literal notranslate"><span class="pre">car.world</span></code> by modifying the poses of each block.</p></li>
 </ul>
 </li>
 <li><p><strong>Maps:</strong>
@@ -161,33 +151,60 @@ Each map is defined by a <code class="docutils literal notranslate"><span class=
 <li><p><code class="docutils literal notranslate"><span class="pre">lab</span></code>: Map of the Lab, first iteration.</p></li>
 </ul>
 </li>
+<li><p><strong>Rviz:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">rviz_ticare_config.rviz</span></code>: Custom RViz configuration for <code class="docutils literal notranslate"><span class="pre">ticare_sim.launch.py</span></code>.</p></li>
+</ul>
+</li>
+<li><p><strong>Scripts:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">modify_poses.py</span></code>: Shifts the original <code class="docutils literal notranslate"><span class="pre">car.world</span></code> by modifying the poses of each block.</p></li>
+</ul>
+</li>
+<li><p><strong>Worlds:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">car</span></code>: Original world.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">car_shifted_final_block</span></code>: Shifted world to match the spawning point with the real world
+location of TIAGo, using tables as blocks to ensure robust navigation.</p></li>
+</ul>
+<p>There are other iterations of the maps that have been obtained by hand editing or implementing
+python scripts.</p>
+</li>
 <li><p><strong>Node:</strong> <code class="docutils literal notranslate"><span class="pre">nav_manager</span></code></p>
 <ul class="simple">
-<li><p><strong>Description:</strong> High-level orchestrator that monitors localization quality (AMCL) and manages state transitions (Search, Navigation, Emergency).</p></li>
+<li><p><strong>Description:</strong> High-level orchestrator that monitors localization quality (AMCL) and manages
+state transitions (Search, Navigation, Emergency).</p></li>
 <li><p><strong>Interfaces:</strong></p>
 <ul>
 <li><p><strong>Publishers:</strong></p>
 <ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">/nav2vis</span></code> (<code class="docutils literal notranslate"><span class="pre">std_msgs/msg/String</span></code>): Sends commands (<em>“start_vis”, “stop_vis”</em>) to the <code class="docutils literal notranslate"><span class="pre">ticare_vision</span></code> package to activate or deactivate the camera during the search phase.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">/nav2com</span></code> (<code class="docutils literal notranslate"><span class="pre">std_msgs/msg/String</span></code>): Communicates mission status (<em>“home”</em>, <em>“object_point”</em>) to the <code class="docutils literal notranslate"><span class="pre">ticare_communication</span></code> package.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">/cmd_vel</span></code> (<code class="docutils literal notranslate"><span class="pre">geometry_msgs/msg/Twist</span></code>): Sends velocity commands to rotate if the initial localization accuracy is insufficient.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/nav2vis</span></code> (<code class="docutils literal notranslate"><span class="pre">std_msgs/msg/String</span></code>): Sends commands (<em>“start_vis”, “stop_vis”</em>) to the
+<code class="docutils literal notranslate"><span class="pre">ticare_vision</span></code> package to activate or deactivate the camera during the search phase.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/nav2com</span></code> (<code class="docutils literal notranslate"><span class="pre">std_msgs/msg/String</span></code>): Communicates mission status (<em>“home”</em>,
+<em>“object_point”</em>) to the <code class="docutils literal notranslate"><span class="pre">ticare_communication</span></code> package.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/cmd_vel</span></code> (<code class="docutils literal notranslate"><span class="pre">geometry_msgs/msg/Twist</span></code>): Sends velocity commands to rotate if the
+initial localization accuracy is insufficient.</p></li>
 </ul>
 </li>
 <li><p><strong>Subscribers:</strong></p>
 <ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">/vis2nav</span></code> (<code class="docutils literal notranslate"><span class="pre">std_msgs/msg/String</span></code>): Receives object detection status (<em>“object_detected”</em>) from <code class="docutils literal notranslate"><span class="pre">ticare_vision</span></code> package.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">/com2nav</span></code> (<code class="docutils literal notranslate"><span class="pre">std_msgs/msg/String</span></code>): Receives mission start commands (<em>“start_nav”</em>, <em>“return”</em>) from <code class="docutils literal notranslate"><span class="pre">ticare_communication</span></code> package.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/vis2nav</span></code> (<code class="docutils literal notranslate"><span class="pre">std_msgs/msg/String</span></code>): Receives object detection status
+(<em>“object_detected”</em>) from <code class="docutils literal notranslate"><span class="pre">ticare_vision</span></code> package.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/com2nav</span></code> (<code class="docutils literal notranslate"><span class="pre">std_msgs/msg/String</span></code>): Receives mission start commands (<em>“start_nav”</em>,
+<em>“return”</em>) from <code class="docutils literal notranslate"><span class="pre">ticare_communication</span></code> package.</p></li>
 </ul>
 </li>
 <li><p><strong>Service Clients:</strong></p>
 <ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">/save_pose</span></code> (<code class="docutils literal notranslate"><span class="pre">ticare_interfaces/srv/SavePose</span></code>): Request to record start or target points.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/save_pose</span></code> (<code class="docutils literal notranslate"><span class="pre">ticare_interfaces/srv/SavePose</span></code>): Request to record start or target
+points.</p></li>
 </ul>
 </li>
 <li><p><strong>Action Clients:</strong></p>
 <ul>
 <li><p><code class="docutils literal notranslate"><span class="pre">/navigate_to_pose</span></code> (<code class="docutils literal notranslate"><span class="pre">nav2_msgs/action/NavigateToPose</span></code>): Sends the robot to the target using A* algorithm.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">/follow_waypoints</span></code> (<code class="docutils literal notranslate"><span class="pre">nav2_msgs/action/FollowWaypoints</span></code>): Executes coverage path planning.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/follow_waypoints</span></code> (<code class="docutils literal notranslate"><span class="pre">nav2_msgs/action/FollowWaypoints</span></code>): Executes coverage path
+planning.</p></li>
 </ul>
 </li>
 </ul>
@@ -198,17 +215,20 @@ Each map is defined by a <code class="docutils literal notranslate"><span class=
 </li>
 <li><p><strong>Node:</strong> <code class="docutils literal notranslate"><span class="pre">pose_recorder</span></code></p>
 <ul class="simple">
-<li><p><strong>Description:</strong> Persistence node responsible for receiving poses and storing them in YAML format.</p></li>
+<li><p><strong>Description:</strong> Persistence node responsible for receiving poses and storing them in YAML
+format.</p></li>
 <li><p><strong>Interfaces:</strong></p>
 <ul>
 <li><p><strong>Subscribers:</strong></p>
 <ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">/amcl_pose</span></code> (<code class="docutils literal notranslate"><span class="pre">geometry_msgs/msg/PoseWithCovarianceStamped</span></code>): Catches the current pose for immediate saving.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/amcl_pose</span></code> (<code class="docutils literal notranslate"><span class="pre">geometry_msgs/msg/PoseWithCovarianceStamped</span></code>): Catches the current pose
+for immediate saving.</p></li>
 </ul>
 </li>
 <li><p><strong>Service Servers:</strong></p>
 <ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">/save_pose</span></code> (<code class="docutils literal notranslate"><span class="pre">ticare_interfaces/srv/SavePose</span></code>): Receives a label and saves the current pose.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/save_pose</span></code> (<code class="docutils literal notranslate"><span class="pre">ticare_interfaces/srv/SavePose</span></code>): Receives a label and saves the
+current pose.</p></li>
 </ul>
 </li>
 </ul>
