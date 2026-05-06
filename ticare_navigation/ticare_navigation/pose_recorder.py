@@ -3,6 +3,7 @@ from ament_index_python.packages import get_package_share_directory
 
 import rclpy
 from rclpy.node import Node
+from rcl_interfaces.msg import ParameterDescriptor
 
 from ticare_interfaces.srv import SavePose
 from geometry_msgs.msg import PoseWithCovarianceStamped
@@ -34,6 +35,20 @@ class PoseRecorder(Node):
         self.current_pose = (
             None  # Initialize current_pose to None to handle possible crashes at startup
         )
+
+        self.declare_parameter(
+            "position_error_threshold",
+            0.5,
+            ParameterDescriptor(description="Maximum error of position"),
+        )
+        self.declare_parameter(
+            "orientation_error_threshold",
+            0.25,
+            ParameterDescriptor(description="Maximum error of orientation"),
+        )
+
+        self.error_position: float = self.get_parameter("position_error_threshold").value
+        self.error_orientation: float = self.get_parameter("orientation_error_threshold").value
 
         self.srv = self.create_service(SavePose, "save_pose", self.save_pose_callback)
 
@@ -93,7 +108,8 @@ class PoseRecorder(Node):
             return response
 
         if request.label == "start_pose" and not (
-            self.covariance_pos < 0.5 and self.covariance_yaw < 0.3
+            self.covariance_pos < self.error_position
+            and self.covariance_yaw < self.error_orientation
         ):
             response.success = False
             response.message = "Covariance is too high to save pose."

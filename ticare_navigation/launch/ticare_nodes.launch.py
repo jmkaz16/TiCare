@@ -30,7 +30,13 @@ def generate_launch_description():
         package="ticare_navigation",
         executable="pose_recorder",
         output="screen",
-        parameters=[{"use_sim_time": LaunchConfiguration("use_sim_time")}],
+        parameters=[
+            {
+                "use_sim_time": LaunchConfiguration("use_sim_time"),
+                "position_error_threshold": 0.5,
+                "orientation_error_threshold": 0.25,
+            }
+        ],
     )
 
     return LaunchDescription([use_sim_time, navigation_manager_node, pose_recorder_node])
