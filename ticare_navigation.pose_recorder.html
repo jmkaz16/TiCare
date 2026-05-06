@@ -114,8 +114,64 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="ticare-navigation-pose-recorder-module">
-<h1>ticare_navigation.pose_recorder module<a class="headerlink" href="#ticare-navigation-pose-recorder-module" title="Link to this heading"></a></h1>
+  <section id="module-ticare_navigation.pose_recorder">
+<span id="ticare-navigation-pose-recorder-module"></span><h1>ticare_navigation.pose_recorder module<a class="headerlink" href="#module-ticare_navigation.pose_recorder" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="ticare_navigation.pose_recorder.PoseRecorder">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ticare_navigation.pose_recorder.</span></span><span class="sig-name descname"><span class="pre">PoseRecorder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ticare_navigation.pose_recorder.PoseRecorder" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Node</span></code></p>
+<p>Node responsible for receiving poses and storing them in YAML format.</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><p>current_pose (PoseWithCovarianceStamped): The latest pose received from the /amcl_pose
+topic.
+srv (Service): Receives a label and saves the current pose.
+subscription (Subscription): Catches the current pose for immediate saving.
+data_dir (str): The directory path where the YAML files will be saved.
+covariance (float): The average covariance calculated from the pose’s covariance matrix.
+data_to_save (PoseStamped): The pose data formatted for saving to a YAML file.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="ticare_navigation.pose_recorder.PoseRecorder.pose_callback">
+<span class="sig-name descname"><span class="pre">pose_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">geometry_msgs.msg.PoseWithCovarianceStamped</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ticare_navigation.pose_recorder.PoseRecorder.pose_callback" title="Link to this definition"></a></dt>
+<dd><p>Callback function that updates the current pose and covariance based on incoming messages
+from the /amcl_pose topic.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>msg (PoseWithCovarianceStamped): The message received from the /amcl_pose topic,</dt><dd><p>containing the robot’s current pose and covariance information.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ticare_navigation.pose_recorder.PoseRecorder.save_pose_callback">
+<span class="sig-name descname"><span class="pre">save_pose_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ticare_interfaces.srv.SavePose.Request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">response</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ticare_interfaces.srv.SavePose.Response</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ticare_interfaces.srv.SavePose.Response</span></span></span><a class="headerlink" href="#ticare_navigation.pose_recorder.PoseRecorder.save_pose_callback" title="Link to this definition"></a></dt>
+<dd><p>Callback function that handles incoming service requests to save the current pose
+to a YAML file.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>request (SavePose.Request): The service request containing the label for the pose</dt><dd><p>to be saved.</p>
+</dd>
+<dt>response (SavePose.Response): The service response indicating the success or failure</dt><dd><p>of the save operation.</p>
+</dd>
+</dl>
+</dd>
+<dt>Returns:</dt><dd><p>SavePose.Response: The response object containing the result of the save operation.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ticare_navigation.pose_recorder.main">
+<span class="sig-prename descclassname"><span class="pre">ticare_navigation.pose_recorder.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ticare_navigation.pose_recorder.main" title="Link to this definition"></a></dt>
+<dd><p>Main function that initializes the ROS node and starts spinning to process incoming messages
+and service requests.</p>
+</dd></dl>
+
 </section>
 
 
