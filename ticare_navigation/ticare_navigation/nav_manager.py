@@ -8,6 +8,8 @@ from rclpy.action import ActionClient
 from rclpy.action.client import ClientGoalHandle
 from rclpy.task import Future
 
+# from tf2_ros import Buffer, TransformListener
+
 from enum import Enum
 from rcl_interfaces.msg import ParameterDescriptor
 from std_msgs.msg import String
@@ -173,6 +175,9 @@ class NavManager(Node):
         self.communication_sub = self.create_subscription(
             String, "com2nav", self.communication_callback, 10
         )
+
+        # self.tf_buffer = Buffer()
+        # self.tf_listener = TransformListener(self.tf_buffer, self)
 
         self.save_pose_client = self.create_client(SavePose, "save_pose")
 
@@ -346,12 +351,25 @@ class NavManager(Node):
 
             case _:
                 self.get_logger().warn("Goal not recognized.")
+                return
 
         with open(file_name, "r") as file:
             yaml_data = yaml.safe_load(file)
 
         goal_pose = PoseStamped()
         set_message_fields(goal_pose, yaml_data)
+
+        # if label == SavePoseLabel.START_POSE:
+        #     try:
+        #         now = rclpy.time.Time()
+        #         transform = self.tf_buffer.lookup_transform(
+        #             "map", "base_footprint", now, timeout=rclpy.duration.Duration(seconds=1.0)
+        #         )
+        #         goal_pose.pose.orientation = transform.transform.rotation
+        #         self.get_logger().info("Got current orientation")
+        #     except Exception as e:
+        #         self.get_logger().warn("Could not obtain orientation")
+
         goal_pose.header.stamp = self.get_clock().now().to_msg()
         goal_msg = NavigateToPose.Goal()
         goal_msg.pose = goal_pose
@@ -359,10 +377,10 @@ class NavManager(Node):
         # self.get_logger().info(f"Goal send: '{goal_msg}'")
 
         self.nav_to_pose_client.wait_for_server()
-        future = self.nav_to_pose_client.send_goal_async(
+        self.future = self.nav_to_pose_client.send_goal_async(
             goal_msg, feedback_callback=self.nav_to_pose_feedback_callback
         )
-        future.add_done_callback(self.nav_to_pose_response_callback)
+        self.future.add_done_callback(self.nav_to_pose_response_callback)
 
     def send_follow_waypoints_goal(self, room: str = "all") -> None:
         """Sends a goal to the FollowWaypoints action server to execute a coverage path.
@@ -551,6 +569,11 @@ class NavManager(Node):
         """
         feedback = feedback_msg.feedback.distance_remaining
         self.get_logger().debug(f"NavigateToPose feedback received: {feedback}")
+
+        if feedback < 0.30 and self.state == NavigationState.RETURNING_HOME:
+            self.get_logger().info(f"Near goal {feedback:.2f}, stopping rotation.")
+            if hasattr(self, "nav_to_pose_goal_handle"):  # cancel goal
+                self.nav_to_pose_goal_handle.cancel_goal_async()
 
     def follow_waypoints_response_callback(self, future: Future) -> None:
         """
