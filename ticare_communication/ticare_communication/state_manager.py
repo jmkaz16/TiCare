@@ -5,6 +5,11 @@ This node implements a 13-state machine to coordinate voice recognition,
 natural language processing, and robot behavior via Vision and Navigation.
 """
 
+import os
+import subprocess
+
+from ament_index_python.packages import get_package_share_directory
+
 import threading
 import rclpy
 from rclpy.node import Node
@@ -118,75 +123,16 @@ def get_nlp():
 # ==========================
 
 
-def get_microphone_index():
-    global _cached_mic_index
-    if _cached_mic_index is not None:
-        return _cached_mic_index
+def record_audio():
+    # Ejecuta el nodo de ROS2 para grabar
+    process = subprocess.Popen(["ros2", "run", "ticare_communication", "save_audio"])
+    process.wait()  # Esperamos a que termine de grabar
 
-    try:
-        devices = sr.Microphone.list_microphone_names()
-        print("\n=== Dispositivos detectados ===")
-        for i, name in enumerate(devices):
-            print(f"{i}: {name}")
+    # Obtenemos la ruta completa del archivo
+    package_share_path = get_package_share_directory("ticare_communication")
+    ruta_archivo = os.path.join(package_share_path, "data", "audio.wav")
 
-        for i, name in enumerate(devices):
-            if "monitor" not in name.lower():
-                print(f"\nUsando micrófono: {name} (index {i})")
-                _cached_mic_index = i
-                return _cached_mic_index
-
-        print("\nNo se encontró un micrófono claro, usando index 0")
-        _cached_mic_index = 0
-        return _cached_mic_index
-
-    except Exception as e:
-        print("Error detectando micrófono:", e)
-        _cached_mic_index = None
-        return None
-
-
-def record_audio(duration=3):
-    global _cached_sample_rate
-
-    r = sr.Recognizer()
-    r.energy_threshold = 300
-    r.dynamic_energy_threshold = True
-
-    mic_index = get_microphone_index()
-    if mic_index is None:
-        print("No hay micrófono disponible.")
-        return None
-
-    # Si ya tenemos un sample_rate válido, úsalo directamente
-    if _cached_sample_rate is not None:
-        try:
-            with sr.Microphone(device_index=mic_index, sample_rate=_cached_sample_rate) as source:
-                print(f"Usando micrófono index {mic_index} con sample_rate={_cached_sample_rate}")
-                r.adjust_for_ambient_noise(source, duration=0.5)
-                print(f"Grabando {duration} segundos...")
-                audio = r.record(source, duration=duration)
-                return audio
-        except Exception as e:
-            print(f"Falló sample_rate cacheado ({_cached_sample_rate}): {e}")
-            _cached_sample_rate = None  # forzar re-detección
-
-    # Detectar sample_rate válido
-    sample_rates = [44100, 48000, 32000, 22050, 16000]
-    for rate in sample_rates:
-        try:
-            print(f"Intentando abrir micrófono {mic_index} con sample_rate={rate}...")
-            with sr.Microphone(device_index=mic_index, sample_rate=rate) as source:
-                r.adjust_for_ambient_noise(source, duration=0.5)
-                print(f"Grabando {duration} segundos con sample_rate={rate}...")
-                audio = r.record(source, duration=duration)
-                _cached_sample_rate = rate
-                return audio
-        except Exception as e:
-            print(f"Falló sample_rate={rate}: {e}")
-            continue
-
-    print("ERROR: No se pudo abrir el micrófono con ningún sample_rate.")
-    return None
+    return ruta_archivo
 
 
 # ==========================
@@ -194,18 +140,28 @@ def record_audio(duration=3):
 # ==========================
 
 
-def transcribe_audio(audio_data):
-    if audio_data is None:
+def transcribe_audio(
+    ruta_wav=os.path.join(get_package_share_directory("ticare_communication"), "data", "audio.wav")
+):
+    if ruta_wav is None or not os.path.exists(ruta_wav):
         return "Errr"
+
     r = sr.Recognizer()
+
     try:
+        # Cargamos el archivo WAV directamente con speech_recognition
+        with sr.AudioFile(ruta_wav) as source:
+            audio_data = r.record(source)  # Esto lee el archivo y lo convierte al formato correcto
+
         text = r.recognize_google(audio_data, language="es-ES")
         print("Transcripción:", text)
         return text
+
     except sr.UnknownValueError:
+        print("No se entendió el audio")
         return "Errr"
     except Exception as e:
-        print("Error en reconocimiento:", e)
+        print(f"Error en reconocimiento: {e}")
         return "Errr"
 
 
@@ -250,12 +206,9 @@ def is_wake_word(text, wake_word):
 def listen_for_wake_word(wake_word, duration=3):
     while True:
         print("Grabando fragmento ... ")
-        audio = record_audio(duration=duration)
-        if audio is None:
-            print("No se pudo grabar audio, reintentando...")
-            continue
+        ruta = record_audio()
+        text = transcribe_audio(ruta)
 
-        text = transcribe_audio(audio)
         if not text or text == "Errr":
             print("No se entendió nada.")
             continue
@@ -491,8 +444,8 @@ class TiagoStateMachine(Node):
 
         # --- STATE 4: LISTENING ---
         elif self.state == "LISTENING":
-            audio = record_audio(duration=5)
-            text = transcribe_audio(audio)
+            ruta = record_audio()
+            text = transcribe_audio(ruta)
 
             if self.check_stop(text):
                 return
