@@ -389,7 +389,8 @@ class NavManager(Node):
             room (str): The room for which to execute the coverage path. Default is "all",
             which executes the full path, other options (Lab_Paloma, Sala_D, etc.).
         """
-        file_name = os.path.join(self.config_dir, "coverage_waypoints.yaml")
+        # file_name = os.path.join(self.config_dir, "coverage_waypoints.yaml") for simulation
+        file_name = os.path.join(self.config_dir, "points_real.yaml")  # for real
         with open(file_name, "r") as file:
             yaml_data = yaml.safe_load(file)
 
