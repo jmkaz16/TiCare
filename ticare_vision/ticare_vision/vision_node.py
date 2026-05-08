@@ -1,15 +1,17 @@
+
+import os
 import rclpy
 from rclpy.node import Node
 from rclpy.action import ActionClient
+from ament_index_python.packages import get_package_share_directory
 from std_msgs.msg import String
 from sensor_msgs.msg import Image
 from control_msgs.action import FollowJointTrajectory
 from trajectory_msgs.msg import JointTrajectoryPoint
-from builtin_interfaces.msg import Duration  # <--- NUEVA IMPORTACIÓN
+from builtin_interfaces.msg import Duration  
 from cv_bridge import CvBridge
 from ultralytics import YOLO
 import cv2
-from rclpy.qos import qos_profile_sensor_data
 from enum import Enum
 
 class VisionState(Enum):
@@ -29,8 +31,16 @@ class VisionNode(Node):
     def __init__(self):
         super().__init__("vision_node")
 
+
         # # Configuration Parameters
-        self.declare_parameter("model_path", "/home/luisgfgetino/ticare_ws/src/ticare_vision/data/weights.pt")
+        default_model_path = os.path.join(
+    	get_package_share_directory("ticare_vision"),
+    	"data",
+    	"weights.pt"
+	)
+
+        self.declare_parameter("model_path", default_model_path)
+
         self.declare_parameter("confidence_threshold", 0.6)
         
         model_path = self.get_parameter("model_path").value
@@ -41,6 +51,9 @@ class VisionNode(Node):
         self.bridge = CvBridge()
         self.window_name = "TIAGo Vision - YOLO v11"
         
+# [CAMBIO 1] Inicializamos cap a None para evitar el AttributeError al cerrar
+        self.cap = None
+
         # State Machine Initialization
         self.current_state = VisionState.ESPERANDO_ORDEN
         self.get_logger().info(f"--- [STATE] Initialized in state: {self.current_state.name} ---")
@@ -52,7 +65,7 @@ class VisionNode(Node):
         # --- SUBSCRIBERS ---
         self.sub_com2vis = self.create_subscription(String, "/com2vis", self.com2vis_callback, 10)
         self.sub_nav2vis = self.create_subscription(String, "/nav2vis", self.nav2vis_callback, 10)
-        self.sub_camera = self.create_subscription(Image, "/head_front_camera/rgb/image_raw", self.camera_callback, 10) ## en la realidad la documentación pone como /head_front_camer/color/image_raw/*
+        #self.sub_camera = self.create_subscription(Image, "/head_front_camera/rgb/image_raw", self.camera_callback, 10) ## en la realidad la documentación pone como /head_front_camer/color/image_raw/*
 
         # --- PUBLISHERS ---
         self.pub_vis2com = self.create_publisher(String, "/vis2com", 10)
@@ -63,13 +76,40 @@ class VisionNode(Node):
         self.head_action_client = ActionClient(
             self, FollowJointTrajectory, "/head_controller/follow_joint_trajectory"
         )
+
+        # --- WEBCAM TIMER ---
+        # Ejecuta la función 'process_webcam' cada 0.05 segundos (20 FPS)
+        self.timer = self.create_timer(0.05, self.process_webcam)
         
         self.get_logger().info("--- [STATUS] Vision Node is READY and listening ---")
 
     def change_state(self, new_state: VisionState) -> None:
-    
+
+        
+# Lógica de transición HACIA Busqueda Activa (Encender cámara)
+        if new_state == VisionState.BUSQUEDA_ACTIVA and self.current_state != VisionState.BUSQUEDA_ACTIVA:
+            self.get_logger().info("--- [WEBCAM] Inicializando cámara local... ---")
+            
+            # [CAMBIO 2] Forzamos el uso del backend de Linux (V4L2)
+            self.cap = cv2.VideoCapture(self.camera_id, cv2.CAP_V4L2) 
+            
+            if self.cap.isOpened():
+                # [CAMBIO 3] Optimizaciones estrictas para WSL y evitar 'select() timeout'
+                # 1. Pedir formato comprimido MJPG en lugar de Raw (YUYV)
+                self.cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*'MJPG'))
+                # 2. Bajar resolución para no atascar el bus USB virtual
+                self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+                self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+                # 3. Limitar buffer para que no se acumulen frames viejos
+                self.cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
+            else:
+                self.get_logger().error("!!! No se pudo acceder a la webcam !!!")
+
+            # Lógica de transición SALIENDO de Busqueda Activa (Apagar cámara)
         if self.current_state == VisionState.BUSQUEDA_ACTIVA and new_state != VisionState.BUSQUEDA_ACTIVA:
-            self.get_logger().info("--- [CLEANUP] Closing vision window ---")
+            self.get_logger().info("--- [CLEANUP] Cerrando ventana y liberando webcam ---")
+            if self.cap is not None:
+                self.cap.release() 
             cv2.destroyAllWindows()
 
         self.get_logger().info(f"--- [STATE TRANSITION] {self.current_state.name} -> {new_state.name} ---")
@@ -92,7 +132,7 @@ class VisionNode(Node):
         # State Machine Logic for Communication Commands       
         if self.current_state == VisionState.ESPERANDO_ORDEN:
             if cmd == "head_up":
-                self.move_head(0.0)  # <--- DESCOMENTADO
+                self.move_head(0.0)  
                 self.change_state(VisionState.PREPARANDO_VISION)
 
         elif self.current_state == VisionState.PREPARANDO_VISION:
@@ -103,7 +143,7 @@ class VisionNode(Node):
 
         elif self.current_state == VisionState.VISION_DETENIDA:
             if cmd == "head_down":
-                self.move_head(-0.5)   # <--- DESCOMENTADO
+                self.move_head(-0.5)   
                 self.change_state(VisionState.ESPERANDO_ORDEN)
 
     def nav2vis_callback(self, msg: String) -> None:
@@ -117,49 +157,37 @@ class VisionNode(Node):
             if cmd == "start_vis":
                 self.change_state(VisionState.BUSQUEDA_ACTIVA)
                 self.move_head(-0.2)
-                #self.trigger_mock_detection()
+
 
         elif self.current_state == VisionState.BUSQUEDA_ACTIVA:
             if cmd == "stop_vis":
                 self.change_state(VisionState.VISION_DETENIDA)
                 self.move_head(0.0)
-    # def trigger_mock_detection(self) -> None:
-    #     if self.current_state == VisionState.BUSQUEDA_ACTIVA:
-    #         self.get_logger().info(f"*** [MOCK] Simulando deteccion de: {self.target_object} ***")
-    #         out_msg = String()
-    #         out_msg.data = "object_detected"
-    #         self.pub_vis2com.publish(out_msg)
-    #         self.pub_vis2nav.publish(out_msg)
-    #         self.get_logger().info("--- [OUT] Publicado 'object_detected' a COM y NAV ---")
-    #         self.change_state(VisionState.VISION_DETENIDA)
 
-    def camera_callback(self, msg: Image) -> None:
 
+    def process_webcam(self) -> None:
+        """Reads from local webcam, runs YOLO, and displays results if active."""
+        # 1. Comprobaciones de seguridad
         if self.current_state != VisionState.BUSQUEDA_ACTIVA:
             return
-
-#1. Convertir el mensaje de ROS a una imagen de OpenCV
-        try:
-            cv_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
-        except Exception as e:
-            self.get_logger().error(f"Error convirtiendo la imagen: {e}")
+        if self.cap is None or not self.cap.isOpened():
             return
 
-        # 2. Mostrar la imagen en una ventana
-        cv2.imshow("Lo que ve TIAGo", cv_image)
-        cv2.waitKey(1) # Necesario para que OpenCV actualice la ventana
+        # 2. Leer el frame directamente del hardware (webcam)
+        ret, cv_image = self.cap.read()
+        if not ret:
+            self.get_logger().warning("Fallo al leer frame de la webcam. Reintentando...")
+            return
 
-
-# 3. Run YOLO v11 Inference
+        # 3. Inferencia de YOLO (No necesitamos CvBridge porque OpenCV ya lee en BGR)
         results = self.model.predict(cv_image, conf=self.conf_thresh, verbose=False)
 
-        # 4. Visualization: Plot results and show window
-        # .plot() returns a BGR numpy array with boxes and labels drawn
+        # 4. Visualización
         annotated_frame = results[0].plot()
         cv2.imshow(self.window_name, annotated_frame)
         cv2.waitKey(1)
 
-        # 5. Logic to detect target object in the results
+        # 5. Lógica de detección
         for result in results:
             for box in result.boxes:
                 class_id = int(box.cls[0])
@@ -168,7 +196,6 @@ class VisionNode(Node):
                 if class_name == self.target_object:
                     self.get_logger().info(f"*** [DETECTION] Found: {class_name}! ***")
                     
-                    # Notify other modules
                     out_msg = String()
                     out_msg.data = "object_detected"
                     self.pub_vis2com.publish(out_msg)
@@ -176,17 +203,9 @@ class VisionNode(Node):
                     
                     self.get_logger().info("--- [OUT] Publishing 'object_detected' to COM/NAV ---")
                     
-                    # Trigger state change (this will also close the window)
                     self.change_state(VisionState.VISION_DETENIDA)
                     return
 
-        # self.get_logger().info(f"*** [MOCK DETECTION] Simulando que he encontrado: {self.target_object}! ***")
-        # out_msg = String()
-        # out_msg.data = "object_detected"
-        # self.pub_vis2com.publish(out_msg)
-        # self.pub_vis2nav.publish(out_msg)
-        # self.change_state(VisionState.VISION_DETENIDA)
-        return 
 
     def move_head(self, tilt: float) -> None:
         """Sends a movement command to TIAGo's head via Action Server."""
@@ -223,6 +242,9 @@ def main(args=None):
     except KeyboardInterrupt:
         pass
     finally:
+        if node.cap is not None:
+            node.cap.release()
+        cv2.destroyAllWindows()
         node.destroy_node()
         rclpy.shutdown()
 
