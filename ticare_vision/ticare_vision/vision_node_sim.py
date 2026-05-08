@@ -12,6 +12,7 @@ from builtin_interfaces.msg import Duration
 from cv_bridge import CvBridge
 from ultralytics import YOLO
 import cv2
+from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy
 from enum import Enum
 
 class VisionState(Enum):
@@ -62,14 +63,18 @@ class VisionNode(Node):
         self.get_logger().info(f"--- [INIT] Loading YOLO v11 model: {model_path} ---")
         self.model = YOLO(model_path)
 
+        
+        qos_profile = QoSProfile(
+            reliability=ReliabilityPolicy.BEST_EFFORT, history=HistoryPolicy.KEEP_LAST, depth=5
+        )
 
         # --- SUBSCRIBERS ---
-        self.sub_com2vis = self.create_subscription(String, "/com2vis", self.com2vis_callback, 10)
-        self.sub_nav2vis = self.create_subscription(String, "/nav2vis", self.nav2vis_callback, 10)
+        self.sub_com2vis = self.create_subscription(String, "/com2vis", self.com2vis_callback, qos_profile)
+        self.sub_nav2vis = self.create_subscription(String, "/nav2vis", self.nav2vis_callback, qos_profile)
        
         # --- PUBLISHERS ---
-        self.pub_vis2com = self.create_publisher(String, "/vis2com", 10)
-        self.pub_vis2nav = self.create_publisher(String, "/vis2nav", 10)
+        self.pub_vis2com = self.create_publisher(String, "/vis2com", qos_profile)
+        self.pub_vis2nav = self.create_publisher(String, "/vis2nav", qos_profile)
 
         # --- ACTION CLIENT FOR TIAGo HEAD ---
         # Este es el canal de comunicación hacia el controlador de Gazebo

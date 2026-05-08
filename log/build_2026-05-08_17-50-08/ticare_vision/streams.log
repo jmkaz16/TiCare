@@ -1,0 +1,48 @@
+[1.193s] Invoking command in '/home/luisgfgetino/ticare_ws/src/ticare_vision': PYTHONPATH=/home/luisgfgetino/ticare_ws/src/build/ticare_vision/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/luisgfgetino/ticare_ws/src/install/ticare_vision/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../build/ticare_vision build --build-base /home/luisgfgetino/ticare_ws/src/build/ticare_vision/build install --record /home/luisgfgetino/ticare_ws/src/build/ticare_vision/install.log --single-version-externally-managed install_data
+[1.531s] running egg_info
+[1.532s] creating ../build/ticare_vision/ticare_vision.egg-info
+[1.533s] writing ../build/ticare_vision/ticare_vision.egg-info/PKG-INFO
+[1.533s] writing dependency_links to ../build/ticare_vision/ticare_vision.egg-info/dependency_links.txt
+[1.533s] writing entry points to ../build/ticare_vision/ticare_vision.egg-info/entry_points.txt
+[1.533s] writing requirements to ../build/ticare_vision/ticare_vision.egg-info/requires.txt
+[1.534s] writing top-level names to ../build/ticare_vision/ticare_vision.egg-info/top_level.txt
+[1.534s] writing manifest file '../build/ticare_vision/ticare_vision.egg-info/SOURCES.txt'
+[1.536s] reading manifest file '../build/ticare_vision/ticare_vision.egg-info/SOURCES.txt'
+[1.538s] writing manifest file '../build/ticare_vision/ticare_vision.egg-info/SOURCES.txt'
+[1.538s] running build
+[1.538s] running build_py
+[1.538s] creating /home/luisgfgetino/ticare_ws/src/build/ticare_vision/build
+[1.539s] creating /home/luisgfgetino/ticare_ws/src/build/ticare_vision/build/lib
+[1.540s] creating /home/luisgfgetino/ticare_ws/src/build/ticare_vision/build/lib/ticare_vision
+[1.540s] copying ticare_vision/vision_node.py -> /home/luisgfgetino/ticare_ws/src/build/ticare_vision/build/lib/ticare_vision
+[1.540s] copying ticare_vision/__init__.py -> /home/luisgfgetino/ticare_ws/src/build/ticare_vision/build/lib/ticare_vision
+[1.541s] copying ticare_vision/vision_node_sim.py -> /home/luisgfgetino/ticare_ws/src/build/ticare_vision/build/lib/ticare_vision
+[1.541s] running install
+[1.541s] running install_lib
+[1.542s] creating /home/luisgfgetino/ticare_ws/src/install/ticare_vision/lib/python3.10/site-packages/ticare_vision
+[1.543s] copying /home/luisgfgetino/ticare_ws/src/build/ticare_vision/build/lib/ticare_vision/vision_node.py -> /home/luisgfgetino/ticare_ws/src/install/ticare_vision/lib/python3.10/site-packages/ticare_vision
+[1.543s] copying /home/luisgfgetino/ticare_ws/src/build/ticare_vision/build/lib/ticare_vision/__init__.py -> /home/luisgfgetino/ticare_ws/src/install/ticare_vision/lib/python3.10/site-packages/ticare_vision
+[1.543s] copying /home/luisgfgetino/ticare_ws/src/build/ticare_vision/build/lib/ticare_vision/vision_node_sim.py -> /home/luisgfgetino/ticare_ws/src/install/ticare_vision/lib/python3.10/site-packages/ticare_vision
+[1.544s] byte-compiling /home/luisgfgetino/ticare_ws/src/install/ticare_vision/lib/python3.10/site-packages/ticare_vision/vision_node.py to vision_node.cpython-310.pyc
+[1.547s] byte-compiling /home/luisgfgetino/ticare_ws/src/install/ticare_vision/lib/python3.10/site-packages/ticare_vision/__init__.py to __init__.cpython-310.pyc
+[1.547s] byte-compiling /home/luisgfgetino/ticare_ws/src/install/ticare_vision/lib/python3.10/site-packages/ticare_vision/vision_node_sim.py to vision_node_sim.cpython-310.pyc
+[1.549s] running install_data
+[1.549s] creating /home/luisgfgetino/ticare_ws/src/install/ticare_vision/share/ament_index
+[1.550s] creating /home/luisgfgetino/ticare_ws/src/install/ticare_vision/share/ament_index/resource_index
+[1.550s] creating /home/luisgfgetino/ticare_ws/src/install/ticare_vision/share/ament_index/resource_index/packages
+[1.551s] copying resource/ticare_vision -> /home/luisgfgetino/ticare_ws/src/install/ticare_vision/share/ament_index/resource_index/packages
+[1.551s] copying package.xml -> /home/luisgfgetino/ticare_ws/src/install/ticare_vision/share/ticare_vision
+[1.551s] creating /home/luisgfgetino/ticare_ws/src/install/ticare_vision/share/ticare_vision/launch
+[1.552s] copying launch/vision_launch.launch.py -> /home/luisgfgetino/ticare_ws/src/install/ticare_vision/share/ticare_vision/launch
+[1.552s] copying launch/vision_launch_sim.launch.py -> /home/luisgfgetino/ticare_ws/src/install/ticare_vision/share/ticare_vision/launch
+[1.552s] creating /home/luisgfgetino/ticare_ws/src/install/ticare_vision/share/ticare_vision/config
+[1.553s] copying config/vision_params.yaml -> /home/luisgfgetino/ticare_ws/src/install/ticare_vision/share/ticare_vision/config
+[1.553s] creating /home/luisgfgetino/ticare_ws/src/install/ticare_vision/share/ticare_vision/data
+[1.554s] copying data/weights.pt -> /home/luisgfgetino/ticare_ws/src/install/ticare_vision/share/ticare_vision/data
+[1.563s] running install_egg_info
+[1.565s] Copying ../build/ticare_vision/ticare_vision.egg-info to /home/luisgfgetino/ticare_ws/src/install/ticare_vision/lib/python3.10/site-packages/ticare_vision-0.0.0-py3.10.egg-info
+[1.567s] running install_scripts
+[1.592s] Installing vision_node script to /home/luisgfgetino/ticare_ws/src/install/ticare_vision/lib/ticare_vision
+[1.593s] Installing vision_node_sim script to /home/luisgfgetino/ticare_ws/src/install/ticare_vision/lib/ticare_vision
+[1.593s] writing list of installed files to '/home/luisgfgetino/ticare_ws/src/build/ticare_vision/install.log'
+[1.621s] Invoked command in '/home/luisgfgetino/ticare_ws/src/ticare_vision' returned '0': PYTHONPATH=/home/luisgfgetino/ticare_ws/src/build/ticare_vision/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/luisgfgetino/ticare_ws/src/install/ticare_vision/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../build/ticare_vision build --build-base /home/luisgfgetino/ticare_ws/src/build/ticare_vision/build install --record /home/luisgfgetino/ticare_ws/src/build/ticare_vision/install.log --single-version-externally-managed install_data

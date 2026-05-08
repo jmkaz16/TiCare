@@ -12,6 +12,7 @@ from control_msgs.action import FollowJointTrajectory
 from trajectory_msgs.msg import JointTrajectoryPoint
 from builtin_interfaces.msg import Duration  
 from cv_bridge import CvBridge
+from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy
 from ultralytics import YOLO
 import cv2
 from enum import Enum
@@ -61,14 +62,17 @@ class VisionNode(Node):
         self.get_logger().info(f"--- [INIT] Loading YOLO v11 model: {model_path} ---")
         self.model = YOLO(model_path)
 
+        qos_profile = QoSProfile(
+            reliability=ReliabilityPolicy.BEST_EFFORT, history=HistoryPolicy.KEEP_LAST, depth=5
+        )
         # --- SUBSCRIBERS ---
-        self.sub_com2vis = self.create_subscription(String, "/com2vis", self.com2vis_callback, 10)
-        self.sub_nav2vis = self.create_subscription(String, "/nav2vis", self.nav2vis_callback, 10)
-        self.sub_camera = self.create_subscription(Image, "/head_front_camera/rgb/image_raw", self.camera_callback, 10) ## en la realidad la documentación pone como /head_front_camer/color/image_raw/*
+        self.sub_com2vis = self.create_subscription(String, "/com2vis", self.com2vis_callback, qos_profile)
+        self.sub_nav2vis = self.create_subscription(String, "/nav2vis", self.nav2vis_callback, qos_profile)
+        self.sub_camera = self.create_subscription(Image, "/head_front_camera/rgb/image_raw", self.camera_callback, qos_profile) ## en la realidad la documentación pone como /head_front_camer/color/image_raw/*
 
         # --- PUBLISHERS ---
-        self.pub_vis2com = self.create_publisher(String, "/vis2com", 10)
-        self.pub_vis2nav = self.create_publisher(String, "/vis2nav", 10)
+        self.pub_vis2com = self.create_publisher(String, "/vis2com", qos_profile)
+        self.pub_vis2nav = self.create_publisher(String, "/vis2nav", qos_profile)
 
         # --- ACTION CLIENT FOR TIAGo HEAD ---
         # Este es el canal de comunicación hacia el controlador de Gazebo
@@ -131,7 +135,7 @@ class VisionNode(Node):
 
         elif self.current_state == VisionState.VISION_DETENIDA:
             if cmd == "head_down":
-                self.move_head(-0.5)   # <--- DESCOMENTADO
+                self.move_head(-0.75)   # <--- DESCOMENTADO
                 self.change_state(VisionState.ESPERANDO_ORDEN)
 
     def nav2vis_callback(self, msg: String) -> None:
@@ -144,7 +148,7 @@ class VisionNode(Node):
         if self.current_state == VisionState.ESPERANDO_OBJETO:
             if cmd == "start_vis":
                 self.change_state(VisionState.BUSQUEDA_ACTIVA)
-                self.move_head(-0.2)
+                self.move_head(-0.5)
                 #self.trigger_mock_detection()
 
         elif self.current_state == VisionState.BUSQUEDA_ACTIVA:

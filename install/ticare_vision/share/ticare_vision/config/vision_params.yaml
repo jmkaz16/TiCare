@@ -1,0 +1,10 @@
+/**:
+  ros__parameters:
+    # Parámetros de Visión
+    confidence_threshold: 0.6
+    camera_id: 0    
+
+
+    # Articulaciones de la cabeza del TIAGo (Actualmente ignoradas en tu lógica Python)
+    head_pan_joint: "head_1_joint"
+    head_tilt_joint: "head_2_joint"
