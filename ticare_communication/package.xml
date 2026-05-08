@@ -16,6 +16,7 @@
   <exec_depend>sensor_msgs</exec_depend>
   <exec_depend>audio_common_msgs</exec_depend>
   <exec_depend>ament_index_python</exec_depend>
+  <exec_depend>ros2launch</exec_depend>
 
   <!-- If you use audio, NLP, etc., add them here -->
   <!-- <exec_depend>audio_common_msgs</exec_depend> -->
