@@ -14,7 +14,7 @@ def generate_launch_description():
     rviz_config_path = PathJoinSubstitution(
         [FindPackageShare("ticare_navigation"), "rviz", "rviz_ticare_config.rviz"]
     )
-    map_path = PathJoinSubstitution("home/pal/mapa_car2.yaml")
+    map_path = "home/pal/mapa_car2.yaml"
 
     use_sim_time = DeclareLaunchArgument(
         "use_sim_time",
@@ -28,14 +28,16 @@ def generate_launch_description():
     )
 
     load_map_service_call = ExecuteProcess(
-    cmd=[
-        'ros2', 'service', 'call', 
-        '/map_server/load_map', 
-        'nav2_msgs/srv/LoadMap', 
-        f'{{map_url: "{map_path}"}}'
-    ],
-    shell=True
-)
+        cmd=[
+            "ros2",
+            "service",
+            "call",
+            "/map_server/load_map",
+            "nav2_msgs/srv/LoadMap",
+            '"{map_url: "home/pal/mapa_car2.yaml"}"',
+        ],
+        shell=True,
+    )
 
     rviz = Node(
         package="rviz2",
@@ -46,4 +48,3 @@ def generate_launch_description():
     )
 
     return LaunchDescription([use_sim_time, ticare_nodes_launch, load_map_service_call, rviz])
-  
