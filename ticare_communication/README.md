@@ -1,17 +1,14 @@
-# TiCare – Communication
+# TiCare – Communication Module
 
-This branch contains the core communication system for the TiCare project.  
-It provides the speech interface, NLP processing, wake‑word detection, and coordination with Vision and Navigation modules.
-
----
+This branch contains the core voice‑interaction system for the TiCare project.  
+It provides wake‑word detection, speech recognition, natural‑language processing, text‑to‑speech, and a 13‑state interaction manager that coordinates with the Vision and Navigation modules.
 
 ## Prerequisites
 
-**Operating System:** Ubuntu 22.04 LTS (Jammy Jellyfish)  
-**ROS 2 Distribution:** Humble Hawksbill  
-**Python Version:** 3.10+  
-
----
+- **Operating System:** Ubuntu 22.04 LTS (Jammy Jellyfish) or Windows 10/11  
+- **ROS 2 Distribution:** Humble Hawksbill  
+- **Python:** 3.10+  
+- **Audio Hardware:** Functional microphone (PyAudio compatible)
 
 ## Installation
 
@@ -23,79 +20,61 @@ Follow these steps to set up the TiCare workspace and install all necessary depe
 
 Open a terminal and run:
 
-```bash
+```sh
 mkdir -p ~/ticare_ws/src
 cd ~/ticare_ws/src
-git clone https://github.com/jmkaz16/TiCare.git -b communication .
+git clone https://github.com/jmkaz16/TiCare.git -b communication_2 .
 ```
-
-This will clone the Communication branch directly into your workspace.
-
 ---
 
-### 2. Install Python Dependencies
+### 2. Clone audio_common (Required for audio recording)
 
-The Communication module relies on external Python libraries for STT, TTS, and NLP.
+The Communication Module depends on ROS 2 audio utilities. Clone the audio_common repository inside the src folder:
 
-From the root of the package:
+```sh
+cd ~/ticare_ws/src
+git clone https://github.com/ros-drivers/audio_common.git -b ros2
+cd..
+```
+This provides the audio_capture and audio_play nodes used internally for microphone handling.
 
-```bash
+
+### 3. Install System Dependencies
+```sh
+cd..
+rosdep install --from-paths src --ignore-src -r -y
+```
+
+### 4. Install Python Dependencies
+Inside the communication package:
+```sh
 cd ~/ticare_ws/src/ticare_communication
-pip3 install -r requirements.txt
+pip install -r requirements.txt
+sudo apt install portaudio19-dev python3-all-dev libasound-dev
+```
+This installs:
+- **SpeechRecognition (STT)**
+- **PyAudio**
+- **gTTS + pygame (TTS)**
+- **spaCy + Spanish model**
+- **rapidfuzz (fuzzy matching)**
+- **pynput**
+
+### 5. Install spaCy Spanish Model (with verification)
+Before downloading the model, you can verify if it is already installed:
+```sh
+python -c "import spacy; 
+import pkgutil; 
+print('Model installed' if pkgutil.find_loader('es_core_news_sm') else 'Model NOT installed')"
+```
+If the output is Model NOT installed, install it manually:
+```sh
+python -m spacy download es_core_news_sm
 ```
 
-If `pip3` is not installed:
-
-```bash
-sudo apt install python3-pip
-```
-
----
-
-### 3. Network Configuration (CycloneDDS)
-
-For optimal ROS 2 performance, TiCare uses CycloneDDS.
-
-Install the RMW implementation:
-
-```bash
-sudo apt update && sudo apt install ros-humble-rmw-cyclonedds-cpp
-```
-
-Add this line to your `~/.bashrc`:
-
-```bash
-export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
-```
-
-Reload your environment:
-
-```bash
-source ~/.bashrc
-```
-
----
-
-### 4. Install ROS Dependencies
-
-Navigate to the root of your workspace and install missing system dependencies:
-
-```bash
-cd ~/ticare_ws
-sudo rosdep init
-rosdep update
-rosdep install -i --from-paths src -y --rosdistro humble
-```
-
----
-
-### 5. Build the Workspace
-
-Build the packages using colcon:
-
-```bash
+### 6. Build the Workspace
+```sh
 source /opt/ros/humble/setup.bash
-cd ~/ticare_ws
 colcon build --symlink-install
 ```
 
@@ -165,4 +144,3 @@ ticare_communication/docs/architecture.md
 ## Contact
 
 For issues, improvements, or contributions, please open a Pull Request or contact the TiCare Communication Team.
-
