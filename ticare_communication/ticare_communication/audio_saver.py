@@ -15,9 +15,9 @@ class AudioRecorder(Node):
         super().__init__("audio_recorder")
         self.audio_buffer = []
 
-        self.sub = self.create_subscription(AudioData, "/audio", self.audio_callback, 10)
+        self.sub = self.create_subscription(AudioData, "/audio", self.audio_callback, 5)
 
-        self.get_logger().info("Grabando... Habla ahora (10 segundos)")
+        self.get_logger().info("Grabando... Habla ahora")
 
         package_share_path = get_package_share_directory("ticare_communication")
 
