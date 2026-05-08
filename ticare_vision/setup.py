@@ -14,6 +14,7 @@ setup(
         ('share/' + package_name, ['package.xml']),
         (os.path.join('share', package_name, 'launch'), glob(os.path.join('launch', '*launch.[pxy][yma]*'))),
         (os.path.join('share', package_name, 'config'), glob(os.path.join('config', '*.yaml'))),
+        (os.path.join('share', package_name, 'data'), glob('data/*')),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
@@ -28,7 +29,8 @@ setup(
     },
     entry_points={
         'console_scripts': [ 
-            'vision_node = ticare_vision.vision_node:main'
+            'vision_node = ticare_vision.vision_node:main',
+            'vision_node_sim = ticare_vision.vision_node_sim:main',
         ],
     },
 )
