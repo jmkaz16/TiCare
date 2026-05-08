@@ -350,21 +350,21 @@ class TiagoStateMachine(Node):
 
         self.group = MutuallyExclusiveCallbackGroup()
 
-        # --- PUBLISHERS ---
-        self.vis_pub = self.create_publisher(String, "/com2vis", 5)
-        self.nav_pub = self.create_publisher(String, "/com2nav", 5)
+        # Create a profile of QoS with Best Effort a Depth of 5
+        qos_profile = QoSProfile(
+            reliability=ReliabilityPolicy.BEST_EFFORT, history=HistoryPolicy.KEEP_LAST, depth=5
+        )
 
-        # # Create a profile of QoS with Best Effort a Depth of 5
-        # qos_profile = QoSProfile(
-        #     reliability=ReliabilityPolicy.BEST_EFFORT, history=HistoryPolicy.KEEP_LAST, depth=10
-        # )
+        # --- PUBLISHERS ---
+        self.vis_pub = self.create_publisher(String, "/com2vis", qos_profile)
+        self.nav_pub = self.create_publisher(String, "/com2nav", qos_profile)
 
         # --- SUBSCRIBERS ---
         self.vis_sub = self.create_subscription(
             String,
             "/vis2com",
             self.vision_callback,
-            5,
+            qos_profile,
             callback_group=self.group,
         )
 
@@ -372,7 +372,7 @@ class TiagoStateMachine(Node):
             String,
             "/nav2com",
             self.navigation_callback,
-            5,
+            qos_profile,
             callback_group=self.group,
         )
 
