@@ -8,6 +8,8 @@ ROS Package Dependencies
     
     ros2launch <https://docs.ros.org/en/humble/p/ros2launch/>
     
+    rcl_interfaces <https://docs.ros.org/en/humble/p/rcl_interfaces/>
+    
     std_msgs <https://docs.ros.org/en/humble/p/std_msgs/>
     
     geometry_msgs <https://docs.ros.org/en/humble/p/geometry_msgs/>
