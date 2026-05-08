@@ -12,7 +12,7 @@ setup(
     data_files=[
         ("share/ament_index/resource_index/packages", ["resource/" + package_name]),
         ("share/" + package_name, ["package.xml"]),
-        (os.path.join("share", package_name, "launch"), glob("launch/*.launch.py")),
+        (os.path.join("share", package_name, "launch"), glob("launch/*.py")),
         (os.path.join("share", package_name, "data"), glob("data/*.wav")),
     ],
     install_requires=["setuptools"],
@@ -28,7 +28,6 @@ setup(
         "console_scripts": [
             "state_manager = ticare_communication.state_manager:main",
             "save_audio = ticare_communication.audio_saver:main",
-            "lanza_subprocess = ticare_communication.lanza_subprocess:main",
         ],
     },
 )
