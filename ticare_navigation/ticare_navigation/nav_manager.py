@@ -7,6 +7,7 @@ from rclpy.time import Time
 from rclpy.action import ActionClient
 from rclpy.action.client import ClientGoalHandle
 from rclpy.task import Future
+from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy
 
 # from tf2_ros import Buffer, TransformListener
 
@@ -167,13 +168,20 @@ class NavManager(Node):
             nanoseconds=0, clock_type=self.get_clock().clock_type
         )  # [s] Timestamp when the search phase starts
 
-        self.vision_pub = self.create_publisher(String, "nav2vis", 10)
-        self.communication_pub = self.create_publisher(String, "nav2com", 10)
-        self.cmd_vel_pub = self.create_publisher(Twist, "cmd_vel", 10)
+        # Create a profile of QoS with Best Effort a Depth of 5
+        qos_profile = QoSProfile(
+            reliability=ReliabilityPolicy.BEST_EFFORT, history=HistoryPolicy.KEEP_LAST, depth=5
+        )
 
-        self.vision_sub = self.create_subscription(String, "vis2nav", self.vision_callback, 10)
+        self.vision_pub = self.create_publisher(String, "nav2vis", qos_profile)
+        self.communication_pub = self.create_publisher(String, "nav2com", qos_profile)
+        self.cmd_vel_pub = self.create_publisher(Twist, "cmd_vel", 5)
+
+        self.vision_sub = self.create_subscription(
+            String, "vis2nav", self.vision_callback, qos_profile
+        )
         self.communication_sub = self.create_subscription(
-            String, "com2nav", self.communication_callback, 10
+            String, "com2nav", self.communication_callback, qos_profile
         )
 
         # self.tf_buffer = Buffer()

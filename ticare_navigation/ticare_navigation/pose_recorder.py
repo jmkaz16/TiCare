@@ -4,6 +4,7 @@ from ament_index_python.packages import get_package_share_directory
 import rclpy
 from rclpy.node import Node
 from rcl_interfaces.msg import ParameterDescriptor
+from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy
 
 from ticare_interfaces.srv import SavePose
 from geometry_msgs.msg import PoseWithCovarianceStamped
@@ -52,8 +53,13 @@ class PoseRecorder(Node):
 
         self.srv = self.create_service(SavePose, "save_pose", self.save_pose_callback)
 
+        # Create a profile of QoS with Best Effort a Depth of 5
+        qos_profile = QoSProfile(
+            reliability=ReliabilityPolicy.BEST_EFFORT, history=HistoryPolicy.KEEP_LAST, depth=5
+        )
+
         self.subscription = self.create_subscription(
-            PoseWithCovarianceStamped, "amcl_pose", self.pose_callback, 10
+            PoseWithCovarianceStamped, "amcl_pose", self.pose_callback, qos_profile
         )
         self.subscription  # prevent unused variable warning
 
