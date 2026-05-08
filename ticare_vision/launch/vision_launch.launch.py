@@ -12,7 +12,7 @@ def generate_launch_description() -> LaunchDescription:
 
     use_sim_time = DeclareLaunchArgument(
         "use_sim_time",
-        default_value="True",
+        default_value="False",
         description="Whether or not to use simulation time for the navigation nodes.",
     )
     # 1. Definimos un argumento que se puede pasar desde la terminal
