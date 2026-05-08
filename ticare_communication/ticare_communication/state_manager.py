@@ -14,8 +14,9 @@ import threading
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String
-from rclpy.callback_groups import ReentrantCallbackGroup
+from rclpy.callback_groups import MutuallyExclusiveCallbackGroup
 from rclpy.executors import MultiThreadedExecutor
+from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy
 
 import speech_recognition as sr
 from gtts import gTTS
@@ -59,12 +60,11 @@ PLACES_MAP = {
 
 # Objetos (para fuzzy de objetos)
 OBJECTS_MAP = {
-    "botella": "botella",
-    "llaves": "llaves",
-    "cartera": "cartera",
-    "mando": "mando",
-    "gafas": "gafas",
-    # añade los que quieras
+    "botella": "bottle",
+    "manzana": "apple",
+    "taza": "mug",
+    "pelota": "tennisball",
+    "gafas": "glasses",
 }
 
 # Respuestas afirmativas / negativas para confirmación
@@ -348,18 +348,23 @@ class TiagoStateMachine(Node):
     def __init__(self):
         super().__init__("state_machine_node")
 
-        self.group = ReentrantCallbackGroup()
+        self.group = MutuallyExclusiveCallbackGroup()
 
         # --- PUBLISHERS ---
-        self.vis_pub = self.create_publisher(String, "/com2vis", 10)
-        self.nav_pub = self.create_publisher(String, "/com2nav", 10)
+        self.vis_pub = self.create_publisher(String, "/com2vis", 5)
+        self.nav_pub = self.create_publisher(String, "/com2nav", 5)
+
+        # Create a profile of QoS with Best Effort a Depth of 5
+        qos_profile = QoSProfile(
+            reliability=ReliabilityPolicy.BEST_EFFORT, history=HistoryPolicy.KEEP_LAST, depth=5
+        )
 
         # --- SUBSCRIBERS ---
         self.vis_sub = self.create_subscription(
             String,
             "/vis2com",
             self.vision_callback,
-            10,
+            qos_profile,
             callback_group=self.group,
         )
 
@@ -367,7 +372,7 @@ class TiagoStateMachine(Node):
             String,
             "/nav2com",
             self.navigation_callback,
-            10,
+            qos_profile,
             callback_group=self.group,
         )
 
@@ -376,6 +381,7 @@ class TiagoStateMachine(Node):
         self.object_name = ""
         self.command_text = ""
         self.parsed_data = None
+        self.object_detected: float = False
 
         # --- TIMER ---
         self.timer = self.create_timer(0.1, self.run_machine, callback_group=self.group)
@@ -464,7 +470,7 @@ class TiagoStateMachine(Node):
                 self.object_name = self.parsed_data["object"]
                 self.state = "OBJECT_FOUND"
             else:
-                self.state = "ERROR_NOT_FOUND"
+                self.state = "OBJECT_NOT_LISTED"
 
         # --- STATE 6: RETRY SPEECH ---
         elif self.state == "RETRY_SPEECH":
@@ -487,9 +493,12 @@ class TiagoStateMachine(Node):
         elif self.state == "SEARCHING":
             pass
 
-        # --- STATE 10: ERROR NOT FOUND ---
-        elif self.state == "ERROR_NOT_FOUND":
-            speak_audio("No he encontrado el objeto.")
+        elif self.state == "RETURN_TO_OBJECT":
+            pass
+
+        # --- STATE 11: OBJECT NOT LISTED ---
+        elif self.state == "OBJECT_NOT_LISTED":
+            speak_audio("El objeto a buscar no está en la lista.")
             self.state = "IDLE"
 
     # ============================================================
@@ -497,19 +506,24 @@ class TiagoStateMachine(Node):
     # ============================================================
 
     def vision_callback(self, msg: String):
-        if msg.data == "object_detected":
-            self.nav_pub.publish(String(data="return"))
+        if self.state == "SEARCHING" and msg.data == "object_detected":
+            self.object_detected = True
 
     def navigation_callback(self, msg: String):
-        if msg.data == "object_point":
-            self.state = "POINTING"
-            speak_audio("Aquí está.")
+        if msg.data == "home":
+            if self.object_detected:
+                speak_audio("Ya lo he encontrado, ¿me acompañas?")
+                self.vis_pub.publish(String(data="head_down"))
+                self.state = "RETURN_TO_OBJECT"
 
-        elif msg.data == "home":
-            self.state = "GOING_HOME"
-            speak_audio("Ya lo he encontrado, ¿me acompañas?")
-            self.vis_pub.publish(String(data="head_down"))
-            self.state = "IDLE"
+            if not self.object_detected:
+                self.vis_pub.publish(String(data="head_down"))
+                speak_audio("No he encontrado el objeto.")
+                return
+
+        elif self.state == "RETURN_TO_OBJECT" and msg.data == "object_point":
+            speak_audio("Aquí está.")
+            return
 
 
 def main(args=None):
