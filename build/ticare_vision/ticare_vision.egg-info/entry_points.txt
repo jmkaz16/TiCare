@@ -1,4 +1,0 @@
-[console_scripts]
-vision_node = ticare_vision.vision_node:main
-vision_node_sim = ticare_vision.vision_node_sim:main
-
