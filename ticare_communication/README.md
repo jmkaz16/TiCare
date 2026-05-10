@@ -90,7 +90,16 @@ This installs:
 
 ---
 
-### 5. Libraries verification
+### 5. Build the Workspace
+Build the packages using colcon. Note that the venv has to be deactivated for the colcon to be done properly:
+```sh
+source /opt/ros/humble/setup.bash
+deactivate
+colcon build --symlink-install
+source venv/bin/activate
+```
+
+### 6. Libraries verification
 Run the following script in terminal to ensure all libraries and models are successfully installed:
 ```sh
 python3 - << 'EOF'
@@ -116,11 +125,12 @@ print(f"{'✓' if has_ros2 else '✗'} ROS2 CLI")
 
 if has_ros2:
     pkgs = subprocess.run(["ros2","pkg","list"], stdout=subprocess.PIPE, text=True).stdout
-    print(f"{'✓' if 'ticare_communication' in pkgs else '✗'} ticare_communication () ")
+    print(f"{'✓' if 'ticare_communication' in pkgs else '✗'} ticare_communication (colcon or source error) ")
 EOF
 ```
 If any errors are detected, the libraries would have to be install manually (just the ones not already installed):
 ```sh
+source venv/bin/activate
 pip install SpeechRecognition gTTS pygame pynput
 pip install numpy==1.26.4
 pip install rapidfuzz==3.14.3
@@ -130,14 +140,7 @@ Specially important is the `spacy`. If not install:
 ```sh
 python3 -m spacy download es_core_news_sm
 ```
-Rerun the inspection code.
-
-### 6. Build the Workspace
-Build the packages using colcon. Note that we explicitly allow overriding specific PAL packages to ensure compatibility:
-```sh
-source /opt/ros/humble/setup.bash
-colcon build --symlink-install
-```
+Return to the point 5 and then rerun the verification script.
 
 ---
 

@@ -60,11 +60,11 @@ PLACES_MAP = {
 
 # Objetos (para fuzzy de objetos)
 OBJECTS_MAP = {
-    "botella": "bottle",
-    "manzana": "apple",
-    "taza": "mug",
-    "pelota": "tennisball",
-    "gafas": "glasses",
+    "botella": {"say": "botella", "send": "bottle"},
+    "llaves": {"say": "llaves", "send": "keys"},
+    "cartera": {"say": "cartera", "send": "wallet"},
+    "mando": {"say": "mando", "send": "remote"},
+    "gafas": {"say": "gafas", "send": "glasses"},
 }
 
 # Respuestas afirmativas / negativas para confirmación
@@ -379,6 +379,8 @@ class TiagoStateMachine(Node):
         # --- INTERNAL VARIABLES ---
         self.state = "IDLE"
         self.object_name = ""
+        self.object_send = ""
+        self.object_data = ""
         self.command_text = ""
         self.parsed_data = None
         self.object_detected: float = False
@@ -467,7 +469,9 @@ class TiagoStateMachine(Node):
             self.parsed_data = parse_command(self.command_text)
 
             if self.parsed_data["object"]:
-                self.object_name = self.parsed_data["object"]
+                self.object_data = self.parsed_data["object"]
+                self.object_name = self.object_data["say"]  
+                self.object_send = self.object_data["send"]  
                 self.state = "OBJECT_FOUND"
             else:
                 self.state = "OBJECT_NOT_LISTED"
@@ -485,12 +489,15 @@ class TiagoStateMachine(Node):
 
         # --- STATE 7: SEND TO VISION ---
         elif self.state == "SEND_TO_VISION":
-            self.vis_pub.publish(String(data=f"object_{self.object_name}"))
+            self.vis_pub.publish(String(data=f"object_{self.object_send}"))
             self.nav_pub.publish(String(data="start_nav"))
             self.state = "SEARCHING"
 
         # --- STATE 8: SEARCHING ---
         elif self.state == "SEARCHING":
+            pass
+
+        elif self.state == "RETURN_TO_USER":
             pass
 
         elif self.state == "RETURN_TO_OBJECT":
@@ -501,6 +508,9 @@ class TiagoStateMachine(Node):
             speak_audio("El objeto a buscar no está en la lista.")
             self.state = "IDLE"
 
+        else:
+            self.state = "IDLE"
+
     # ============================================================
     # CALLBACKS
     # ============================================================
@@ -508,15 +518,16 @@ class TiagoStateMachine(Node):
     def vision_callback(self, msg: String):
         if self.state == "SEARCHING" and msg.data == "object_detected":
             self.object_detected = True
+            self.state = "RETURN_TO_USER"
 
     def navigation_callback(self, msg: String):
-        if msg.data == "home":
+        if self.state == "RETURN_TO_USER" and msg.data == "home":
             if self.object_detected:
                 speak_audio("Ya lo he encontrado, ¿me acompañas?")
                 self.vis_pub.publish(String(data="head_down"))
                 self.state = "RETURN_TO_OBJECT"
 
-            if not self.object_detected:
+            else:
                 self.vis_pub.publish(String(data="head_down"))
                 speak_audio("No he encontrado el objeto.")
                 return
