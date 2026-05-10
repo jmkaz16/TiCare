@@ -62,7 +62,7 @@ The package includes a `requirements.txt` file to simplify the Python installati
 
 ```bash
 cd ~/ticare_ws
-python3 -m pip install --user -r src/ticare_vision/requirements.txt
+python3 -m pip install --user -r ticare_vision/requirements.txt
 ```
 
 The current requirements file includes:
