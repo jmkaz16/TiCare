@@ -470,8 +470,8 @@ class TiagoStateMachine(Node):
 
             if self.parsed_data["object"]:
                 self.object_data = self.parsed_data["object"]
-                self.object_name = self.object_data["say"]  
-                self.object_send = self.object_data["send"]  
+                self.object_name = self.object_data["say"]
+                self.object_send = self.object_data["send"]
                 self.state = "OBJECT_FOUND"
             else:
                 self.state = "OBJECT_NOT_LISTED"
@@ -524,16 +524,17 @@ class TiagoStateMachine(Node):
         if self.state == "RETURN_TO_USER" and msg.data == "home":
             if self.object_detected:
                 speak_audio("Ya lo he encontrado, ¿me acompañas?")
-                self.vis_pub.publish(String(data="head_down"))
+                self.nav_pub.publish(String(data="return"))
                 self.state = "RETURN_TO_OBJECT"
 
             else:
-                self.vis_pub.publish(String(data="head_down"))
                 speak_audio("No he encontrado el objeto.")
+                self.vis_pub.publish(String(data="head_down"))
                 return
 
         elif self.state == "RETURN_TO_OBJECT" and msg.data == "object_point":
             speak_audio("Aquí está.")
+            self.vis_pub.publish(String(data="head_down"))
             return
 
 
