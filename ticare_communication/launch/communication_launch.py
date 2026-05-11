@@ -8,7 +8,7 @@ def generate_launch_description():
 
     use_sim_time = DeclareLaunchArgument(
         "use_sim_time",
-        default="True",
+        default_value="True",
         description="Whether or not to use simulation time for the communication nodes.",
     )
 
