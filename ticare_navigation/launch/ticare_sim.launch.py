@@ -1,4 +1,5 @@
 from launch import LaunchDescription
+from launch_ros.actions import Node
 from launch.actions import DeclareLaunchArgument
 from launch.actions import IncludeLaunchDescription
 from launch.substitutions import LaunchConfiguration
@@ -18,6 +19,9 @@ def generate_launch_description():
     tiago_dir = PathJoinSubstitution([FindPackageShare("tiago_gazebo"), "launch"])
     world_path = PathJoinSubstitution(
         [FindPackageShare("ticare_navigation"), "worlds", "car_shifted_final_block"]
+    )
+    rviz_config_path = PathJoinSubstitution(
+        [FindPackageShare("ticare_navigation"), "rviz", "rviz_ticare_config.rviz"]
     )
 
     tiago_gazebo_launch = IncludeLaunchDescription(
@@ -43,13 +47,21 @@ def generate_launch_description():
             "world_name": world_path,
             "slam": "False",
             "use_sim_time": "True",
-            "rviz": "True",
+            "rviz": "False",
             "base_type": "pmb2",
         }.items(),
         condition=UnlessCondition(LaunchConfiguration("use_default_map")),
     )
 
-    return LaunchDescription([use_default_map_arg, tiago_gazebo_launch, ticare_nav_stack])
+    rviz = Node(
+        package="rviz2",
+        executable="rviz2",
+        output="screen",
+        arguments=["-d", rviz_config_path],
+        parameters=[{"use_sim_time": LaunchConfiguration("use_sim_time")}],
+    )
+
+    return LaunchDescription([use_default_map_arg, ticare_nav_stack, tiago_gazebo_launch, rviz])
 
 
 # Possible arguments to pass to the launch file:

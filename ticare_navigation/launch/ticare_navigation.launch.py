@@ -39,6 +39,30 @@ def generate_launch_description():
         shell=True,
     )
 
+    set_max_vel_x_cmd = ExecuteProcess(
+        cmd=[
+            "ros2",
+            "param",
+            "set",
+            "/controller_server",
+            "FollowPath.vx_max",
+            "0.25",
+        ],
+        shell=True,
+    )
+
+    set_acc_lim_x_cmd = ExecuteProcess(
+        cmd=[
+            "ros2",
+            "param",
+            "set",
+            "/mobile_base_controller",
+            "linear.x.max_acceleration",
+            "0.5",
+        ],
+        shell=True,
+    )
+
     rviz = Node(
         package="rviz2",
         executable="rviz2",
@@ -47,4 +71,13 @@ def generate_launch_description():
         parameters=[{"use_sim_time": LaunchConfiguration("use_sim_time")}],
     )
 
-    return LaunchDescription([use_sim_time, ticare_nodes_launch, load_map_service_call, rviz])
+    return LaunchDescription(
+        [
+            use_sim_time,
+            ticare_nodes_launch,
+            load_map_service_call,
+            set_max_vel_x_cmd,
+            set_acc_lim_x_cmd,
+            rviz,
+        ]
+    )
