@@ -1,8 +1,13 @@
 """
 TiCare Communication Module - State Manager.
 
-This node implements a 13-state machine to coordinate voice recognition,
-natural language processing, and robot behavior via Vision and Navigation.
+This module implements a 13‑state machine that coordinates wake‑word detection,
+speech recognition, natural language parsing, and robot behavior through Vision
+and Navigation subsystems.
+
+The state machine listens for the wake word, processes user commands, performs
+object parsing, communicates with perception and navigation, and handles
+emergency stop conditions.
 """
 
 import os
@@ -18,7 +23,7 @@ from rclpy.callback_groups import MutuallyExclusiveCallbackGroup
 from rclpy.executors import MultiThreadedExecutor
 from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy
 
-import speech_recognition as sr
+import whisper
 from gtts import gTTS
 import pygame
 import io
@@ -27,7 +32,7 @@ import unicodedata
 import spacy
 from rapidfuzz import process, fuzz
 
-WAKE_WORD = "tiago"
+WAKE_WORD = "Robot"
 
 _nlp = None
 _cached_mic_index = None
@@ -38,54 +43,21 @@ _cached_sample_rate = None
 # COMMAND MAPS (fuzzy matching)
 # ==========================
 
-# Acciones
 COMMAND_MAP = {
     "buscar": "buscar",
     "busca": "buscar",
     "encuentra": "buscar",
     "localiza": "buscar",
-    # añade aquí más verbos si quieres
 }
 
-# Lugares
-PLACES_MAP = {
-    "cocina": "la cocina",
-    "salon": "el salón",
-    "salón": "el salón",
-    "habitacion": "la habitación",
-    "habitación": "la habitación",
-    "baño": "el baño",
-    # etc.
-}
-
-# Objetos (para fuzzy de objetos)
 OBJECTS_MAP = {
     "botella": {"say": "botella", "send": "bottle"},
-    "llaves": {"say": "llaves", "send": "keys"},
-    "cartera": {"say": "cartera", "send": "wallet"},
-    "mando": {"say": "mando", "send": "remote"},
+    "taza": {"say": "taza", "send": "mug"},
+    "pelota": {"say": "pelota", "send": "tennisball"},
+    "manzana": {"say": "manzana", "send": "apple"},
     "gafas": {"say": "gafas", "send": "glasses"},
 }
 
-# Respuestas afirmativas / negativas para confirmación
-YES_MAP = {
-    "sí": "yes",
-    "si": "yes",
-    "claro": "yes",
-    "vale": "yes",
-    "correcto": "yes",
-    "afirmativo": "yes",
-}
-
-NO_MAP = {
-    "no": "no",
-    "negativo": "no",
-    "para": "no",
-    "me he equivocado": "no",
-    "cancela": "no",
-}
-
-# Palabras de parada (stop) por voz
 STOP_MAP = {
     "para": "stop",
     "detente": "stop",
@@ -95,77 +67,97 @@ STOP_MAP = {
     "cancela": "stop",
 }
 
-# ==========================
-# Utilidades generales
-# ==========================
-
 
 def normalize(s: str) -> str:
+    """
+    Normalize a string by lowercasing, trimming whitespace, and removing accents.
+
+    Args:
+        s (str): Input string.
+
+    Returns:
+        str: Normalized string without diacritics.
+    """
     s = s.lower().strip()
     s = unicodedata.normalize("NFD", s)
     return "".join(ch for ch in s if unicodedata.category(ch) != "Mn")
 
 
 def get_nlp():
+    """
+    Load and cache the Spanish spaCy model.
+
+    Returns:
+        Language: spaCy language model instance.
+    """
     global _nlp
     if _nlp is not None:
         return _nlp
     try:
         _nlp = spacy.load("es_core_news_sm")
     except Exception as e:
-        print("spaCy no disponible, usando modelo en blanco:", e)
+        print("spaCy unavailable, using blank model:", e)
         _nlp = spacy.blank("es")
     return _nlp
 
 
 # ==========================
-# Micrófono / audio
+# Microphone / audio
 # ==========================
 
 
 def record_audio():
-    # Ejecuta el nodo de ROS2 para grabar
-    process = subprocess.Popen(["ros2", "run", "ticare_communication", "save_audio"])
-    process.wait()  # Esperamos a que termine de grabar
+    """
+    Record audio by launching the ROS2 save_audio node.
 
-    # Obtenemos la ruta completa del archivo
+    Returns:
+        str: Path to the recorded WAV file.
+    """
+    process = subprocess.Popen(["ros2", "run", "ticare_communication", "save_audio_TIAGo"])
+    process.wait()
+
     package_share_path = get_package_share_directory("ticare_communication")
     ruta_archivo = os.path.join(package_share_path, "data", "audio.wav")
 
     return ruta_archivo
 
-
-# ==========================
-# STT / TTS
-# ==========================
-
-
+model = whisper.load_model("small", device="cpu")
 def transcribe_audio(
     ruta_wav=os.path.join(get_package_share_directory("ticare_communication"), "data", "audio.wav")
 ):
+    """
+    Transcribe a WAV file using Whisper.
+    """
     if ruta_wav is None or not os.path.exists(ruta_wav):
         return "Errr"
 
-    r = sr.Recognizer()
-
     try:
-        # Cargamos el archivo WAV directamente con speech_recognition
-        with sr.AudioFile(ruta_wav) as source:
-            audio_data = r.record(source)  # Esto lee el archivo y lo convierte al formato correcto
+        result = model.transcribe(
+            ruta_wav,
+            language="es",
+            fp16=False
+        )
 
-        text = r.recognize_google(audio_data, language="es-ES")
-        print("Transcripción:", text)
+        text = result["text"].strip()
+        print("Transcription:", text)
+
+        if not text:
+            return "Errr"
+
         return text
 
-    except sr.UnknownValueError:
-        print("No se entendió el audio")
-        return "Errr"
     except Exception as e:
-        print(f"Error en reconocimiento: {e}")
+        print(f"Recognition error: {e}")
         return "Errr"
 
 
 def speak_audio(texto):
+    """
+    Convert text to speech using gTTS and play it with pygame.
+
+    Args:
+        texto (str): Text to be spoken aloud.
+    """
     tts = gTTS(text=texto, lang="es")
     fp = io.BytesIO()
     tts.write_to_fp(fp)
@@ -180,11 +172,21 @@ def speak_audio(texto):
 
 
 # ==========================
-# Wake word (parametrizada)
+# Wake word
 # ==========================
 
 
 def clean_wake_word(text, wake_word):
+    """
+    Remove the wake word from a detected phrase.
+
+    Args:
+        text (str): Input phrase.
+        wake_word (str): Wake word to remove.
+
+    Returns:
+        str: Remaining text after removing the wake word.
+    """
     text = text.lower().strip()
     if wake_word in text:
         cleaned = text.replace(wake_word, "").strip(" ,.")
@@ -193,45 +195,74 @@ def clean_wake_word(text, wake_word):
 
 
 def is_wake_word(text, wake_word):
+    """
+    Determine whether a phrase contains or resembles the wake word.
+
+    Args:
+        text (str): Input phrase.
+        wake_word (str): Wake word to detect.
+
+    Returns:
+        bool: True if wake word is detected or fuzzy‑matched.
+    """
     text = text.lower().strip()
     if wake_word in text:
-        print("Wake-word encontrada dentro de la frase.")
+        print("Wake‑word found inside phrase.")
         return True
 
     score = fuzz.ratio(text, wake_word)
-    print(f"Similitud con wake-word: {score}")
+    print(f"Wake‑word similarity: {score}")
     return score > 70
 
 
 def listen_for_wake_word(wake_word, duration=3):
+    """
+    Continuously record audio until the wake word is detected.
+
+    Args:
+        wake_word (str): Wake word to detect.
+        duration (int): Recording duration per attempt.
+
+    Returns:
+        str: Remaining text after wake word, or empty string.
+    """
     while True:
-        print("Grabando fragmento ... ")
+        print("Recording fragment...")
         ruta = record_audio()
         text = transcribe_audio(ruta)
 
         if not text or text == "Errr":
-            print("No se entendió nada.")
+            print("Nothing understood.")
             continue
 
         text = text.lower().strip()
-        print(f"Detectado: {text}")
+        print(f"Detected: {text}")
 
         if is_wake_word(text, wake_word):
             remaining = clean_wake_word(text, wake_word)
             if remaining:
-                print("Wake-word + orden detectada en la misma frase.")
-                print(f"Orden detectada: {remaining}")
+                print("Wake‑word + command detected.")
+                print(f"Command: {remaining}")
                 return remaining
-            print("¡Palabra clave detectada!")
+            print("Wake‑word detected.")
             return ""
 
 
 # ==========================
-# Fuzzy mapeos
+# Fuzzy mappings
 # ==========================
 
 
 def map_action(text: str):
+    """
+    Fuzzy‑match an action verb.
+
+    Args:
+        text (str): Input text.
+
+    Returns:
+        str | None: Canonical action or None.
+    """
     choices = list(COMMAND_MAP.keys())
     match = process.extractOne(text, choices, scorer=fuzz.ratio)
     if match and match[1] >= 75:
@@ -239,37 +270,33 @@ def map_action(text: str):
     return None
 
 
-def map_place(word: str):
-    choices = list(PLACES_MAP.keys())
-    match = process.extractOne(word, choices, scorer=fuzz.ratio)
-    if match and match[1] >= 75:
-        return PLACES_MAP[match[0]]
-    return None
-
 
 def map_object(text: str):
+    """
+    Fuzzy‑match an object.
+
+    Args:
+        text (str): Input text.
+
+    Returns:
+        dict | None: Object metadata or None.
+    """
     choices = list(OBJECTS_MAP.keys())
     match = process.extractOne(text, choices, scorer=fuzz.ratio)
     if match and match[1] >= 75:
         return OBJECTS_MAP[match[0]]
     return None
 
-
-def classify_answer(text: str):
-    text_norm = normalize(text)
-
-    yes_match = process.extractOne(text_norm, YES_MAP.keys(), scorer=fuzz.ratio)
-    if yes_match and yes_match[1] >= 75:
-        return "yes"
-
-    no_match = process.extractOne(text_norm, NO_MAP.keys(), scorer=fuzz.ratio)
-    if no_match and no_match[1] >= 75:
-        return "no"
-
-    return "unknown"
-
-
 def classify_stop(text: str):
+    """
+    Determine whether a phrase indicates a stop command.
+
+    Args:
+        text (str): Input phrase.
+
+    Returns:
+        bool: True if stop command detected.
+    """
     text_norm = normalize(text)
     match = process.extractOne(text_norm, STOP_MAP.keys(), scorer=fuzz.ratio)
     if match and match[1] >= 75:
@@ -278,18 +305,24 @@ def classify_stop(text: str):
 
 
 # ==========================
-# NLP: género y parsing
+# NLP parsing
 # ==========================
 
 
 def get_article(word: str):
     """
-    Devuelve el artículo correcto (el, la, los, las) según género y número.
+    Determine the correct Spanish article for a noun.
+
+    Args:
+        word (str): Noun to analyze.
+
+    Returns:
+        str: Appropriate article ("el", "la", "los", "las").
     """
     nlp = get_nlp()
     doc = nlp(word)
     if not doc:
-        return "el"  # fallback
+        return "el"
 
     token = doc[0]
 
@@ -301,15 +334,23 @@ def get_article(word: str):
     elif "Masc" in gender:
         return "los" if "Plur" in number else "el"
     else:
-        return "el"  # fallback neutro
+        return "el"
 
 
 def parse_command(text: str):
+    """
+    Parse a natural language command into action, object, and place.
+
+    Args:
+        text (str): Input command.
+
+    Returns:
+        dict: Parsed components including action, object, place, and topic.
+    """
     text_norm = normalize(text)
     nlp = get_nlp()
     doc = nlp(text_norm)
 
-    # Acción: primero por frase completa, luego por tokens
     action = map_action(text_norm)
     if not action:
         for token in doc:
@@ -318,7 +359,6 @@ def parse_command(text: str):
                 action = candidate
                 break
 
-    # Objeto: fuzzy por frase completa, luego por tokens
     obj = map_object(text_norm)
     if not obj:
         for token in doc:
@@ -327,39 +367,38 @@ def parse_command(text: str):
                 obj = candidate
                 break
 
-    # Lugar: por tokens
-    place = None
-    for token in doc:
-        candidate = map_place(token.lemma_)
-        if candidate:
-            place = candidate
-            break
-
     return {
         "action": action,
         "object": obj,
-        "place": place,
         "topic": text_norm,
     }
 
 
 class TiagoStateMachine(Node):
+    """
+    Main state machine for the TiCare communication module.
+
+    This class manages wake‑word detection, speech recognition, command parsing,
+    and communication with Vision and Navigation subsystems.
+    """
 
     def __init__(self):
+        """
+        Initialize publishers, subscribers, timers, and internal state.
+        """
         super().__init__("state_machine_node")
 
         self.group = MutuallyExclusiveCallbackGroup()
 
-        # Create a profile of QoS with Best Effort a Depth of 5
         qos_profile = QoSProfile(
-            reliability=ReliabilityPolicy.BEST_EFFORT, history=HistoryPolicy.KEEP_LAST, depth=5
+            reliability=ReliabilityPolicy.BEST_EFFORT,
+            history=HistoryPolicy.KEEP_LAST,
+            depth=5,
         )
 
-        # --- PUBLISHERS ---
         self.vis_pub = self.create_publisher(String, "/com2vis", qos_profile)
         self.nav_pub = self.create_publisher(String, "/com2nav", qos_profile)
 
-        # --- SUBSCRIBERS ---
         self.vis_sub = self.create_subscription(
             String,
             "/vis2com",
@@ -376,19 +415,16 @@ class TiagoStateMachine(Node):
             callback_group=self.group,
         )
 
-        # --- INTERNAL VARIABLES ---
         self.state = "IDLE"
         self.object_name = ""
         self.object_send = ""
         self.object_data = ""
         self.command_text = ""
         self.parsed_data = None
-        self.object_detected: float = False
+        self.object_detected = False
 
-        # --- TIMER ---
         self.timer = self.create_timer(0.1, self.run_machine, callback_group=self.group)
 
-        # --- EMERGENCY LISTENER THREAD ---
         threading.Thread(target=self.emergency_listener, daemon=True).start()
 
         self.get_logger().info("TiCare State Manager: Logic engine started (Spanish mode).")
@@ -399,7 +435,7 @@ class TiagoStateMachine(Node):
 
     def emergency_listener(self):
         """
-        Escucha continuamente palabras de parada usando fuzzy logic.
+        Continuously listen for emergency stop commands using fuzzy logic.
         """
         while rclpy.ok() and self.state != "EMERGENCY_STOP":
             text = listen_for_wake_word(WAKE_WORD, duration=1)
@@ -409,6 +445,9 @@ class TiagoStateMachine(Node):
                 break
 
     def send_emergency(self):
+        """
+        Trigger an emergency stop and notify Vision and Navigation.
+        """
         self.state = "EMERGENCY_STOP"
         msg = String(data="emergency_stop")
         self.vis_pub.publish(msg)
@@ -417,6 +456,15 @@ class TiagoStateMachine(Node):
         self.get_logger().error("emergency_stop sent to Vision and Navigation.")
 
     def check_stop(self, text: str) -> bool:
+        """
+        Check whether a phrase contains a stop command.
+
+        Args:
+            text (str): Input phrase.
+
+        Returns:
+            bool: True if emergency stop triggered.
+        """
         if classify_stop(text):
             self.send_emergency()
             return True
@@ -427,11 +475,12 @@ class TiagoStateMachine(Node):
     # ============================================================
 
     def run_machine(self):
-
+        """
+        Execute one iteration of the state machine.
+        """
         if self.state == "EMERGENCY_STOP":
             return
 
-        # --- STATE 1: IDLE ---
         if self.state == "IDLE":
             result = listen_for_wake_word(WAKE_WORD, duration=2)
 
@@ -440,17 +489,14 @@ class TiagoStateMachine(Node):
                     return
                 self.state = "WAKE_WORD_DETECTED"
 
-        # --- STATE 2: WAKE WORD DETECTED ---
         elif self.state == "WAKE_WORD_DETECTED":
             self.vis_pub.publish(String(data="head_up"))
             self.state = "GREETING"
 
-        # --- STATE 3: GREETING ---
         elif self.state == "GREETING":
             speak_audio("¿Te puedo ayudar en algo?")
             self.state = "LISTENING"
 
-        # --- STATE 4: LISTENING ---
         elif self.state == "LISTENING":
             ruta = record_audio()
             text = transcribe_audio(ruta)
@@ -464,7 +510,6 @@ class TiagoStateMachine(Node):
                 self.command_text = text
                 self.state = "PROCESSING_REQUEST"
 
-        # --- STATE 5: PROCESSING REQUEST ---
         elif self.state == "PROCESSING_REQUEST":
             self.parsed_data = parse_command(self.command_text)
 
@@ -476,34 +521,28 @@ class TiagoStateMachine(Node):
             else:
                 self.state = "OBJECT_NOT_LISTED"
 
-        # --- STATE 6: RETRY SPEECH ---
         elif self.state == "RETRY_SPEECH":
             speak_audio("No he entendido, ¿puedes repetirlo?")
             self.state = "LISTENING"
 
-        # --- STATE 9: OBJECT FOUND ---
         elif self.state == "OBJECT_FOUND":
             article = get_article(self.object_name)
+            if self.object_name=="botella":
+                article="la"
             speak_audio(f"Ok, iré a buscar {article} {self.object_name}.")
             self.state = "SEND_TO_VISION"
 
-        # --- STATE 7: SEND TO VISION ---
         elif self.state == "SEND_TO_VISION":
             self.vis_pub.publish(String(data=f"object_{self.object_send}"))
             self.nav_pub.publish(String(data="start_nav"))
             self.state = "SEARCHING"
 
-        # --- STATE 8: SEARCHING ---
         elif self.state == "SEARCHING":
-            pass
-
-        elif self.state == "RETURN_TO_USER":
             pass
 
         elif self.state == "RETURN_TO_OBJECT":
             pass
 
-        # --- STATE 11: OBJECT NOT LISTED ---
         elif self.state == "OBJECT_NOT_LISTED":
             speak_audio("El objeto a buscar no está en la lista.")
             self.state = "IDLE"
@@ -516,12 +555,24 @@ class TiagoStateMachine(Node):
     # ============================================================
 
     def vision_callback(self, msg: String):
+        """
+        Handle messages from the Vision subsystem.
+
+        Args:
+            msg (String): Incoming message.
+        """
         if self.state == "SEARCHING" and msg.data == "object_detected":
             self.object_detected = True
             self.state = "RETURN_TO_USER"
 
     def navigation_callback(self, msg: String):
-        if self.state == "RETURN_TO_USER" and msg.data == "home":
+        """
+        Handle messages from the Navigation subsystem.
+
+        Args:
+            msg (String): Incoming message.
+        """
+        if self.state == "SEARCHING" and msg.data == "home":
             if self.object_detected:
                 speak_audio("Ya lo he encontrado, ¿me acompañas?")
                 self.nav_pub.publish(String(data="return"))
@@ -533,12 +584,18 @@ class TiagoStateMachine(Node):
                 return
 
         elif self.state == "RETURN_TO_OBJECT" and msg.data == "object_point":
-            speak_audio("Aquí está.")
+            speak_audio("Aquí está tu objeto.")
             self.vis_pub.publish(String(data="head_down"))
             return
 
 
 def main(args=None):
+    """
+    Entry point for the TiagoStateMachine node.
+
+    Args:
+        args (list | None): Optional command‑line arguments.
+    """
     rclpy.init(args=args)
     node = TiagoStateMachine()
     executor = MultiThreadedExecutor()

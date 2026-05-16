@@ -26,8 +26,10 @@ setup(
     },
     entry_points={
         "console_scripts": [
-            "state_manager = ticare_communication.state_manager:main",
-            "save_audio = ticare_communication.audio_saver:main",
+            "state_manager_simulation = ticare_communication.state_manager_simulation:main",
+            "state_manager_TIAGo = ticare_communication.state_manager_TIAGo:main",
+            "save_audio_simulation= ticare_communication.audio_saver_simulation:main",
+            "save_audio_TIAGo= ticare_communication.audio_saver_TIAGo:main",
         ],
     },
 )
