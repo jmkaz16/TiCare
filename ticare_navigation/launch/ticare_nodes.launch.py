@@ -20,7 +20,7 @@ def generate_launch_description():
             {
                 "use_sim_time": LaunchConfiguration("use_sim_time"),
                 "recovery_rotation_duration": 30.0,
-                "recovery_rotation_speed": 0.5,
+                "recovery_rotation_speed": 0.3,
                 "search_duration": 300.0,
             }
         ],
@@ -34,7 +34,7 @@ def generate_launch_description():
             {
                 "use_sim_time": LaunchConfiguration("use_sim_time"),
                 "position_error_threshold": 0.5,
-                "orientation_error_threshold": 0.25,
+                "orientation_error_threshold": 0.5,
             }
         ],
     )
