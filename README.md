@@ -12,7 +12,7 @@ The primary objective is to integrate advanced **SLAM navigation techniques in R
 
 Watch and listen to TiCare in action. In this video, the user interacts with the TIAGo robot via voice commands to locate and retrieve objects:
 
-<video src="media/demo.mp4" controls width="100%"></video>
+https://github.com/user-attachments/assets/2089f07f-d2ec-48a8-9bd9-716faa2ba8c5
 
 > **Integration Status:** Full system integration across the TIAGo modules is near completion. Currently, this `main` branch includes the core architecture stable base merged with the `navigation` features.
 
