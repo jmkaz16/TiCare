@@ -11,7 +11,7 @@ The primary objective is the implementation of **a voice control system for the 
 The system is structured into the following packages:  
 - [`bittle_communication`](https://github.com/jmkaz16/TiCare/tree/bittle/bittle_communication): Responsible for audio capture, speech recognition, natural language processing (NLP), and synonym mapping. It publishes the processed commands to the `/bittle_raw` topic.
 - [`bittle_manager`](https://github.com/jmkaz16/TiCare/tree/bittle/bittle_manager): Acts as the logical core of the system. It implements a Finite State Machine (FSM) that manages the validation of critical commands and organizes an execution queue for multiple orders. It subscribes to `/bittle_raw` and publishes to `bittle_cmd`.
-- [`bittle_actions`](https://github.com/jmkaz16/TiCare/tree/bittle/bittle_manager): Manages low-level communication with the robot's hardware. It subscribes to the `/bittle_cmd` topic and translates validated instructions into specific serial commands for the Petoi Bittle controller.
+- [`bittle_actions`](https://github.com/jmkaz16/TiCare/tree/bittle/bittle_actions): Manages low-level communication with the robot's hardware. It subscribes to the `/bittle_cmd` topic and translates validated instructions into specific serial commands for the Petoi Bittle controller.
 - [`bittle_bringup`](https://github.com/jmkaz16/TiCare/tree/bittle/bittle_bringup): Contains the launch files and parameter configurations (`.yaml`) necessary to start the complete system in a coordinated manner.
 
 ## Prerequisites
