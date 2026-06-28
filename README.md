@@ -241,8 +241,8 @@ colcon test-result --verbose
 
 This branch is maintained and developed by the Vision Team of the TiCare project, consisting of:
 
-- Daniel Franco - CEO & Requirements Manager  
-- Luis Gómez - CTO & Product Manager  
-- Marco Muñoz - Design & Modeling Manager  
+- **Daniel Franco** - CEO & Requirements Manager  
+- **Luis Gómez** - CTO & Product Manager  
+- **Marco Muñoz** - Design & Modeling Manager  
 
 The Vision module is designed to integrate with the Communication and Navigation modules through the agreed TiCare ROS 2 topics.
